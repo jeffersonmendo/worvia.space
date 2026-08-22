@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  normalizePortalCardColorCount,
   normalizePortalCardColors,
   normalizePortalCardFileCount,
   normalizePortalCardFileTypes,
@@ -121,7 +122,7 @@ describe("portal card metadata", () => {
     }
   });
 
-  test("keeps only valid unique hex colors and caps the visual stack", () => {
+  test("keeps only valid unique hex colors and caps the visual stack at four", () => {
     expect(
       normalizePortalCardColors([
         "#FF0000",
@@ -133,6 +134,18 @@ describe("portal card metadata", () => {
         "#ffffff",
         "#111111",
       ]),
-    ).toEqual(["#FF0000", "#00ff00", "#123", "#0000ff", "#ffffff"]);
+    ).toEqual(["#FF0000", "#00ff00", "#123", "#0000ff"]);
+    expect(
+      normalizePortalCardColorCount([
+        "#FF0000",
+        "#00ff00",
+        "not-a-color",
+        "#ff0000",
+        "#123",
+        "#0000ff",
+        "#ffffff",
+        "#111111",
+      ]),
+    ).toBe(6);
   });
 });

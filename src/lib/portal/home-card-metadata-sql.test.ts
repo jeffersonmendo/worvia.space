@@ -252,6 +252,9 @@ test("a new forward migration counts all unique visible images without expanding
     imageCountBlock(buyerBranch),
   ]) {
     expect(block).toContain("count(distinct image_url)");
+    expect(block).toContain(
+      "coalesce(image_item->>'image_url', image_item->>'asset_id', image_item->>'storage_path')",
+    );
     expect(block).toContain("coalesce((image_item->>'visible')::boolean,true)");
     expect(block).toContain("image_url <> ''");
   }

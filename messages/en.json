@@ -269,6 +269,7 @@
       "fileTypesLabel": "Available file types",
       "filesCount": "+ {count, plural, one {# file} other {# files}}",
       "colorsLabel": "Color palette",
+      "colorsCount": "+ {count, plural, one {# color} other {# colors}}",
       "noFiles": "No files",
       "noColors": "No colors",
       "imagesLabel": "Portal images",

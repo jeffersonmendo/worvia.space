@@ -54,6 +54,8 @@ describe("PortalHome", () => {
       expect(messages.portal.filesCount).toContain("{count, plural,");
       expect(messages.portal.filesCount).toStartWith("+ ");
       expect(messages.portal.colorsLabel).toBeString();
+      expect(messages.portal.colorsCount).toContain("{count, plural,");
+      expect(messages.portal.colorsCount).toStartWith("+ ");
       expect(messages.portal.noFiles).toBeString();
       expect(messages.portal.noColors).toBeString();
       expect(messages.portal.imagesLabel).toBeString();
@@ -242,7 +244,10 @@ describe("PortalHome", () => {
     expect(portalCard).toContain("portal.totalFileCount");
     expect(portalCard).toContain("portal.totalImageCount");
     expect(portalCard).toContain('portalTranslations("filesCount"');
+    expect(portalCard).toContain("portal.totalFileCount ?? 0");
+    expect(portalCard).toContain('portalTranslations("colorsCount"');
     expect(portalCard).toContain('portalTranslations("imagesCount"');
+    expect(portalCard).toContain("portal.images?.length ?? 0");
     expect(portalCard).toContain("portal.colors");
     expect(portalCard).toContain("copy.portal.fileTypesLabel");
     expect(portalCard).toContain("copy.portal.colorsLabel");

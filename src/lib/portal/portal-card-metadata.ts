@@ -53,6 +53,10 @@ export function normalizePortalCardFileCount(value: unknown) {
 export const normalizePortalCardImageCount = normalizePortalCardFileCount;
 
 export function normalizePortalCardColors(values: unknown) {
+  return normalizePortalCardColorValues(values).slice(0, 4);
+}
+
+function normalizePortalCardColorValues(values: unknown) {
   if (!Array.isArray(values)) return [];
   const seen = new Set<string>();
   return values
@@ -63,8 +67,11 @@ export function normalizePortalCardColors(values: unknown) {
       if (seen.has(normalized)) return false;
       seen.add(normalized);
       return true;
-    })
-    .slice(0, 5);
+    });
+}
+
+export function normalizePortalCardColorCount(values: unknown) {
+  return normalizePortalCardColorValues(values).length;
 }
 
 export function normalizePortalCardImages(

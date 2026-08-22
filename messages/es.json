@@ -269,6 +269,7 @@
       "fileTypesLabel": "Tipos de archivo disponibles",
       "filesCount": "+ {count, plural, one {# archivo} other {# archivos}}",
       "colorsLabel": "Paleta de colores",
+      "colorsCount": "+ {count, plural, one {# color} other {# colores}}",
       "noFiles": "Sin archivos",
       "noColors": "Sin colores",
       "imagesLabel": "Imágenes del portal",

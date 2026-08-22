@@ -1153,14 +1153,29 @@ function PortalCard({
         <div className="flex min-w-0 flex-col items-start gap-2">
           <PortalFileTypeBadges
             emptyLabel={copy.portal.noFiles}
-            fileCountLabel={portalTranslations("filesCount", {
-              count: portal.totalFileCount ?? 0,
-            })}
+            fileCountLabel={
+              (portal.totalFileCount ?? 0) > (portal.fileTypes?.length ?? 0)
+                ? portalTranslations("filesCount", {
+                    count:
+                      (portal.totalFileCount ?? 0) -
+                      (portal.fileTypes?.length ?? 0),
+                  })
+                : undefined
+            }
             fileTypes={portal.fileTypes ?? []}
             label={copy.portal.fileTypesLabel}
             totalFileCount={portal.totalFileCount ?? 0}
           />
           <PortalColorStack
+            colorCountLabel={
+              (portal.totalColorCount ?? 0) > (portal.colors?.length ?? 0)
+                ? portalTranslations("colorsCount", {
+                    count:
+                      (portal.totalColorCount ?? 0) -
+                      (portal.colors?.length ?? 0),
+                  })
+                : undefined
+            }
             colors={portal.colors ?? []}
             emptyLabel={copy.portal.noColors}
             label={copy.portal.colorsLabel}
@@ -1169,9 +1184,15 @@ function PortalCard({
         <div className="col-span-full min-w-0">
           <PortalImageStack
             emptyLabel={copy.portal.noImages}
-            imageCountLabel={portalTranslations("imagesCount", {
-              count: portal.totalImageCount ?? 0,
-            })}
+            imageCountLabel={
+              (portal.totalImageCount ?? 0) > (portal.images?.length ?? 0)
+                ? portalTranslations("imagesCount", {
+                    count:
+                      (portal.totalImageCount ?? 0) -
+                      (portal.images?.length ?? 0),
+                  })
+                : undefined
+            }
             images={portal.images ?? []}
             label={copy.portal.imagesLabel}
             totalImageCount={portal.totalImageCount ?? 0}

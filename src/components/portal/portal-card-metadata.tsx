@@ -10,6 +10,7 @@ import type {
   PortalCardFileType,
   PortalCardImage,
 } from "@/lib/portal/portal-card-metadata";
+import { cn } from "@/lib/utils";
 
 export function PortalFileTypeBadges({
   fileTypes,
@@ -19,7 +20,7 @@ export function PortalFileTypeBadges({
   totalFileCount,
 }: {
   emptyLabel: string;
-  fileCountLabel: string;
+  fileCountLabel?: string;
   fileTypes: PortalCardFileType[];
   label: string;
   totalFileCount: number;
@@ -60,16 +61,20 @@ export function PortalFileTypeBadges({
           </li>
         ))}
       </ul>
-      <span className="text-muted-foreground">{fileCountLabel}</span>
+      {fileCountLabel ? (
+        <span className="text-muted-foreground">{fileCountLabel}</span>
+      ) : null}
     </div>
   );
 }
 
 export function PortalColorStack({
+  colorCountLabel,
   colors,
   emptyLabel,
   label,
 }: {
+  colorCountLabel?: string;
   colors: string[];
   emptyLabel: string;
   label: string;
@@ -83,18 +88,27 @@ export function PortalColorStack({
     );
 
   return (
-    <ul aria-label={label} className="flex items-center pl-1">
-      {colors.map((color) => (
-        <li key={color}>
-          <span
-            aria-label={color}
-            className="-ml-1 block size-5 rounded-full border-[0.5px] border-black"
-            role="img"
-            style={{ backgroundColor: color }}
-          />
-        </li>
-      ))}
-    </ul>
+    <div className="flex items-center gap-2">
+      <ul aria-label={label} className="flex items-center gap-1">
+        {colors.slice(0, 4).map((color) => (
+          <li key={color}>
+            <span
+              aria-label={color}
+              className={cn(
+                "block size-5 rounded-sm",
+                /^#(?:000|000000|fff|ffffff)$/i.test(color.trim()) &&
+                  "border border-primary/50",
+              )}
+              role="img"
+              style={{ backgroundColor: color }}
+            />
+          </li>
+        ))}
+      </ul>
+      {colorCountLabel ? (
+        <span className="text-muted-foreground">{colorCountLabel}</span>
+      ) : null}
+    </div>
   );
 }
 
@@ -106,7 +120,7 @@ export function PortalImageStack({
   totalImageCount,
 }: {
   emptyLabel: string;
-  imageCountLabel: string;
+  imageCountLabel?: string;
   images: PortalCardImage[];
   label: string;
   totalImageCount: number;
@@ -152,7 +166,9 @@ export function PortalImageStack({
           </li>
         ))}
       </ul>
-      <span className="text-muted-foreground">{imageCountLabel}</span>
+      {imageCountLabel ? (
+        <span className="text-muted-foreground">{imageCountLabel}</span>
+      ) : null}
     </div>
   );
 }

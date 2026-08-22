@@ -13,6 +13,7 @@ import {
   PAID_PORTAL_MIN_PRICE_CENTS,
 } from "@/lib/portal/paid-access";
 import {
+  normalizePortalCardColorCount,
   normalizePortalCardColors,
   normalizePortalCardFileCount,
   normalizePortalCardFileTypes,
@@ -65,6 +66,7 @@ export type HomePortal = Pick<
   canDelete?: boolean;
   isFavorite: boolean;
   colors?: string[];
+  totalColorCount?: number;
   fileTypes?: Array<"ai" | "psd" | "eps" | "pdf">;
   totalFileCount?: number;
   totalImageCount?: number;
@@ -154,6 +156,7 @@ export async function getHomePortals(
         canDelete: portal.canDelete !== false,
         isFavorite: portal.isFavorite === true,
         colors: normalizePortalCardColors(portal.colors),
+        totalColorCount: normalizePortalCardColorCount(portal.colors),
         fileTypes: normalizePortalCardFileTypes(portal.fileTypes),
         totalFileCount: normalizePortalCardFileCount(portal.totalFileCount),
         totalImageCount: normalizePortalCardImageCount(portal.totalImageCount),

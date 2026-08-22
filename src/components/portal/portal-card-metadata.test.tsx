@@ -11,7 +11,7 @@ test("home cards reuse canonical file icons with accessible names", () => {
     <PortalFileTypeBadges
       emptyLabel="Sin archivos"
       fileTypes={["ai", "psd", "eps", "pdf"]}
-      fileCountLabel="+ 12 archivos"
+      fileCountLabel="+ 8 archivos"
       label="Tipos de archivo disponibles"
       totalFileCount={12}
     />,
@@ -24,14 +24,14 @@ test("home cards reuse canonical file icons with accessible names", () => {
   }
   expect(markup.match(/class="size-5"/g)).toHaveLength(4);
   expect(markup).not.toContain('data-slot="badge"');
-  expect(markup).toContain("+ 12 archivos");
+  expect(markup).toContain("+ 8 archivos");
 });
 
 test("file metadata distinguishes unsupported files from an empty portal", () => {
   const withUnsupportedFiles = renderToStaticMarkup(
     <PortalFileTypeBadges
       emptyLabel="Sin archivos"
-      fileCountLabel="+ 12 archivos"
+      fileCountLabel="+ 8 archivos"
       fileTypes={[]}
       label="Tipos de archivo disponibles"
       totalFileCount={12}
@@ -47,7 +47,7 @@ test("file metadata distinguishes unsupported files from an empty portal", () =>
     />,
   );
 
-  expect(withUnsupportedFiles).toContain("+ 12 archivos");
+  expect(withUnsupportedFiles).toContain("+ 8 archivos");
   expect(withUnsupportedFiles).not.toContain("Sin archivos");
   expect(empty).toContain("Sin archivos");
   expect(empty).not.toContain("0 archivos");
@@ -57,7 +57,7 @@ test("image previews render as a responsive 100px row without overlap", () => {
   const markup = renderToStaticMarkup(
     <PortalImageStack
       emptyLabel="Sin imágenes"
-      imageCountLabel="+ 20 imágenes"
+      imageCountLabel="+ 19 imágenes"
       images={[
         {
           url: "/api/portal-assets/preview?slug=brand&assetId=asset-1",
@@ -95,7 +95,7 @@ test("image previews render as a responsive 100px row without overlap", () => {
   expect(markup).not.toContain("/fourth.png");
   expect(markup).toContain("flex-wrap");
   expect(markup).toContain("gap-3");
-  expect(markup).toContain("+ 20 imágenes");
+  expect(markup).toContain("+ 19 imágenes");
   expect(markup).toContain("items-center");
   expect(markup).not.toContain("-ml-");
   expect(markup).not.toContain("w-auto");
@@ -149,17 +149,42 @@ test("image metadata keeps the empty label only for a zero total", () => {
   expect(markup).toContain("tabler-icon-photo-off size-4");
 });
 
-test("color circles use the requested black border for separation", () => {
+test("color circles only use the primary border for black and white", () => {
   const markup = renderToStaticMarkup(
     <PortalColorStack
-      colors={["#112233", "#ffffff"]}
+      colors={["#112233", "#000", "#ffffff"]}
       emptyLabel="Sin colores"
       label="Paleta de colores"
     />,
   );
 
-  expect(markup.match(/border-black/g)).toHaveLength(2);
+  expect(markup.match(/border-primary\/50/g)).toHaveLength(2);
   expect(markup.match(/border-\[0\.5px\]/g)).toHaveLength(2);
+  expect(markup).not.toContain("border-black");
   expect(markup).not.toContain("border-2");
   expect(markup).not.toContain("ring-");
+});
+
+test("colors are separated, show at most four, and announce the remainder", () => {
+  const markup = renderToStaticMarkup(
+    <PortalColorStack
+      colorCountLabel="+ 2 colores"
+      colors={[
+        "#111111",
+        "#222222",
+        "#333333",
+        "#444444",
+        "#555555",
+        "#666666",
+      ]}
+      emptyLabel="Sin colores"
+      label="Paleta de colores"
+    />,
+  );
+
+  expect(markup.match(/style="background-color/g)).toHaveLength(4);
+  expect(markup).toContain("+ 2 colores");
+  expect(markup).toContain("gap-1");
+  expect(markup).not.toContain("rounded-full");
+  expect(markup).not.toContain("-ml-1");
 });
