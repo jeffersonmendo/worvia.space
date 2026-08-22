@@ -135,9 +135,9 @@ describe("PortalHome", () => {
     const workspaceTitleSectionStart = source.indexOf(
       '<section\n          aria-labelledby="portal-workspace-title"',
     );
-    expect(source).toContain(
-      "grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3",
-    );
+    expect(source).toContain("const { open: sidebarOpen } = useSidebar();");
+    expect(source).toContain('"md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2"');
+    expect(source).toContain('"md:grid-cols-1 lg:grid-cols-2"');
     expect(source).toContain("bg-background");
     expect(workspaceTitleSectionStart).toBe(-1);
     expect(source).not.toContain("copy.intro");

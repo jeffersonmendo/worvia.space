@@ -78,6 +78,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useSidebar } from "@/components/ui/sidebar";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
   getCountryFlag,
@@ -88,6 +89,7 @@ import { getHomeErrorEvent } from "@/lib/portal/home-error-event";
 import { usePortalHomeStore } from "@/lib/portal/home-store";
 import { shouldOpenPortalCardFromKeyDown } from "@/lib/portal/portal-card-keyboard";
 import { workspaceQueryKeys } from "@/lib/portal/workspace-read-models";
+import { cn } from "@/lib/utils";
 
 export type PortalHomeCopy = {
   authRequired: string;
@@ -1221,6 +1223,7 @@ export function PortalHome({
   recommendedCountry: string | null;
 }) {
   const [search, setSearch] = useState("");
+  const { open: sidebarOpen } = useSidebar();
   const portalsQuery = useQuery({
     enabled: backendEnabled,
     initialData: {
@@ -1297,7 +1300,14 @@ export function PortalHome({
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+            <div
+              className={cn(
+                "grid gap-4",
+                sidebarOpen
+                  ? "md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2"
+                  : "md:grid-cols-1 lg:grid-cols-2",
+              )}
+            >
               {filteredPortals.map((portal) => (
                 <PortalCard
                   copy={copy}
