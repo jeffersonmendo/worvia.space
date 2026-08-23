@@ -58,6 +58,9 @@ describe("projectPaidPreview", () => {
     expect(paidPreviewSource).toContain("size-[100px] shrink-0");
     expect(paidPreviewSource).toContain("rounded-lg bg-secondary");
     expect(paidPreviewSource).toContain('className="size-full object-contain"');
+    expect(paidPreviewSource).toContain(
+      'className="aspect-[16/10] w-full object-contain"',
+    );
     expect(paidPreviewSource).toContain('t("moreImages"');
   });
 

@@ -13,6 +13,8 @@ test("serves a reduced-quality preview with a larger logo watermark", () => {
   expect(routeSource).toContain('opacity="0.7"');
   expect(routeSource).toContain('gravity: "southeast"');
   expect(routeSource).toContain('searchParams.get("image_index")');
+  expect(routeSource).toContain('searchParams.get("asset_id")');
   expect(routeSource).toContain("images[imageIndex]");
+  expect(routeSource).toContain("images.find((asset) => asset.id === assetId)");
   expect(routeSource).toContain('.order("position", { ascending: true })');
 });

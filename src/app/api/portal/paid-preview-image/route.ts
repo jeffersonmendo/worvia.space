@@ -21,6 +21,7 @@ const imageMimeTypes = new Set([
 export async function GET(request: Request) {
   const portalId = new URL(request.url).searchParams.get("portal_id");
   if (!portalId) return new NextResponse(null, { status: 404 });
+  const assetId = new URL(request.url).searchParams.get("asset_id");
   const imageIndex = Number.parseInt(
     new URL(request.url).searchParams.get("image_index") ?? "0",
     10,
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
       .maybeSingle(),
     admin
       .from("portal_assets")
-      .select("file_path,mime_type,position")
+      .select("id,file_path,mime_type,position")
       .eq("portal_id", portalId)
       .eq("state", "ready")
       .order("position", { ascending: true })
@@ -51,11 +52,14 @@ export async function GET(request: Request) {
     (asset) => asset.mime_type && imageMimeTypes.has(asset.mime_type),
   );
   const image = images[imageIndex];
-  if (!image) return new NextResponse(null, { status: 404 });
+  const selectedImage = assetId
+    ? images.find((asset) => asset.id === assetId)
+    : image;
+  if (!selectedImage) return new NextResponse(null, { status: 404 });
 
   const { data, error } = await admin.storage
     .from("portal-assets")
-    .download(image.file_path);
+    .download(selectedImage.file_path);
   if (error || !data) return new NextResponse(null, { status: 404 });
 
   try {

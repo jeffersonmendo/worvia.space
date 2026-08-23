@@ -174,7 +174,7 @@ export async function PaidPreview({
                     {/* biome-ignore lint/performance/noImgElement: This URL is a server-generated preview derivative. */}
                     <img
                       alt=""
-                      className="aspect-[16/10] w-full object-cover"
+                      className="aspect-[16/10] w-full object-contain"
                       src={previewImage}
                     />
                   </div>

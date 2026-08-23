@@ -95,6 +95,50 @@ function previewColorValues(value: unknown): string[] {
   return [...new Set(colors)];
 }
 
+function publishedImageAssetKeys(snapshot: Json | null | undefined) {
+  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
+    return [];
+  }
+  const record = snapshot as Record<string, unknown>;
+  const sections = Array.isArray(record.sections) ? record.sections : [];
+  const keys: string[] = [];
+  for (const section of [...sections].sort(
+    (left, right) =>
+      Number((left as Record<string, unknown>)?.position ?? 0) -
+      Number((right as Record<string, unknown>)?.position ?? 0),
+  )) {
+    if (!section || typeof section !== "object") continue;
+    const sectionRecord = section as Record<string, unknown>;
+    const content = sectionRecord.content;
+    if (!content || typeof content !== "object") continue;
+    const contentRecord = content as Record<string, unknown>;
+    const images =
+      sectionRecord.type === "image"
+        ? contentRecord.image
+          ? [contentRecord.image]
+          : []
+        : Array.isArray(contentRecord.images)
+          ? [...contentRecord.images].sort(
+              (left, right) =>
+                Number((left as Record<string, unknown>)?.position ?? 0) -
+                Number((right as Record<string, unknown>)?.position ?? 0),
+            )
+          : [];
+    for (const image of images) {
+      if (!image || typeof image !== "object") continue;
+      const imageRecord = image as Record<string, unknown>;
+      if (imageRecord.visible === false) continue;
+      const assetId = stringValue(imageRecord.asset_id as Json | undefined);
+      const storagePath = stringValue(
+        imageRecord.storage_path as Json | undefined,
+      );
+      if (assetId) keys.push(`id:${assetId}`);
+      else if (storagePath) keys.push(`path:${storagePath}`);
+    }
+  }
+  return [...new Set(keys)];
+}
+
 function booleanValue(value: Json | undefined) {
   return typeof value === "boolean" ? value : false;
 }
@@ -261,7 +305,7 @@ async function enrichPaidPreview(
       .maybeSingle(),
     admin
       .from("portal_assets")
-      .select("id,name,mime_type,category,size_bytes,position")
+      .select("id,name,mime_type,category,size_bytes,position,file_path")
       .eq("portal_id", portalId)
       .eq("state", "ready")
       .order("position", { ascending: true })
@@ -329,17 +373,34 @@ async function enrichPaidPreview(
       : null;
   const contentFiles = [...publishedSummary.files, ...editorSummary.files];
   const colors = previewColorValues([documentRow?.document, blocks]);
-  const previewImageAssets = readyAssets.filter((asset) =>
+  const imageAssets = readyAssets.filter((asset) =>
     asset.mime_type?.startsWith("image/"),
   );
+  const publishedImageKeys = publishedImageAssetKeys(publication?.snapshot);
+  const orderedPreviewImageAssets = [
+    ...publishedImageKeys
+      .map((key) =>
+        imageAssets.find((asset) =>
+          key.startsWith("id:")
+            ? asset.id === key.slice(3)
+            : asset.file_path === key.slice(5),
+        ),
+      )
+      .filter((asset): asset is (typeof imageAssets)[number] => Boolean(asset)),
+    ...imageAssets.filter(
+      (asset) =>
+        !publishedImageKeys.includes(`id:${asset.id}`) &&
+        !publishedImageKeys.includes(`path:${asset.file_path}`),
+    ),
+  ];
   return {
     ...preview,
     assetSummary: summary.size ? [...summary.values()] : preview.assetSummary,
     colors: colors.length ? colors : preview.colors,
     previewImages: hasPreviewImage
-      ? previewImageAssets.slice(0, 6).map((_, imageIndex) => ({
+      ? orderedPreviewImageAssets.slice(0, 6).map((asset, imageIndex) => ({
           alt: `Portal preview ${imageIndex + 1}`,
-          src: `/api/portal/paid-preview-image?portal_id=${encodeURIComponent(portalId)}&image_index=${imageIndex}`,
+          src: `/api/portal/paid-preview-image?portal_id=${encodeURIComponent(portalId)}&asset_id=${encodeURIComponent(asset.id)}`,
         }))
       : [],
     price,
