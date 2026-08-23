@@ -159,7 +159,7 @@ test("color circles only use the primary border for black and white", () => {
   );
 
   expect(markup.match(/border-primary\/50/g)).toHaveLength(2);
-  expect(markup.match(/border-\[0\.5px\]/g)).toHaveLength(2);
+  expect(markup.match(/border /g)).toHaveLength(2);
   expect(markup).not.toContain("border-black");
   expect(markup).not.toContain("border-2");
   expect(markup).not.toContain("ring-");

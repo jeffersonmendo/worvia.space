@@ -272,3 +272,26 @@ test("a new forward migration counts all unique visible images without expanding
     ),
   ).toHaveLength(2);
 });
+
+test("latest forward migration preserves all colors for the remaining count", async () => {
+  const sql = await readFile(
+    "supabase/migrations/20260823090000_fix_home_card_color_count.sql",
+    "utf8",
+  );
+  const ownerBranch = sql.slice(0, sql.indexOf("      union all\n"));
+  const buyerBranch = sql.slice(sql.indexOf("      union all\n"));
+
+  for (const branch of [ownerBranch, buyerBranch]) {
+    const palette = branch.slice(
+      branch.indexOf("'colors'"),
+      branch.indexOf(") palette), '[]'::jsonb)"),
+    );
+    expect(palette).toContain("duplicate_rank=1");
+    expect(palette).not.toContain("limit 5");
+  }
+  expect(
+    sql.match(
+      /unique_images where duplicate_rank=1 order by section_position, image_position limit 1/g,
+    ),
+  ).toHaveLength(2);
+});
