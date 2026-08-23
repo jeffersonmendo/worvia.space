@@ -19,5 +19,7 @@ describe("public portal header integration", () => {
     expect(pageSource).toMatch(
       /downloadHref=\{\s*portal\.allow_downloads\s*\? portalExportHref\(slug, exportSource\)\s*: undefined\s*\}/,
     );
+    expect(pageSource).toContain("purchaseAction={{");
+    expect(pageSource).toContain('headerT("buy"');
   });
 });

@@ -4,13 +4,18 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function PaidUnlockButton({
   locale,
+  compact = false,
+  label,
   portalId,
   price,
   slug,
 }: {
+  compact?: boolean;
+  label?: string;
   locale: string;
   portalId: string;
   price: string | null;
@@ -20,7 +25,11 @@ export function PaidUnlockButton({
   const [pending, setPending] = useState(false);
   return (
     <Button
-      className="min-h-12 w-full gap-2 px-5 py-3"
+      className={cn(
+        compact
+          ? "min-h-9 w-auto gap-1.5 px-2.5"
+          : "min-h-12 w-full gap-2 px-5 py-3",
+      )}
       disabled={pending}
       onClick={async () => {
         setPending(true);
@@ -47,15 +56,15 @@ export function PaidUnlockButton({
       }}
       type="button"
     >
-      {pending ? (
-        t("processing")
-      ) : (
-        <>
-          <span>{t("unlock")}</span>
-          <span aria-hidden="true">·</span>
-          <span>{price || "—"}</span>
-        </>
-      )}
+      {pending
+        ? t("processing")
+        : label || (
+            <>
+              <span>{t("unlock")}</span>
+              <span aria-hidden="true">·</span>
+              <span>{price || "—"}</span>
+            </>
+          )}
     </Button>
   );
 }

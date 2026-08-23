@@ -14,7 +14,7 @@ export default function PublicPortalLoading() {
       <span className="sr-only" id="public-portal-loading-label">
         {t("label")}
       </span>
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex w-full max-w-[900px] flex-col items-center gap-4 px-6">
         <Skeleton className="size-20 rounded-2xl" />
         <Skeleton className="h-5 w-36" />
       </div>

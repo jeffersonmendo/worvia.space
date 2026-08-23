@@ -131,11 +131,18 @@ export default async function PublicPortalPage({
   }
   if (isPaidPreviewDecision(access.decision)) {
     return (
-      <PublicPortalShell downloadLabel={headerT("download")}>
+      <PublicPortalShell
+        downloadLabel={headerT("download")}
+        purchaseAction={{
+          label: headerT("buy", { price: access.paidPreview?.price ?? "—" }),
+          locale,
+          portalId: access.portal.id,
+          price: access.paidPreview?.price ?? null,
+          slug,
+        }}
+      >
         <PaidPreview
           locale={locale}
-          portalId={access.portal.id}
-          slug={slug}
           name={access.paidPreview?.name || access.portal.name}
           description={
             access.paidPreview?.description ?? access.portal.short_description
@@ -150,7 +157,6 @@ export default async function PublicPortalPage({
           totalFiles={access.paidPreview?.totalFiles}
           totalImages={access.paidPreview?.totalImages}
           updatedAt={access.portal.updated_at}
-          unlockHref={access.paidPreview?.unlockHref}
         />
       </PublicPortalShell>
     );

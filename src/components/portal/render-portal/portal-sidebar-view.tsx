@@ -41,7 +41,7 @@ export function PortalSidebarView({
 
   return (
     <nav className="flex h-full min-h-0 flex-col gap-1 text-muted-foreground text-sm">
-      <div className="flex min-h-0 flex-col gap-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
         {sections.map((section) => (
           <a
             className={cn(

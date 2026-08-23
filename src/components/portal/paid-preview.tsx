@@ -9,26 +9,19 @@ import {
   type PaidPreviewInput,
   projectPaidPreview,
 } from "./paid-preview-projection";
-import { PaidUnlockButton } from "./paid-unlock-button";
 
 export type PaidPreviewProps = PaidPreviewInput & {
   createdAt?: string | null;
   designerName?: string | null;
   locale: string;
-  portalId: string;
-  slug: string;
   updatedAt?: string | null;
-  unlockHref?: string | null;
 };
 
 export async function PaidPreview({
   locale,
-  portalId,
-  slug,
   createdAt,
   designerName,
   updatedAt,
-  unlockHref,
   ...input
 }: PaidPreviewProps) {
   const t = await getTranslations({
@@ -75,133 +68,107 @@ export async function PaidPreview({
   );
 
   return (
-    <main className="min-h-dvh px-4 py-7 text-foreground sm:px-8 sm:py-10">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-        <div className="w-full">
-          <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-            <section className="flex flex-col justify-start p-7 sm:p-12 lg:p-16">
-              <h1 className="max-w-2xl text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
-                {preview.name}
-              </h1>
-              {preview.description ? (
-                <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-                  {preview.description}
+    <main className="min-h-dvh px-2 py-2 text-foreground">
+      <div className="mx-auto flex w-full max-w-[900px] flex-col gap-8">
+        <div className="grid w-full min-w-0 gap-8 lg:grid-cols-2">
+          <section className="flex min-w-0 flex-col justify-start p-1">
+            <h1 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+              {preview.name}
+            </h1>
+            {preview.description ? (
+              <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg">
+                {preview.description}
+              </p>
+            ) : null}
+
+            <div className="mt-10 w-full">
+              <ul className="space-y-3 text-sm">
+                <InfoItem label={t("totalFiles")} value={String(totalFiles)} />
+                <InfoItem
+                  label={t("totalImages")}
+                  value={String(totalImages)}
+                />
+                <InfoItem
+                  label={t("totalSize")}
+                  value={formatPreviewBytes(totalBytes, locale)}
+                />
+                {designerName ? (
+                  <InfoItem label={t("designer")} value={designerName} />
+                ) : null}
+                {createdAt ? (
+                  <InfoItem
+                    label={t("createdAt")}
+                    value={formatPreviewDate(createdAt, locale)}
+                  />
+                ) : null}
+                {updatedAt ? (
+                  <InfoItem
+                    label={t("updatedAt")}
+                    value={formatPreviewDate(updatedAt, locale)}
+                  />
+                ) : null}
+              </ul>
+            </div>
+
+            <div className="mt-10">
+              <p className="text-sm font-medium">{t("benefitsTitle")}</p>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                <Benefit>{t("oneTimePayment")}</Benefit>
+                <Benefit>{t("lifetimeUpdates")}</Benefit>
+              </ul>
+            </div>
+          </section>
+
+          <section className="min-w-0 p-1">
+            <div className="flex w-full flex-col gap-6">
+              <div>
+                <p className="text-base font-semibold">{t("previewLabel")}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("previewDescription")}
                 </p>
+              </div>
+
+              {previewImage ? (
+                <div className="relative overflow-hidden rounded-2xl">
+                  {/* biome-ignore lint/performance/noImgElement: This URL is a server-generated blurred derivative. */}
+                  <img
+                    alt=""
+                    className="aspect-[16/10] w-full object-cover"
+                    src={previewImage}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex size-12 items-center justify-center rounded-full bg-background/40">
+                      <IconLock className="size-5" />
+                    </span>
+                  </div>
+                </div>
               ) : null}
 
-              <div className="mt-10 max-w-xl">
-                <ul className="space-y-3 text-sm">
-                  <InfoItem
-                    label={t("totalFiles")}
-                    value={String(totalFiles)}
-                  />
-                  <InfoItem
-                    label={t("totalImages")}
-                    value={String(totalImages)}
-                  />
-                  <InfoItem
-                    label={t("totalSize")}
-                    value={formatPreviewBytes(totalBytes, locale)}
-                  />
-                  {designerName ? (
-                    <InfoItem label={t("designer")} value={designerName} />
-                  ) : null}
-                  {createdAt ? (
-                    <InfoItem
-                      label={t("createdAt")}
-                      value={formatPreviewDate(createdAt, locale)}
-                    />
-                  ) : null}
-                  {updatedAt ? (
-                    <InfoItem
-                      label={t("updatedAt")}
-                      value={formatPreviewDate(updatedAt, locale)}
-                    />
-                  ) : null}
-                </ul>
-              </div>
-
-              <div className="mt-10">
-                <p className="text-sm font-medium">{t("benefitsTitle")}</p>
-                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                  <Benefit>{t("oneTimePayment")}</Benefit>
-                  <Benefit>{t("lifetimeUpdates")}</Benefit>
-                </ul>
-              </div>
-
-              <div className="mt-10 w-full max-w-xl">
-                {unlockHref ? (
-                  <a
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                    href={unlockHref}
-                  >
-                    <IconLock className="size-4" />
-                    {t("unlock")}
-                    <span aria-hidden="true">·</span>
-                    {preview.price || "—"}
-                  </a>
-                ) : (
-                  <PaidUnlockButton
-                    locale={locale}
-                    portalId={portalId}
-                    price={preview.price}
-                    slug={slug}
-                  />
-                )}
-              </div>
-            </section>
-
-            <section className="p-7 sm:p-10 lg:pt-16">
-              <div className="mx-auto flex max-w-md flex-col gap-6">
-                <div>
-                  <p className="text-base font-semibold">{t("previewLabel")}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    {t("previewDescription")}
-                  </p>
-                </div>
-
-                {previewImage ? (
-                  <div className="relative overflow-hidden rounded-2xl">
-                    {/* biome-ignore lint/performance/noImgElement: This URL is a server-generated blurred derivative. */}
-                    <img
-                      alt=""
-                      className="aspect-[16/10] w-full object-cover"
-                      src={previewImage}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="flex size-12 items-center justify-center rounded-full bg-background/40">
-                        <IconLock className="size-5" />
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
-
-                <div>
-                  <div className="grid grid-cols-5 gap-4">
-                    {fileGroups.length > 0 ? (
-                      fileGroups.map((file) => (
-                        <div
-                          aria-label={file.name}
-                          className="flex size-20 items-center justify-center rounded-xl"
-                          key={`${file.name}-${file.type}`}
-                          role="img"
-                        >
-                          <PortalFileTypeIcon
-                            fallback={{ file: "", image: "" }}
-                            type={paidPreviewFileType("", file.type)}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <p className="col-span-5 text-sm text-muted-foreground">
-                        {t("noFiles")}
-                      </p>
-                    )}
-                  </div>
+              <div>
+                <div className="grid grid-cols-5 gap-4">
+                  {fileGroups.length > 0 ? (
+                    fileGroups.map((file) => (
+                      <div
+                        aria-label={file.name}
+                        className="flex size-20 items-center justify-center rounded-xl"
+                        key={`${file.name}-${file.type}`}
+                        role="img"
+                      >
+                        <PortalFileTypeIcon
+                          fallback={{ file: "", image: "" }}
+                          type={paidPreviewFileType("", file.type)}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="col-span-5 text-sm text-muted-foreground">
+                      {t("noFiles")}
+                    </p>
+                  )}
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
 
         <footer className="flex flex-col items-center justify-center gap-2 text-center text-xs text-muted-foreground">
@@ -311,7 +278,7 @@ function fileTypeLabel(name: string, type: string) {
 
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
-    <li className="flex max-w-xl items-baseline justify-between gap-6">
+    <li className="flex w-full items-baseline justify-between gap-6">
       <span className="text-muted-foreground">{label}</span>
       <strong className="text-right font-medium text-foreground">
         {value}

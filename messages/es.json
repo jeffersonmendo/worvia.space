@@ -363,7 +363,8 @@
   },
   "PublicPortal": {
     "header": {
-      "download": "Descargar portal"
+      "download": "Descargar",
+      "buy": "Comprar {price}"
     },
     "loading": {
       "label": "Cargando portal"

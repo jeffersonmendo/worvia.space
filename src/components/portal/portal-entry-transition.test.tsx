@@ -70,6 +70,7 @@ describe("PortalEntryTransition", () => {
     expect(loadingSource).toContain('useTranslations("PublicPortal.loading")');
     expect(loadingSource).toContain("<output");
     expect(loadingSource).toContain('className="sr-only"');
+    expect(loadingSource).toContain("w-full max-w-[900px]");
     expect(english.PublicPortal.loading.label).toBe("Loading portal");
     expect(spanish.PublicPortal.loading.label).toBe("Cargando portal");
   });

@@ -11,7 +11,7 @@ export function PortalShell({
   sidebar?: ReactNode;
 }) {
   return (
-    <main className={cn("min-h-dvh bg-background text-foreground", className)}>
+    <main className={cn("min-h-0 bg-background text-foreground", className)}>
       <div
         className={cn(
           "mx-auto grid w-full gap-8 px-6 py-8",
@@ -21,8 +21,8 @@ export function PortalShell({
         )}
       >
         {sidebar ? (
-          <aside className="hidden lg:block">
-            <div className="sticky top-8 h-[calc(100dvh-4rem)] w-60">
+          <aside className="hidden min-h-0 lg:block">
+            <div className="fixed top-[calc(var(--portal-sidebar-offset,2rem)+2rem)] bottom-8 left-[max(1.5rem,calc((100vw-900px)/2))] w-60">
               {sidebar}
             </div>
           </aside>
