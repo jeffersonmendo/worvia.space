@@ -10,6 +10,7 @@ export type PaidPreviewFile = {
 
 export type PaidPreviewInput = {
   assetSummary?: PaidPreviewAssetSummary[] | null;
+  colors?: string[] | null;
   description: string | null;
   name: string;
   previewImages?: PaidPreviewImage[] | null;
@@ -22,6 +23,7 @@ export type PaidPreviewInput = {
 
 export type PaidPreviewProjection = {
   assetSummary: PaidPreviewAssetSummary[];
+  colors: string[];
   description: string | null;
   name: string;
   previewImages: PaidPreviewImage[];
@@ -51,6 +53,11 @@ export function projectPaidPreview(
         asset.count > 0 &&
         Number.isInteger(asset.totalBytes) &&
         asset.totalBytes >= 0,
+    ),
+    colors: [...new Set(input.colors ?? [])].filter((color) =>
+      /^(?:#[0-9a-f]{3,4}|#[0-9a-f]{6,8}|(?:rgb|rgba|hsl|hsla|hsb|hsba)\(.+\))$/i.test(
+        color,
+      ),
     ),
     description: input.description,
     name: input.name,

@@ -1,6 +1,6 @@
 "use client";
 
-import { IconFileText, IconPhoto } from "@tabler/icons-react";
+import { IconFileText, IconPhotoFilled } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
 import type { SVGProps } from "react";
 import type { PortalFileType } from "@/lib/portal/document";
@@ -253,7 +253,7 @@ export function PortalFileTypeIcon({
   if (type === "md") return <MdIcon className={iconClassName} />;
   if (type === "txt") return <IconFileText className={iconClassName} />;
   if (type === "image" || type === "tiff")
-    return <IconPhoto className={iconClassName} />;
+    return <IconPhotoFilled className={iconClassName} />;
   return (
     <span
       className={cn(

@@ -1,26 +1,30 @@
-import { IconCheck, IconLock } from "@tabler/icons-react";
+import {
+  IconCalendarEventFilled,
+  IconCheck,
+  IconCrownFilled,
+  IconDatabaseFilled,
+  IconPhotoFilled,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
 import type { PortalFileType } from "@/lib/portal/document";
-import { PortalFileTypeIcon } from "./file-preview";
+import type { PortalCardFileType } from "@/lib/portal/portal-card-metadata";
 import {
   formatPreviewBytes,
   type PaidPreviewInput,
   projectPaidPreview,
 } from "./paid-preview-projection";
+import { PortalColorStack, PortalFileTypeBadges } from "./portal-card-metadata";
 
 export type PaidPreviewProps = PaidPreviewInput & {
-  createdAt?: string | null;
-  designerName?: string | null;
   locale: string;
   updatedAt?: string | null;
 };
 
 export async function PaidPreview({
   locale,
-  createdAt,
-  designerName,
   updatedAt,
   ...input
 }: PaidPreviewProps) {
@@ -40,6 +44,11 @@ export async function PaidPreview({
     preview.totalImages ||
     preview.assetSummary.find((item) => item.assetType === "image")?.count ||
     0;
+  const previewThumbnails = preview.previewImages.slice(1, 5);
+  const remainingPreviewImages = Math.max(
+    totalImages - 1 - previewThumbnails.length,
+    0,
+  );
   const fileGroups = preview.sampleFiles.reduce<
     Array<{ count: number; name: string; type: string }>
   >((groups, file) => {
@@ -66,13 +75,22 @@ export async function PaidPreview({
       Number(!adobeTypes.has(left.type)) -
         Number(!adobeTypes.has(right.type)) || right.count - left.count,
   );
+  const fileTypes = fileGroups
+    .map((file) => file.type)
+    .filter(
+      (type, index, values): type is PortalCardFileType =>
+        ["ai", "psd", "eps", "pdf"].includes(type) &&
+        values.indexOf(type) === index,
+    )
+    .slice(0, 4);
+  const visibleColorCount = Math.min(preview.colors.length, 4);
 
   return (
     <main className="min-h-dvh px-2 py-2 text-foreground">
       <div className="mx-auto flex w-full max-w-[900px] flex-col gap-8">
         <div className="grid w-full min-w-0 gap-8 lg:grid-cols-2">
           <section className="flex min-w-0 flex-col justify-start p-1">
-            <h1 className="text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">
+            <h1 className="text-2xl font-semibold tracking-[-0.03em] sm:text-4xl">
               {preview.name}
             </h1>
             {preview.description ? (
@@ -81,39 +99,68 @@ export async function PaidPreview({
               </p>
             ) : null}
 
-            <div className="mt-10 w-full">
-              <ul className="space-y-3 text-sm">
-                <InfoItem label={t("totalFiles")} value={String(totalFiles)} />
-                <InfoItem
-                  label={t("totalImages")}
-                  value={String(totalImages)}
+            <div className="mt-10 flex flex-col gap-3 text-sm">
+              <Badge className="w-fit gap-1.5 border-0 bg-amber-400/15 text-amber-700 dark:text-amber-300">
+                <IconCrownFilled data-icon="inline-start" />
+                {t("premium")}
+              </Badge>
+              <PortalFileTypeBadges
+                emptyLabel={t("noFiles")}
+                fileCountLabel={
+                  totalFiles > fileTypes.length
+                    ? t("filesCount", { count: totalFiles - fileTypes.length })
+                    : t("filesTotal", { count: totalFiles })
+                }
+                fileTypes={fileTypes}
+                label={t("fileTypesLabel")}
+                totalFileCount={totalFiles}
+              />
+              {preview.colors.length ? (
+                <PortalColorStack
+                  colorCountLabel={
+                    preview.colors.length > visibleColorCount
+                      ? t("colorsCount", {
+                          count: preview.colors.length - visibleColorCount,
+                        })
+                      : t("colorsTotal", { count: preview.colors.length })
+                  }
+                  colors={preview.colors}
+                  emptyLabel={t("noColors")}
+                  label={t("colorsLabel")}
                 />
-                <InfoItem
-                  label={t("totalSize")}
-                  value={formatPreviewBytes(totalBytes, locale)}
-                />
-                {designerName ? (
-                  <InfoItem label={t("designer")} value={designerName} />
-                ) : null}
-                {createdAt ? (
-                  <InfoItem
-                    label={t("createdAt")}
-                    value={formatPreviewDate(createdAt, locale)}
+              ) : null}
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <IconPhotoFilled aria-hidden="true" className="size-4" />
+                <span>
+                  {t("totalImages")} · {totalImages}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <IconDatabaseFilled aria-hidden="true" className="size-4" />
+                <span>
+                  {t("totalSize")} · {formatPreviewBytes(totalBytes, locale)}
+                </span>
+              </div>
+              {updatedAt ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <IconCalendarEventFilled
+                    aria-hidden="true"
+                    className="size-4"
                   />
-                ) : null}
-                {updatedAt ? (
-                  <InfoItem
-                    label={t("updatedAt")}
-                    value={formatPreviewDate(updatedAt, locale)}
-                  />
-                ) : null}
-              </ul>
+                  <span>
+                    {t("updatedAt")} · {formatPreviewDate(updatedAt, locale)}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-10">
               <p className="text-sm font-medium">{t("benefitsTitle")}</p>
               <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
                 <Benefit>{t("oneTimePayment")}</Benefit>
+                <Benefit>{t("fullAccess")}</Benefit>
+                <Benefit>{t("originalImages")}</Benefit>
+                <Benefit>{t("privateAccess")}</Benefit>
                 <Benefit>{t("lifetimeUpdates")}</Benefit>
               </ul>
             </div>
@@ -121,52 +168,43 @@ export async function PaidPreview({
 
           <section className="min-w-0 p-1">
             <div className="flex w-full flex-col gap-6">
-              <div>
-                <p className="text-base font-semibold">{t("previewLabel")}</p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  {t("previewDescription")}
-                </p>
-              </div>
-
               {previewImage ? (
-                <div className="relative overflow-hidden rounded-2xl">
-                  {/* biome-ignore lint/performance/noImgElement: This URL is a server-generated blurred derivative. */}
-                  <img
-                    alt=""
-                    className="aspect-[16/10] w-full object-cover"
-                    src={previewImage}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex size-12 items-center justify-center rounded-full bg-background/40">
-                      <IconLock className="size-5" />
-                    </span>
+                <>
+                  <div className="relative overflow-hidden rounded-2xl">
+                    {/* biome-ignore lint/performance/noImgElement: This URL is a server-generated preview derivative. */}
+                    <img
+                      alt=""
+                      className="aspect-[16/10] w-full object-cover"
+                      src={previewImage}
+                    />
                   </div>
-                </div>
+                  {previewThumbnails.length ? (
+                    <ul
+                      aria-label={t("imagesLabel")}
+                      className="scroll-fade flex w-full gap-3 overflow-x-auto pb-1"
+                    >
+                      {previewThumbnails.map((image) => (
+                        <li
+                          className="size-[100px] shrink-0 overflow-hidden rounded-lg bg-secondary"
+                          key={image.src}
+                        >
+                          {/* biome-ignore lint/performance/noImgElement: These URLs are server-generated preview derivatives. */}
+                          <img
+                            alt={image.alt}
+                            className="size-full object-contain"
+                            src={image.src}
+                          />
+                        </li>
+                      ))}
+                      {remainingPreviewImages ? (
+                        <li className="flex size-[100px] shrink-0 list-none items-center justify-center rounded-lg bg-secondary px-2 text-center text-sm font-medium text-muted-foreground">
+                          {t("moreImages", { count: remainingPreviewImages })}
+                        </li>
+                      ) : null}
+                    </ul>
+                  ) : null}
+                </>
               ) : null}
-
-              <div>
-                <div className="grid grid-cols-5 gap-4">
-                  {fileGroups.length > 0 ? (
-                    fileGroups.map((file) => (
-                      <div
-                        aria-label={file.name}
-                        className="flex size-20 items-center justify-center rounded-xl"
-                        key={`${file.name}-${file.type}`}
-                        role="img"
-                      >
-                        <PortalFileTypeIcon
-                          fallback={{ file: "", image: "" }}
-                          type={paidPreviewFileType("", file.type)}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <p className="col-span-5 text-sm text-muted-foreground">
-                      {t("noFiles")}
-                    </p>
-                  )}
-                </div>
-              </div>
             </div>
           </section>
         </div>
@@ -189,6 +227,7 @@ function paidPreviewFileType(
   type: string,
 ): PortalFileType | undefined {
   const extension = name.split(".").pop()?.toLowerCase();
+  const normalizedType = type.trim().toLowerCase().replace(/^\./, "");
   const knownExtensions = [
     "pdf",
     "ai",
@@ -213,13 +252,14 @@ function paidPreviewFileType(
   ];
   const candidate = knownExtensions.includes(extension ?? "")
     ? extension
-    : type.toLowerCase().split("/").pop();
+    : normalizedType.split("/").pop()?.split(".").pop();
   if (candidate === "pdf") return "pdf";
   if (candidate === "ai") return "ai";
   if (candidate === "ait") return "ait";
   if (candidate === "eps" || candidate === "postscript") return "eps";
-  if (candidate === "illustrator") return "ai";
-  if (candidate === "psd") return "psd";
+  if (candidate === "illustrator" || normalizedType.includes("illustrator"))
+    return "ai";
+  if (candidate === "psd" || normalizedType.includes("photoshop")) return "psd";
   if (candidate === "psb") return "psb";
   if (candidate === "indd") return "indd";
   if (candidate === "indt") return "indt";
@@ -274,17 +314,6 @@ function fileTypeLabel(name: string, type: string) {
   if (["indd", "indt", "idml"].includes(normalized)) return "Adobe InDesign";
   if (normalized === "pdf") return "PDF";
   return normalized;
-}
-
-function InfoItem({ label, value }: { label: string; value: string }) {
-  return (
-    <li className="flex w-full items-baseline justify-between gap-6">
-      <span className="text-muted-foreground">{label}</span>
-      <strong className="text-right font-medium text-foreground">
-        {value}
-      </strong>
-    </li>
-  );
 }
 
 function Benefit({ children }: { children: ReactNode }) {

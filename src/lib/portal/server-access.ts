@@ -46,6 +46,7 @@ export type ResolvedPortalAccess = {
   /** Narrow contract for the future paid-preview payload. Not used for authorization. */
   paidPreview: {
     assetSummary: PaidPreviewAssetSummary[];
+    colors: string[];
     description: string | null;
     name: string;
     previewImages: PaidPreviewImage[];
@@ -66,6 +67,32 @@ function jsonRecord(value: Json | null | undefined) {
 
 function stringValue(value: Json | undefined) {
   return typeof value === "string" ? value : null;
+}
+
+function previewColorValues(value: unknown): string[] {
+  const colors: string[] = [];
+  const visit = (current: unknown) => {
+    if (Array.isArray(current)) {
+      current.forEach(visit);
+      return;
+    }
+    if (!current || typeof current !== "object") return;
+    const record = current as Record<string, unknown>;
+    for (const key of ["color_code", "color"]) {
+      const color = record[key];
+      if (
+        typeof color === "string" &&
+        /^(?:#[0-9a-f]{3,4}|#[0-9a-f]{6,8}|(?:rgb|rgba|hsl|hsla|hsb|hsba)\(.+\))$/i.test(
+          color,
+        )
+      ) {
+        colors.push(color);
+      }
+    }
+    Object.values(record).forEach(visit);
+  };
+  visit(value);
+  return [...new Set(colors)];
 }
 
 function booleanValue(value: Json | undefined) {
@@ -97,6 +124,7 @@ function paidPreviewValue(value: Json | undefined) {
     : [];
   return {
     assetSummary,
+    colors: previewColorValues(record.colors),
     description: stringValue(record.description),
     name: stringValue(record.name) ?? "",
     previewImages: [],
@@ -180,10 +208,13 @@ function snapshotAssetSummary(snapshot: Json | null | undefined) {
           return name
             ? [
                 {
-                  assetType:
-                    stringValue(file?.file_type) ??
-                    stringValue(file?.category) ??
-                    "file",
+                  assetType: assetType({
+                    category:
+                      stringValue(file?.category) ??
+                      stringValue(file?.file_type),
+                    mime_type: stringValue(file?.mime_type),
+                    name,
+                  }),
                   name,
                   sizeBytes: fileSizeBytes(file?.file_size),
                 },
@@ -297,16 +328,19 @@ async function enrichPaidPreview(
         : editorSummary
       : null;
   const contentFiles = [...publishedSummary.files, ...editorSummary.files];
+  const colors = previewColorValues([documentRow?.document, blocks]);
+  const previewImageAssets = readyAssets.filter((asset) =>
+    asset.mime_type?.startsWith("image/"),
+  );
   return {
     ...preview,
     assetSummary: summary.size ? [...summary.values()] : preview.assetSummary,
+    colors: colors.length ? colors : preview.colors,
     previewImages: hasPreviewImage
-      ? [
-          {
-            alt: "Portal preview",
-            src: `/api/portal/paid-preview-image?portal_id=${encodeURIComponent(portalId)}`,
-          },
-        ]
+      ? previewImageAssets.slice(0, 6).map((_, imageIndex) => ({
+          alt: `Portal preview ${imageIndex + 1}`,
+          src: `/api/portal/paid-preview-image?portal_id=${encodeURIComponent(portalId)}&image_index=${imageIndex}`,
+        }))
       : [],
     price,
     sampleFiles: contentFiles.length

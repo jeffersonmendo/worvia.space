@@ -147,10 +147,9 @@ export default async function PublicPortalPage({
           description={
             access.paidPreview?.description ?? access.portal.short_description
           }
-          createdAt={access.portal.created_at}
-          designerName={access.portal.designer_name}
           previewImages={access.paidPreview?.previewImages}
           assetSummary={access.paidPreview?.assetSummary}
+          colors={access.paidPreview?.colors}
           sampleFiles={access.paidPreview?.sampleFiles}
           price={access.paidPreview?.price}
           totalBytes={access.paidPreview?.totalBytes}

@@ -21,5 +21,11 @@ describe("public portal header integration", () => {
     );
     expect(pageSource).toContain("purchaseAction={{");
     expect(pageSource).toContain('headerT("buy"');
+    expect(accessSource).toContain("assetType({");
+    expect(accessSource).toContain("stringValue(file?.file_type)");
+    expect(accessSource).toContain("previewImageAssets.slice(0, 6)");
+    expect(accessSource).toContain("image_index=");
+    expect(accessSource).toContain("imageIndex");
+    expect(accessSource).toContain('.order("position", { ascending: true })');
   });
 });
