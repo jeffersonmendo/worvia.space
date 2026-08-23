@@ -84,7 +84,6 @@ import {
   getCountryFlag,
   STRIPE_CONNECT_COUNTRY_CODES,
 } from "@/lib/billing/connect-countries";
-import { storagePercent } from "@/lib/billing/portal-plan-client";
 import { getHomeErrorEvent } from "@/lib/portal/home-error-event";
 import { usePortalHomeStore } from "@/lib/portal/home-store";
 import { shouldOpenPortalCardFromKeyDown } from "@/lib/portal/portal-card-keyboard";
@@ -885,40 +884,6 @@ function DeletePortalDialog({
   );
 }
 
-function UsageCircle({ percent }: { percent: number }) {
-  const circumference = 2 * Math.PI * 8;
-  const offset = circumference - (percent / 100) * circumference;
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="size-4 -rotate-90 text-chart-2"
-      viewBox="0 0 20 20"
-    >
-      <circle
-        className="text-chart-2/15"
-        cx="10"
-        cy="10"
-        fill="none"
-        r="8"
-        stroke="currentColor"
-        strokeWidth="3"
-      />
-      <circle
-        cx="10"
-        cy="10"
-        fill="none"
-        r="8"
-        stroke="currentColor"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        strokeLinecap="round"
-        strokeWidth="3"
-      />
-    </svg>
-  );
-}
-
 function PortalCard({
   copy,
   locale,
@@ -993,18 +958,6 @@ function PortalCard({
     },
   );
   const plan = portal.plan ?? "free";
-  const storageLimit =
-    {
-      free: 100,
-      starter: 500,
-      pro: 1024,
-      premium: 2048,
-    }[plan] *
-    1024 *
-    1024;
-  const usagePercent = Math.round(
-    storagePercent(portal.storageUsedBytes ?? 0, storageLimit),
-  );
   const visibility =
     portal.visibility === "paid"
       ? {
@@ -1139,11 +1092,9 @@ function PortalCard({
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2 text-primary">
-                <UsageCircle percent={usagePercent} />
-                <span>
-                  {copy.portal.usage} {usagePercent}%
-                </span>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <IconCalendarEventFilled className="size-4" />
+                {copy.portal.lastEdited} · {updatedDate}
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 {visibility.icon}

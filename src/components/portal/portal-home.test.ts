@@ -49,7 +49,6 @@ describe("PortalHome", () => {
       expect(messages.delete.confirm).toBeString();
       expect(messages.settings.title).toContain("{name}");
       expect(messages.portal.lastEdited).toBeString();
-      expect(messages.portal.usage).toBeString();
       expect(messages.portal.fileTypesLabel).toBeString();
       expect(messages.portal.filesCount).toContain("{count, plural,");
       expect(messages.portal.filesCount).toStartWith("+ ");
@@ -217,9 +216,9 @@ describe("PortalHome", () => {
     expect(portalCard).toContain("cursor-pointer");
     expect(portalCard).toContain('className="h-fit');
     expect(portalCard).toContain("flex min-w-0 flex-col items-start");
-    expect(portalCard).toContain("storagePercent");
-    expect(source).toContain("function UsageCircle");
-    expect(source).toContain("text-chart-2");
+    expect(portalCard).not.toContain("storagePercent");
+    expect(source).not.toContain("function UsageCircle");
+    expect(source).toContain("copy.portal.lastEdited");
     expect(portalCard).toContain("IconCreditCardFilled");
     expect(portalCard).toContain("IconWorldFilled");
     expect(portalCard).toContain("IconLockFilled");
@@ -236,7 +235,6 @@ describe("PortalHome", () => {
     expect(portalCard).toContain("IconCrownFilled");
     expect(portalCard).toContain("bg-amber-400/20");
     expect(portalCard).toContain("bg-green-500/10");
-    expect(portalCard).toContain("text-primary");
     expect(portalCard).toContain("text-muted-foreground");
     expect(portalCard).toContain("PortalFileTypeBadges");
     expect(portalCard).toContain("PortalColorStack");
