@@ -69,6 +69,11 @@ function stringValue(value: Json | undefined) {
   return typeof value === "string" ? value : null;
 }
 
+function snapshotDocumentRecord(snapshot: Json | null | undefined) {
+  const root = jsonRecord(snapshot);
+  return jsonRecord(root?.document) ?? root;
+}
+
 function previewColorValues(value: unknown): string[] {
   const colors: string[] = [];
   const visit = (current: unknown) => {
@@ -96,10 +101,8 @@ function previewColorValues(value: unknown): string[] {
 }
 
 function publishedImageAssetKeys(snapshot: Json | null | undefined) {
-  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
-    return [];
-  }
-  const record = snapshot as Record<string, unknown>;
+  const record = snapshotDocumentRecord(snapshot);
+  if (!record) return [];
   const sections = Array.isArray(record.sections) ? record.sections : [];
   const keys: string[] = [];
   for (const section of [...sections].sort(
@@ -137,6 +140,62 @@ function publishedImageAssetKeys(snapshot: Json | null | undefined) {
     }
   }
   return [...new Set(keys)];
+}
+
+function publishedImagePresentation(snapshot: Json | null | undefined) {
+  const result = new Map<
+    string,
+    { backgroundColor?: string; containerPadding?: number }
+  >();
+  const record = snapshotDocumentRecord(snapshot);
+  if (!record) return result;
+  const sections = Array.isArray(record.sections) ? record.sections : [];
+  for (const section of sections) {
+    if (!section || typeof section !== "object") continue;
+    const sectionRecord = section as Record<string, unknown>;
+    const content = sectionRecord.content;
+    if (!content || typeof content !== "object") continue;
+    const contentRecord = content as Record<string, unknown>;
+    const layout =
+      sectionRecord.layout && typeof sectionRecord.layout === "object"
+        ? (sectionRecord.layout as Record<string, unknown>)
+        : {};
+    const images =
+      sectionRecord.type === "image"
+        ? contentRecord.image
+          ? [contentRecord.image]
+          : []
+        : Array.isArray(contentRecord.images)
+          ? contentRecord.images
+          : [];
+    for (const image of images) {
+      if (!image || typeof image !== "object") continue;
+      const imageRecord = image as Record<string, unknown>;
+      const assetId = stringValue(imageRecord.asset_id as Json | undefined);
+      const storagePath = stringValue(
+        imageRecord.storage_path as Json | undefined,
+      );
+      const key = assetId
+        ? `id:${assetId}`
+        : storagePath
+          ? `path:${storagePath}`
+          : null;
+      if (!key) continue;
+      result.set(key, {
+        backgroundColor:
+          stringValue(imageRecord.background_color as Json | undefined) ??
+          stringValue(layout.imageBackgroundColor as Json | undefined) ??
+          undefined,
+        containerPadding:
+          typeof imageRecord.container_padding === "number"
+            ? imageRecord.container_padding
+            : typeof layout.imageContainerPadding === "number"
+              ? layout.imageContainerPadding
+              : undefined,
+      });
+    }
+  }
+  return result;
 }
 
 function booleanValue(value: Json | undefined) {
@@ -377,6 +436,7 @@ async function enrichPaidPreview(
     asset.mime_type?.startsWith("image/"),
   );
   const publishedImageKeys = publishedImageAssetKeys(publication?.snapshot);
+  const imagePresentations = publishedImagePresentation(publication?.snapshot);
   const orderedPreviewImageAssets = [
     ...publishedImageKeys
       .map((key) =>
@@ -400,6 +460,8 @@ async function enrichPaidPreview(
     previewImages: hasPreviewImage
       ? orderedPreviewImageAssets.slice(0, 6).map((asset, imageIndex) => ({
           alt: `Portal preview ${imageIndex + 1}`,
+          ...(imagePresentations.get(`id:${asset.id}`) ??
+            imagePresentations.get(`path:${asset.file_path}`)),
           src: `/api/portal/paid-preview-image?portal_id=${encodeURIComponent(portalId)}&asset_id=${encodeURIComponent(asset.id)}`,
         }))
       : [],

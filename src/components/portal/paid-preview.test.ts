@@ -7,6 +7,9 @@ import {
 const paidPreviewSource = await Bun.file(
   new URL("./paid-preview.tsx", import.meta.url),
 ).text();
+const paidPreviewCarouselSource = await Bun.file(
+  new URL("./paid-preview-carousel.tsx", import.meta.url),
+).text();
 
 describe("projectPaidPreview", () => {
   test("keeps the paid preview content within the public portal width", () => {
@@ -20,9 +23,9 @@ describe("projectPaidPreview", () => {
       'className="text-2xl font-semibold tracking-[-0.03em] sm:text-4xl"',
     );
     expect(paidPreviewSource).toContain(
-      "grid w-full min-w-0 gap-8 lg:grid-cols-2",
+      "grid w-full min-w-0 gap-4 min-[800px]:gap-8 min-[800px]:flex",
     );
-    expect(paidPreviewSource).toContain('className="min-w-0 p-1"');
+    expect(paidPreviewSource).toContain("min-w-0 p-1");
     expect(paidPreviewSource).not.toContain("sm:p-12");
     expect(paidPreviewSource).not.toContain("lg:p-16");
   });
@@ -31,6 +34,15 @@ describe("projectPaidPreview", () => {
     expect(paidPreviewSource).not.toContain("max-w-2xl");
     expect(paidPreviewSource).not.toContain("max-w-xl");
     expect(paidPreviewSource).not.toContain("max-w-md");
+  });
+
+  test("places the image block between the description and metadata on mobile", () => {
+    expect(paidPreviewSource).toContain("order-1");
+    expect(paidPreviewSource).toContain("order-2");
+    expect(paidPreviewSource).toContain("order-3");
+    expect(paidPreviewSource).toContain("order-4");
+    expect(paidPreviewSource).toContain("order-5");
+    expect(paidPreviewSource).toContain("min-[800px]:w-1/2");
   });
 
   test("renders compact file, color, size, and update metadata", () => {
@@ -53,15 +65,57 @@ describe("projectPaidPreview", () => {
   });
 
   test("renders additional preview images in a horizontal scroll", () => {
-    expect(paidPreviewSource).toContain("preview.previewImages.slice(1, 5)");
-    expect(paidPreviewSource).toContain('className="scroll-fade flex w-full');
-    expect(paidPreviewSource).toContain("size-[100px] shrink-0");
-    expect(paidPreviewSource).toContain("rounded-lg bg-secondary");
-    expect(paidPreviewSource).toContain('className="size-full object-contain"');
-    expect(paidPreviewSource).toContain(
-      'className="aspect-[16/10] w-full object-contain"',
+    expect(paidPreviewSource).toContain("preview.previewImages.slice(1, 6)");
+    expect(paidPreviewSource).toContain("PaidPreviewCarousel");
+    expect(paidPreviewCarouselSource).toContain("<Carousel");
+    expect(paidPreviewCarouselSource).toContain("<CarouselContent");
+    expect(paidPreviewCarouselSource).toContain("loop: true");
+    expect(paidPreviewCarouselSource).toContain("containScroll: false");
+    expect(paidPreviewCarouselSource).toContain("slidesToScroll: 1");
+    expect(paidPreviewCarouselSource).toContain(
+      "images.length > 1 && images.length < 6 ? [...images, ...images] : images",
     );
-    expect(paidPreviewSource).toContain('t("moreImages"');
+    expect(paidPreviewCarouselSource).toContain("Autoplay({ delay: 3000");
+    expect(paidPreviewCarouselSource).toContain(
+      'className="left-2 shadow-md disabled:opacity-70"',
+    );
+    expect(paidPreviewCarouselSource).toContain('variant="secondary"');
+    expect(paidPreviewCarouselSource).toContain(
+      'className="right-2 shadow-md disabled:opacity-70"',
+    );
+    expect(paidPreviewCarouselSource).toContain('className="basis-1/3"');
+    expect(paidPreviewCarouselSource).toContain(
+      'className="aspect-square overflow-hidden rounded-lg"',
+    );
+    expect(paidPreviewCarouselSource).toContain(
+      'className="size-full select-none object-contain"',
+    );
+    expect(paidPreviewSource).toContain(
+      'className="aspect-[16/10] w-full select-none object-contain"',
+    );
+    expect(paidPreviewSource).not.toContain("rounded-lg bg-secondary");
+    expect(paidPreviewCarouselSource).toContain(
+      "Math.min(Math.max(image.containerPadding ?? 0, 0), 10)",
+    );
+    expect(paidPreviewCarouselSource).toContain(
+      "style={imagePresentationStyle(image)}",
+    );
+    expect(paidPreviewSource).toContain(
+      "style={imagePresentationStyle(previewImage)}",
+    );
+    expect(paidPreviewSource).toContain("select-none object-contain");
+    expect(paidPreviewSource).toContain("draggable={false}");
+    expect(paidPreviewSource).not.toContain("bg-accent");
+  });
+
+  test("reads image presentation from the published document snapshot", async () => {
+    const serverAccessSource = await Bun.file(
+      new URL("../../lib/portal/server-access.ts", import.meta.url),
+    ).text();
+
+    expect(serverAccessSource).toContain("jsonRecord(root?.document) ?? root");
+    expect(serverAccessSource).toContain("imageRecord.background_color");
+    expect(serverAccessSource).toContain("imageRecord.container_padding");
   });
 
   test("orders metadata as files, colors, images, size, and dates", () => {
@@ -122,7 +176,12 @@ describe("projectPaidPreview", () => {
       description: "A concise project description.",
       name: "Northstar",
       previewImages: [
-        { alt: "Selected cover", src: "https://cdn.test/cover.jpg" },
+        {
+          alt: "Selected cover",
+          backgroundColor: "#ffffff",
+          containerPadding: 12,
+          src: "https://cdn.test/cover.jpg",
+        },
       ],
       sampleFiles: [{ assetType: "pdf" }],
       price: "$19.99",
@@ -140,7 +199,12 @@ describe("projectPaidPreview", () => {
       description: "A concise project description.",
       name: "Northstar",
       previewImages: [
-        { alt: "Selected cover", src: "https://cdn.test/cover.jpg" },
+        {
+          alt: "Selected cover",
+          backgroundColor: "#ffffff",
+          containerPadding: 12,
+          src: "https://cdn.test/cover.jpg",
+        },
       ],
       sampleFiles: [{ assetType: "pdf" }],
       price: "$19.99",

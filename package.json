@@ -26,6 +26,8 @@
     "blobatar": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.42.2",
     "geist": "^1.7.2",
     "motion": "^12.42.2",

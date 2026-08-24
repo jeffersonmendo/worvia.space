@@ -96,5 +96,7 @@ export function formatPreviewBytes(bytes: number, locale: string) {
 }
 export type PaidPreviewImage = {
   alt: string;
+  backgroundColor?: string;
+  containerPadding?: number;
   src: string;
 };
