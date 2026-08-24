@@ -1,19 +1,19 @@
 {
   "Metadata": {
-    "title": "Portals Design",
-    "description": "Organiza, presenta y entrega proyectos de branding mediante portales profesionales para clientes."
+    "title": "Worvia",
+    "description": "Organiza, presenta y entrega proyectos de branding mediante proyectos profesionales para clientes."
   },
   "NotFound": {
     "title": "Página no encontrada",
     "description": "La página que buscas no existe o ya no está disponible.",
     "viewProjects": "Ver mis proyectos",
-    "goHome": "Ir a Portals Design"
+    "goHome": "Ir a Worvia"
   },
   "Landing": {
     "titleLine1": "Diseña la marca.",
     "titleLine2": "Entrega la experiencia.",
-    "description": "Portals Design convierte tus sistemas de marca en portales profesionales donde puedes presentar el proyecto, organizar recursos y entregar cada archivo en un solo lugar.",
-    "cta": "Crear un portal",
+    "description": "Worvia convierte tus sistemas de marca en proyectos profesionales donde puedes presentar el proyecto, organizar recursos y entregar cada archivo en un solo lugar.",
+    "cta": "Crear un proyecto",
     "header": {
       "createAccount": "Crear cuenta",
       "enter": "Entrar",
@@ -21,7 +21,7 @@
     },
     "details": {
       "title": "Una mejor entrega también forma parte del diseño.",
-      "description": "Portals Design ofrece a los diseñadores de marca un espacio cuidado para presentar el concepto, organizar el sistema y entregar cada recurso final sin romper la experiencia.",
+      "description": "Worvia ofrece a los diseñadores de marca un espacio cuidado para presentar el concepto, organizar el sistema y entregar cada recurso final sin romper la experiencia.",
       "benefits": [
         {
           "title": "Cuenta la historia detrás del sistema",
@@ -29,7 +29,7 @@
         },
         {
           "title": "Dale un lugar claro a cada recurso",
-          "description": "Estructura logotipos, guías, colores, tipografías y archivos finales en un portal fácil de entender."
+          "description": "Estructura logotipos, guías, colores, tipografías y archivos finales en un proyecto fácil de entender."
         },
         {
           "title": "Diseña también el momento final",
@@ -37,20 +37,20 @@
         }
       ],
       "pricing": {
-        "title": "Ponle precio a tu portal.",
-        "description": "Los diseñadores pueden fijar un precio para el acceso al portal y convertir una presentación terminada en una experiencia de pago para sus clientes."
+        "title": "Ponle precio a tu proyecto.",
+        "description": "Los diseñadores pueden fijar un precio para el acceso al proyecto y convertir una presentación terminada en una experiencia de pago para sus clientes."
       },
       "plans": {
-        "title": "Elige el alcance de cada portal.",
-        "description": "Empieza gratis y elige la capacidad que necesita cada portal.",
-        "perPortal": "Por portal",
+        "title": "Elige el alcance de cada proyecto.",
+        "description": "Empieza gratis y elige la capacidad que necesita cada proyecto.",
+        "perPortal": "Por proyecto",
         "free": {
           "name": "Gratis",
           "price": "$0",
-          "pricing": "También puedes fijar un precio para acceder a este portal.",
+          "pricing": "También puedes fijar un precio para acceder a este proyecto.",
           "description": "Para presentar proyectos pequeños y empezar sin fricción.",
           "features": [
-            "100 MB para este portal",
+            "100 MB para este proyecto",
             "1 sección de archivos, tipografías, colores y galería",
             "Hasta 2 secciones de texto",
             "Hasta 10 elementos por sección"
@@ -60,46 +60,46 @@
         "starter": {
           "name": "Starter",
           "price": "$4.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este portal.",
+          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
           "description": "Para entregas pequeñas que necesitan más espacio.",
           "features": [
-            "500 MB para este portal",
+            "500 MB para este proyecto",
             "Hasta 30 secciones",
             "Hasta 20 archivos, colores o imágenes por sección",
-            "Protección del portal con contraseña"
+            "Protección del proyecto con contraseña"
           ],
           "cta": "Elegir Starter"
         },
         "pro": {
           "name": "Pro",
           "price": "$9.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este portal.",
+          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
           "description": "Para freelancers y entregas profesionales.",
           "features": [
-            "1 GB para este portal",
+            "1 GB para este proyecto",
             "Hasta 60 secciones",
             "Hasta 30 imágenes de galería y 40 archivos o colores",
-            "Protección del portal con contraseña"
+            "Protección del proyecto con contraseña"
           ],
           "cta": "Elegir Pro"
         },
         "premium": {
           "name": "Premium",
           "price": "$19.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este portal.",
-          "description": "Para entregas más completas y portales con identidad propia.",
+          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
+          "description": "Para entregas más completas y proyectos con identidad propia.",
           "features": [
-            "2 GB dedicados a este portal",
-            "Protección del portal con contraseña",
+            "2 GB dedicados a este proyecto",
+            "Protección del proyecto con contraseña",
             "Hasta 100 secciones en total",
             "Hasta 2 secciones de archivos y tipografías",
             "Hasta 3 galerías de 15 imágenes"
           ],
-          "cta": "Crear un portal Premium"
+          "cta": "Crear un proyecto Premium"
         }
       },
       "ctaTitle": "Tu trabajo merece más que un enlace de descarga.",
-      "ctaDescription": "Crea un portal y haz que la entrega sea tan intencional como la identidad.",
+      "ctaDescription": "Crea un proyecto y haz que la entrega sea tan intencional como la identidad.",
       "ctaLabel": "Crear cuenta"
     }
   },
@@ -121,7 +121,7 @@
       "configure": "Configurar",
       "country": "País del vendedor",
       "countryHelp": "Stripe usará este país para verificar al vendedor.",
-      "emailRecommendation": "Usa en Stripe el mismo correo de Portals Design.",
+      "emailRecommendation": "Usa en Stripe el mismo correo de Worvia.",
       "countryRecommended": "Recomendado",
       "countrySearch": "Buscar país…",
       "countryNoResults": "No se encontraron países.",
@@ -150,14 +150,14 @@
     },
     "create": {
       "title": "Crear proyecto",
-      "description": "Dale un nombre al proyecto y elige quién puede acceder. Podrás diseñar toda la experiencia dentro del portal.",
+      "description": "Dale un nombre al proyecto y elige quién puede acceder. Podrás diseñar toda la experiencia dentro del proyecto.",
       "nameLabel": "Nombre",
       "namePlaceholder": "Nombre del proyecto",
-      "visibilityDescription": "Privado está seleccionado por defecto. Puedes cambiarlo después en la configuración del portal.",
+      "visibilityDescription": "Privado está seleccionado por defecto. Puedes cambiarlo después en la configuración del proyecto.",
       "visibilityLabel": "Acceso",
       "visibilityPrivate": "Privado",
       "visibilityPublic": "Público",
-      "submit": "Crear portal",
+      "submit": "Crear proyecto",
       "stepProject": "Proyecto",
       "stepFiles": "Archivos",
       "stepReview": "Revisión",
@@ -175,7 +175,7 @@
       "fileDescriptionPlaceholder": "Describe este archivo (opcional)",
       "back": "Atrás",
       "next": "Continuar",
-      "review": "Revisa la información antes de crear el portal.",
+      "review": "Revisa la información antes de crear el proyecto.",
       "aiPrice": "Crear con IA: 3 créditos",
       "project": "Crear proyecto",
       "files": "Archivos",
@@ -185,13 +185,13 @@
       "projectDescription": "Descripción del proyecto",
       "aiContext": "Contexto adicional para la IA (opcional)",
       "aiContextPlaceholder": "Cuéntale a la IA de qué trata el proyecto, qué debe destacar o para quién es.",
-      "aiContextDescription": "Agrega indicaciones para que el portal generado se adapte mejor a tus objetivos.",
+      "aiContextDescription": "Agrega indicaciones para que el proyecto generado se adapte mejor a tus objetivos.",
       "generateColors": "Generar colores",
       "generateColorsDescription": "Permite que la IA cree una sección de colores a partir de los colores detectados en tus archivos.",
       "enabled": "Activado",
       "disabled": "Desactivado",
       "visibility": "Acceso",
-      "language": "Idioma del portal",
+      "language": "Idioma del proyecto",
       "languageDescription": "Todo el contenido generado por IA seguirá este idioma.",
       "spanish": "Español",
       "english": "Inglés",
@@ -214,7 +214,7 @@
       "generatingCopy": "Generando secciones y textos",
       "generatingCopyDetail": "Creamos el nombre, la descripción, los títulos, las descripciones de las secciones y las recomendaciones a partir del análisis.",
       "applying": "Aplicando la propuesta",
-      "applyingDetail": "Convertimos el análisis en las secciones, textos y recursos del portal.",
+      "applyingDetail": "Convertimos el análisis en las secciones, textos y recursos del proyecto.",
       "aiSkipped": "El proyecto se creó, pero no se pudo aplicar la propuesta de IA. Puedes editarlo manualmente.",
       "aiInsufficientCredits": "El proyecto se creó, pero no tienes suficientes créditos de IA para aplicar la propuesta.",
       "aiPlanLimit": "El proyecto se creó, pero la propuesta supera los límites de tu plan.",
@@ -236,22 +236,22 @@
     },
     "delete": {
       "cancel": "Cancelar",
-      "confirm": "Eliminar portal",
+      "confirm": "Eliminar proyecto",
       "deleting": "Eliminando…",
       "description": "Esto eliminará permanentemente {name}, incluyendo su contenido, configuración y archivos subidos.",
       "phraseLabel": "Escribe Eliminar para confirmar",
       "phrasePlaceholder": "Eliminar",
-      "slugLabel": "Escribe el slug del portal",
+      "slugLabel": "Escribe el slug del proyecto",
       "slugInstruction": "Escribe exactamente este slug: {slug}",
-      "slugPlaceholder": "Slug del portal",
+      "slugPlaceholder": "Slug del proyecto",
       "title": "¿Eliminar {name}?",
       "trigger": "Eliminar {name}",
-      "paidProtected": "Los portales de pago no se pueden eliminar."
+      "paidProtected": "Los proyectos de pago no se pueden eliminar."
     },
     "settings": {
       "trigger": "Configurar {name}",
       "title": "Configuración de {name}",
-      "description": "Actualiza el nombre del portal y su dirección pública.",
+      "description": "Actualiza el nombre del proyecto y su dirección pública.",
       "nameLabel": "Nombre",
       "slugLabel": "Dirección pública",
       "save": "Guardar cambios"
@@ -272,7 +272,7 @@
       "colorsCount": "+ {count, plural, one {# color} other {# colores}}",
       "noFiles": "Sin archivos",
       "noColors": "Sin colores",
-      "imagesLabel": "Imágenes del portal",
+      "imagesLabel": "Imágenes del proyecto",
       "imagesCount": "+ {count, plural, one {# imagen} other {# imágenes}}",
       "noImages": "Sin imágenes",
       "purchasedAt": "Comprado",
@@ -296,7 +296,7 @@
     },
     "backendDisabled": {
       "title": "Conecta Supabase",
-      "description": "Configura el backend para crear y administrar portales para clientes."
+      "description": "Configura el backend para crear y administrar proyectos para clientes."
     },
     "errorGeneric": "No se pudo completar la acción.",
     "social": {
@@ -310,15 +310,15 @@
     "close": "Cerrar"
   },
   "Actions": {
-    "nameRequired": "El nombre del portal es obligatorio.",
+    "nameRequired": "El nombre del proyecto es obligatorio.",
     "slugInvalid": "El slug no es válido.",
-    "passwordAfterCreation": "Configura la contraseña después de crear el portal.",
-    "visibilityInvalid": "Elige si el portal será público o privado.",
-    "createPortalFailed": "No se pudo crear el portal.",
-    "portalNotFound": "Portal no encontrado.",
+    "passwordAfterCreation": "Configura la contraseña después de crear el proyecto.",
+    "visibilityInvalid": "Elige si el proyecto será público o privado.",
+    "createPortalFailed": "No se pudo crear el proyecto.",
+    "portalNotFound": "Proyecto no encontrado.",
     "contentLanguageInvalid": "Elige inglés o español para los textos generados por IA.",
     "paidPortalImmutable": "El acceso de pago no puede cambiarse a otro modo de acceso.",
-    "paidPortalProtected": "Esta acción no está disponible para portales de pago.",
+    "paidPortalProtected": "Esta acción no está disponible para proyectos de pago.",
     "designerNameInvalid": "El nombre del diseñador supera 8 palabras o 80 caracteres.",
     "websiteHttps": "El sitio web debe usar HTTPS.",
     "slugCheckFailed": "No se pudo validar el slug.",
@@ -337,7 +337,7 @@
     },
     "signIn": {
       "title": "Iniciar sesión",
-      "description": "Entra a tu espacio de Portals Design.",
+      "description": "Entra a tu espacio de Worvia.",
       "checkEmail": "Revisa tu correo para confirmar la cuenta.",
       "confirmationExpired": "Este enlace de confirmación no es válido o expiró. Solicita uno nuevo o vuelve a iniciar sesión.",
       "emailPlaceholder": "nombre@ejemplo.com",
@@ -350,7 +350,7 @@
     },
     "signUp": {
       "title": "Crear cuenta",
-      "description": "Empieza a organizar tus portales de branding.",
+      "description": "Empieza a organizar tus proyectos de branding.",
       "name": "Nombre",
       "namePlaceholder": "Tu nombre",
       "emailPlaceholder": "nombre@ejemplo.com",
@@ -367,14 +367,14 @@
       "buy": "Comprar {price}"
     },
     "loading": {
-      "label": "Cargando portal"
+      "label": "Cargando proyecto"
     },
     "password": {
-      "description": "Este portal de Portals Design está protegido con contraseña.",
+      "description": "Este proyecto de Worvia está protegido con contraseña.",
       "label": "Contraseña",
       "placeholder": "Ingresa la contraseña",
       "invalid": "La contraseña no es válida.",
-      "submit": "Ver portal"
+      "submit": "Ver proyecto"
     },
     "preview": {
       "eyebrow": "Contenido premium",
@@ -385,7 +385,7 @@
       "moreImages": "+ {count, plural, one {# imagen} other {# imágenes}}",
       "previewImageLocked": "Vista previa bloqueada",
       "previewLabel": "Una vista previa del contenido",
-      "previewDescription": "Desbloquea el portal para acceder a todos los recursos incluidos.",
+      "previewDescription": "Desbloquea el proyecto para acceder a todos los recursos incluidos.",
       "totalFiles": "Archivos",
       "totalImages": "Imágenes",
       "totalSize": "Peso total",
@@ -404,12 +404,12 @@
       "oneTimePayment": "Pago único, sin suscripción",
       "fullAccess": "Acceso completo a todos los archivos e imágenes",
       "originalImages": "Imágenes en calidad original y sin marca de agua",
-      "privateAccess": "Acceso privado y seguro a tu portal",
-      "lifetimeUpdates": "Acceso a futuras actualizaciones del portal",
+      "privateAccess": "Acceso privado y seguro a tu proyecto",
+      "lifetimeUpdates": "Acceso a futuras actualizaciones del proyecto",
       "priceLabel": "Acceso completo",
       "sampleFiles": "Algunos archivos incluidos",
       "fileCount": "{count, plural, one {# archivo} other {# archivos}}",
-      "contentHidden": "El contenido completo y las descargas están protegidos hasta desbloquear el portal.",
+      "contentHidden": "El contenido completo y las descargas están protegidos hasta desbloquear el proyecto.",
       "securePayment": "Compra segura con Stripe. Tus datos de pago nunca se comparten con el creador.",
       "assetTypesLabel": "Resumen de recursos incluidos",
       "summary": "{count, plural, =0 {No hay recursos listados} one {# recurso} other {# recursos}} · {size}",
@@ -422,21 +422,28 @@
     },
     "notFound": {
       "title": "Proyecto no encontrado",
-      "description": "Este portal es privado o no está publicado.",
+      "description": "Este proyecto es privado o no está publicado.",
       "viewProjects": "Ver mis proyectos",
-      "goHome": "Ir a Portals Design"
+      "goHome": "Ir a Worvia"
     },
     "metadata": {
-      "description": "Portal creado y compartido con Portals Design.",
-      "title": "Portal no encontrado · Portals Design",
+      "colorsLabel": "colores",
+      "description": "Proyecto creado y compartido con Worvia.",
+      "freeBadge": "Gratis",
+      "filesLabel": "archivos",
+      "imagesLabel": "imágenes",
+      "lastUpdatedLabel": "Última actualización",
+      "premiumBadge": "Premium",
+      "totalSizeLabel": "Tamaño total",
+      "title": "Proyecto no encontrado · Worvia",
       "discover": "Descubre {name}",
       "paidDescription": "Descubre la vista previa de {name} y desbloquea su contenido premium."
     }
   },
   "PortalViewer": {
     "branding": {
-      "credit": "Este portal ha sido creado o potenciado por",
-      "brand": "Portals Design"
+      "credit": "Este proyecto ha sido creado o potenciado por",
+      "brand": "Worvia"
     },
     "sidebar": {
       "theme": "Cambiar tema de color",
@@ -449,9 +456,9 @@
       "fileAbbreviation": "ARCH"
     },
     "summary": {
-      "name": "Nombre del portal",
-      "description": "Descripción del portal",
-      "namePlaceholder": "Nombre del portal",
+      "name": "Nombre del proyecto",
+      "description": "Descripción del proyecto",
+      "namePlaceholder": "Nombre del proyecto",
       "descriptionPlaceholder": "Descripción breve opcional"
     },
     "section": {
@@ -522,7 +529,7 @@
     "video": "Video",
     "layout": "{type} · {layout}",
     "emptyContent": "Sin contenido todavía.",
-    "portalImage": "Imagen del portal",
+    "portalImage": "Imagen del proyecto",
     "emptyImage": "Sin imagen todavía.",
     "galleryImage": "Imagen de galería",
     "emptyGallery": "Sin imágenes todavía.",
@@ -537,20 +544,20 @@
       "pro": "Pro",
       "premium": "Premium",
       "storageLabels": {
-        "free": "Almacenamiento de este portal",
-        "starter": "Almacenamiento de este portal",
-        "pro": "Almacenamiento de este portal",
-        "premium": "Almacenamiento de este portal"
+        "free": "Almacenamiento de este proyecto",
+        "starter": "Almacenamiento de este proyecto",
+        "pro": "Almacenamiento de este proyecto",
+        "premium": "Almacenamiento de este proyecto"
       },
       "storageSummaries": {
-        "free": "Plan Gratis. {used} de {limit} usados en este portal. {percent}%.",
-        "starter": "Plan Starter. {used} de {limit} usados en este portal. {percent}%.",
-        "pro": "Plan Pro. {used} de {limit} usados en este portal. {percent}%.",
-        "premium": "Plan Premium. {used} de {limit} usados en este portal. {percent}%."
+        "free": "Plan Gratis. {used} de {limit} usados en este proyecto. {percent}%.",
+        "starter": "Plan Starter. {used} de {limit} usados en este proyecto. {percent}%.",
+        "pro": "Plan Pro. {used} de {limit} usados en este proyecto. {percent}%.",
+        "premium": "Plan Premium. {used} de {limit} usados en este proyecto. {percent}%."
       },
       "currentPlan": "Plan actual",
       "usageTitle": "Uso del plan",
-      "usageDescription": "Consulta el plan actual y el uso de almacenamiento de este portal.",
+      "usageDescription": "Consulta el plan actual y el uso de almacenamiento de este proyecto.",
       "limitsTitle": "Límites del plan",
       "maxUpload": "Tamaño máximo por archivo",
       "totalSections": "Secciones totales",
@@ -580,17 +587,17 @@
       "unavailable": "Plan no disponible",
       "retry": "Reintentar",
       "aPlan": "un plan",
-      "upgradeTitle": "Elige {plan} para este portal",
-      "upgradeDescription": "Elige el plan que corresponda a las necesidades de este portal.",
+      "upgradeTitle": "Elige {plan} para este proyecto",
+      "upgradeDescription": "Elige el plan que corresponda a las necesidades de este proyecto.",
       "compareDescription": "Compara el almacenamiento y los límites de contenido antes de continuar.",
       "benefits": {
         "title": "Ventajas de {plan}",
-        "password": "Protege tu portal con una contraseña.",
-        "storage": "Usa hasta {storage} en este portal.",
-        "sections": "Usa hasta {sections} secciones en este portal.",
+        "password": "Protege tu proyecto con una contraseña.",
+        "storage": "Usa hasta {storage} en este proyecto.",
+        "sections": "Usa hasta {sections} secciones en este proyecto.",
         "gallery": "Usa hasta {gallery} imágenes en cada galería."
       },
-      "limitTitle": "Límite del portal alcanzado",
+      "limitTitle": "Límite del proyecto alcanzado",
       "upgrade": "Mejorar +",
       "upgradeAction": "Mejorar",
       "viewPlans": "Ver planes",
@@ -598,11 +605,11 @@
       "buyAccessible": "Comprar {plan} por {price}",
       "cancelled": "El pago del plan fue cancelado. No se realizó ningún cargo.",
       "checkoutUnavailable": "No se pudo iniciar el pago. Diagnóstico: {reason}",
-      "ownerRequired": "Solo el propietario del portal puede comprar un plan.",
+      "ownerRequired": "Solo el propietario del proyecto puede comprar un plan.",
       "violations": {
         "password_requires_paid_plan": "La protección con contraseña está disponible en los planes Starter, Pro y Premium.",
-        "colors_items": "Los portales gratis pueden incluir hasta 10 colores por sección.",
-        "colors_sections": "Los portales gratis pueden incluir una sección de colores.",
+        "colors_items": "Los proyectos gratis pueden incluir hasta 10 colores por sección.",
+        "colors_sections": "Los proyectos gratis pueden incluir una sección de colores.",
         "files_items": "Esta sección alcanzó su límite de 10 archivos.",
         "files_sections": "Elige un plan superior para añadir otra sección de archivos.",
         "fonts_items": "Una sección de tipografía puede incluir hasta 3 familias.",
@@ -610,11 +617,11 @@
         "gallery_items": "Esta galería alcanzó el límite de elementos de su plan.",
         "gallery_sections": "Elige un plan superior para añadir más secciones de galería.",
         "image_sections": "Elige un plan superior para añadir más secciones de imagen.",
-        "plan_unavailable": "No se pudo verificar el plan del portal. Reinténtalo antes de hacer cambios.",
-        "storage_bytes": "Este portal alcanzó el almacenamiento disponible en su plan.",
+        "plan_unavailable": "No se pudo verificar el plan del proyecto. Reinténtalo antes de hacer cambios.",
+        "storage_bytes": "Este proyecto alcanzó el almacenamiento disponible en su plan.",
         "storage_bytes_detail": "Almacenamiento: {used} de {limit} usados. Esta subida necesita {requested}, pero solo quedan {available}.",
-        "text_sections": "Los portales gratis pueden incluir hasta 2 secciones de texto.",
-        "total_sections": "Este portal alcanzó el límite de secciones de su plan.",
+        "text_sections": "Los proyectos gratis pueden incluir hasta 2 secciones de texto.",
+        "total_sections": "Este proyecto alcanzó el límite de secciones de su plan.",
         "upload_bytes": "Este archivo supera el tamaño permitido por el plan actual.",
         "upload_bytes_detail": "Este archivo pesa {requested}. El tamaño máximo permitido es {maximum}."
       }
@@ -623,7 +630,7 @@
       "saving": "Guardando cambios…",
       "error": "No se pudieron guardar los cambios",
       "errorDescription": "Tus últimos cambios siguen disponibles. Vuelve a intentar guardarlos antes de publicar.",
-      "conflict": "Este portal cambió en otro lugar",
+      "conflict": "Este proyecto cambió en otro lugar",
       "conflictDescription": "Tu última edición local está preservada. Carga la versión guardada y reintenta solo si deseas aplicar tu edición sobre ella.",
       "conflictRetry": "Reintentar última edición",
       "retry": "Reintentar guardado"
@@ -634,7 +641,7 @@
     "workspace": {
       "back": "Atrás",
       "project": "Proyecto",
-      "portal": "Portal",
+      "portal": "Proyecto",
       "all": "Todos",
       "projects": "Proyectos",
       "createProject": "Crear proyecto",
@@ -651,7 +658,7 @@
       "aiAnalyzingBatch": "Lote {batch}/{total}",
       "aiBatchLabel": "lote {batch}/{total}",
       "aiGeneratingCopy": "Generando secciones y textos…",
-      "aiGeneratingStructure": "Generando la estructura del portal…",
+      "aiGeneratingStructure": "Generando la estructura del proyecto…",
       "aiApplying": "Aplicando la propuesta de IA…",
       "aiProcessingContent": "Procesando el contenido seleccionado…",
       "aiCompletedTitle": "Generación con IA completada",
@@ -685,39 +692,39 @@
       "signOutDescription": "¿Seguro que quieres cerrar la sesión de tu espacio de trabajo?",
       "signOutConfirm": "Cerrar sesión",
       "title": "Workspace",
-      "openPublished": "Abrir portal publicado en otra pestaña",
+      "openPublished": "Abrir proyecto publicado en otra pestaña",
       "openPreview": "Abrir vista previa en otra pestaña",
       "publish": "Publicar",
       "publishing": "Publicando…",
       "goToProject": "Ir al proyecto",
-      "publishSuccess": "Portal publicado correctamente",
-      "publishError": "No se pudo publicar el portal",
+      "publishSuccess": "Proyecto publicado correctamente",
+      "publishError": "No se pudo publicar el proyecto",
       "publication": {
         "action": "Ver problemas de publicación",
-        "title": "El portal aún no está listo para publicarse",
+        "title": "El proyecto aún no está listo para publicarse",
         "description": "Corrige estos campos obligatorios antes de publicar. Tu borrador permanece guardado.",
         "fix": "Corregir",
         "issues": {
-          "portal_name_required": "Agrega un nombre al portal.",
+          "portal_name_required": "Agrega un nombre al proyecto.",
           "section_required": "Agrega al menos una sección.",
           "section_title_required": "Agrega un título a esta sección.",
           "section_content_required": "Agrega contenido a esta sección."
         }
       },
       "unpublishedTitle": "Cambios no publicados",
-      "unpublishedDescription": "Publica el portal para que los visitantes puedan ver tus últimos cambios.",
+      "unpublishedDescription": "Publica el proyecto para que los visitantes puedan ver tus últimos cambios.",
       "unpublishedAction": "Ver cambios no publicados",
       "credits": {
         "badge": "Créditos de IA: {count}",
         "title": "Créditos de IA",
-        "description": "Los créditos pagan las acciones de IA. Crear un portal con IA cuesta 3, agregar archivos con IA cuesta 2 y mejorar textos cuesta 1 crédito.",
+        "description": "Los créditos pagan las acciones de IA. Crear un proyecto con IA cuesta 3, agregar archivos con IA cuesta 2 y mejorar textos cuesta 1 crédito.",
         "available": "Disponibles: {count}",
         "upgrade": "Mejorar créditos"
       }
     },
     "ai": {
       "actions": "Acciones IA",
-      "improve": "Mejora este portal",
+      "improve": "Mejora este proyecto",
       "analyzeFiles": "Analizar nuevos archivos",
       "addWithAi": "Añadir con IA · 2 créditos",
       "addWithAiLabel": "Añadir con IA",
@@ -737,10 +744,10 @@
       "insufficientCredits": "No tienes créditos suficientes para mejorar este texto.",
       "planLimit": "La IA no pudo agregar los archivos porque se alcanzó el límite del plan.",
       "generate": "Generar con IA",
-      "title": "Generar portal con IA",
+      "title": "Generar proyecto con IA",
       "description": "La IA propone una estructura y siempre podrás revisarla antes de aplicarla.",
       "uploadTitle": "Subir nuevos archivos",
-      "uploadDescription": "La IA analizará los archivos y los incorporará al portal sin eliminar tu contenido existente.",
+      "uploadDescription": "La IA analizará los archivos y los incorporará al proyecto sin eliminar tu contenido existente.",
       "filesLabel": "Archivos del proyecto",
       "filesDescription": "Imágenes, PDFs, archivos de diseño, fuentes y documentos de texto.",
       "filesAdded": "{count, plural, =0 {No se agregaron archivos} one {# archivo agregado} other {# archivos agregados}}",
@@ -750,7 +757,7 @@
       "remove": "Eliminar",
       "analyzing": "Analizando dimensiones, colores y relevancia…",
       "analyzingDescription": "La IA está leyendo tus archivos y preparando títulos y descripciones específicas.",
-      "applyingDescription": "Estamos aplicando la propuesta al portal y guardando los cambios.",
+      "applyingDescription": "Estamos aplicando la propuesta al proyecto y guardando los cambios.",
       "pleaseWait": "Este proceso puede tardar unos segundos.",
       "proposalReady": "Propuesta lista para revisar",
       "proposalDescription": "Se detectaron proporciones, posibles logos y archivos que podrían ir a cuarentena. Ningún crédito se consume en la vista previa.",
@@ -763,7 +770,7 @@
       "apply": "Aplicar propuesta · {count} créditos",
       "applying": "Aplicando propuesta…",
       "applyError": "No se pudo aplicar la propuesta. Los créditos fueron reembolsados.",
-      "newFilesApplied": "Los nuevos archivos se analizaron y agregaron al portal.",
+      "newFilesApplied": "Los nuevos archivos se analizaron y agregaron al proyecto.",
       "credits": "Créditos disponibles: {count}",
       "creditsUnavailable": "No se pudo consultar el saldo de créditos.",
       "cancel": "Cancelar",
@@ -774,12 +781,12 @@
       "content": "Contenido de la sección",
       "add": "Agregar sección",
       "addTitle": "Añade una sección",
-      "chooseDescription": "Elige el contenido que quieres mostrar en tu portal.",
+      "chooseDescription": "Elige el contenido que quieres mostrar en tu proyecto.",
       "changeType": "Cambiar tipo de sección",
       "configure": "Configurar sección",
       "order": "Ordenar secciones",
       "orderTitle": "Posición de secciones",
-      "orderDescription": "Arrastra las secciones para acomodar el orden del portal.",
+      "orderDescription": "Arrastra las secciones para acomodar el orden del proyecto.",
       "move": "Mover {name}",
       "types": {
         "text": {
@@ -808,7 +815,7 @@
         },
         "empty": {
           "label": "Sección",
-          "description": "Una sección vacía del portal."
+          "description": "Una sección vacía del proyecto."
         },
         "image_comparison": {
           "label": "Comparación de imágenes",
@@ -959,11 +966,11 @@
     },
     "settings": {
       "generalTitle": "Configuración general",
-      "generalDescription": "Ajusta el slug y la información visible del diseñador. Guardar estos datos no publica el portal.",
+      "generalDescription": "Ajusta el slug y la información visible del diseñador. Guardar estos datos no publica el proyecto.",
       "generalTab": "General",
       "securityTab": "Seguridad",
       "slug": "Slug",
-      "slugPlaceholder": "mi-portal",
+      "slugPlaceholder": "mi-proyecto",
       "checkingSlug": "Comprobando disponibilidad…",
       "slugAvailable": "Este slug está disponible.",
       "slugUnavailable": "Slug no disponible",
@@ -976,7 +983,7 @@
       "english": "Inglés",
       "spanish": "Español",
       "aiLanguageDescription": "Esto no cambia el idioma de la interfaz ni del contenido existente. Indica a la IA en qué idioma debe generar los textos nuevos.",
-      "privacyDescription": "Elige quién puede acceder a este portal. Los cambios no lo publican ni despublican.",
+      "privacyDescription": "Elige quién puede acceder a este proyecto. Los cambios no lo publican ni despublican.",
       "privacy": "Privacidad",
       "privacyPlaceholder": "Selecciona la privacidad",
       "public": "Público",
@@ -986,10 +993,10 @@
       "publicHelp": "Cualquiera que encuentre el enlace podrá verlo.",
       "privateHelp": "Solo tú podrás verlo con tu cuenta.",
       "passwordHelp": "Cualquiera con el enlace y la contraseña podrá verlo.",
-      "paidHelp": "Los visitantes verán una vista previa y deberán pagar para desbloquear el portal.",
-      "paidImmutable": "Los visitantes deben pagar para desbloquear este portal.",
-      "paidConfirmationTitle": "¿Convertir este portal en uno de pago?",
-      "paidConfirmationDescription": "Este cambio es permanente. No podrás volver a cambiar este portal a público, privado ni a ningún otro modo de acceso. Los visitantes verán una vista previa y deberán pagar para desbloquearlo.",
+      "paidHelp": "Los visitantes verán una vista previa y deberán pagar para desbloquear el proyecto.",
+      "paidImmutable": "Los visitantes deben pagar para desbloquear este proyecto.",
+      "paidConfirmationTitle": "¿Convertir este proyecto en uno de pago?",
+      "paidConfirmationDescription": "Este cambio es permanente. No podrás volver a cambiar este proyecto a público, privado ni a ningún otro modo de acceso. Los visitantes verán una vista previa y deberán pagar para desbloquearlo.",
       "paidConfirmationCancel": "Cancelar",
       "paidConfirmationConfirm": "Convertir a pago",
       "paidPriceLabel": "Precio (USD)",
@@ -999,7 +1006,7 @@
       "paidOfferUnavailable": "No se pudo configurar el acceso de pago. Primero conecta tu cuenta de Stripe.",
       "connectStripe": "Conectar Stripe",
       "configureConnect": "Configurar Stripe Connect",
-      "connectRequiredForPaid": "Configura Stripe Connect desde Inicio para poder definir el precio del portal.",
+      "connectRequiredForPaid": "Configura Stripe Connect desde Inicio para poder definir el precio del proyecto.",
       "connectChecking": "Cargando información de Stripe Connect…",
       "connectCountry": "País del vendedor",
       "connectCountryHelp": "Selecciona el país legal o de residencia del vendedor. Stripe no permite cambiarlo después.",

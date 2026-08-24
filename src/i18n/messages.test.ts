@@ -77,35 +77,35 @@ describe("translation catalogs", () => {
   test("explains whether storage is shared or belongs to one portal", () => {
     expect(es).toHaveProperty(
       "PortalEditor.plan.storageLabels.free",
-      "Almacenamiento de este portal",
+      "Almacenamiento de este proyecto",
     );
     expect(es).toHaveProperty(
       "PortalEditor.plan.storageLabels.premium",
-      "Almacenamiento de este portal",
+      "Almacenamiento de este proyecto",
     );
     expect(es).toHaveProperty(
       "PortalEditor.plan.storageSummaries.free",
-      "Plan Gratis. {used} de {limit} usados en este portal. {percent}%.",
+      "Plan Gratis. {used} de {limit} usados en este proyecto. {percent}%.",
     );
     expect(es).toHaveProperty(
       "PortalEditor.plan.storageSummaries.premium",
-      "Plan Premium. {used} de {limit} usados en este portal. {percent}%.",
+      "Plan Premium. {used} de {limit} usados en este proyecto. {percent}%.",
     );
     expect(en).toHaveProperty(
       "PortalEditor.plan.storageLabels.free",
-      "This portal's storage",
+      "This project's storage",
     );
     expect(en).toHaveProperty(
       "PortalEditor.plan.storageLabels.premium",
-      "This portal's storage",
+      "This project's storage",
     );
     expect(en).toHaveProperty(
       "PortalEditor.plan.storageSummaries.free",
-      "Free plan. {used} of {limit} used by this portal. {percent}%.",
+      "Free plan. {used} of {limit} used by this project. {percent}%.",
     );
     expect(en).toHaveProperty(
       "PortalEditor.plan.storageSummaries.premium",
-      "Premium plan. {used} of {limit} used by this portal. {percent}%.",
+      "Premium plan. {used} of {limit} used by this project. {percent}%.",
     );
   });
 

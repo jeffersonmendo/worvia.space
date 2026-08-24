@@ -374,7 +374,7 @@ export function buildManifestText(
   omitted: string[] = [],
 ) {
   const lines = [
-    "Portals Design export",
+    "Worvia export",
     `Portal: ${manifest.slug}`,
     "",
     "Files:",

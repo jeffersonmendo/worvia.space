@@ -8,8 +8,8 @@ describe("HomeOpenGraphCard", () => {
     const visibleCopy = markup.replace(/<[^>]+>/g, "").trim();
     const containerCount = markup.match(/<div/g)?.length ?? 0;
 
-    expect(visibleCopy).toBe("Portals Design");
-    expect(markup).toContain('aria-label="Portals Design"');
+    expect(visibleCopy).toBe("Worvia");
+    expect(markup).toContain('aria-label="Worvia"');
     expect(markup).toContain("background-color:#050507");
     expect(markup).toContain("radial-gradient");
     expect(markup).toContain("<svg");

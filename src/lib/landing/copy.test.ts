@@ -14,12 +14,12 @@ describe("landing copy", () => {
   });
 
   test("keeps the creative product voice localized", () => {
-    expect(spanish.Landing.description).toContain("Portals Design");
+    expect(spanish.Landing.description).toContain("Worvia");
     expect(spanish.Landing.description).toContain("sistemas de marca");
-    expect(spanish.Landing.description).toContain("portales");
-    expect(english.Landing.description).toContain("Portals Design");
+    expect(spanish.Landing.description).toContain("proyectos");
+    expect(english.Landing.description).toContain("Worvia");
     expect(english.Landing.description).toContain("brand systems");
-    expect(english.Landing.description).toContain("portals");
+    expect(english.Landing.description).toContain("projects");
     expect(spanish.Landing.cta).not.toBe(english.Landing.cta);
   });
 

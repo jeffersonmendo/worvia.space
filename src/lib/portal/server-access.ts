@@ -343,6 +343,58 @@ function snapshotAssetSummary(snapshot: Json | null | undefined) {
   };
 }
 
+export type PortalShareSummary = {
+  colors: string[];
+  colorCount: number;
+  fileTypes: string[];
+  imageCount: number;
+  totalBytes: number;
+  totalFiles: number;
+};
+
+const shareFileType = (value: string) => {
+  const type = value.trim().toLowerCase().replace(/^\./, "");
+  if (["ai", "ait", "illustrator"].includes(type)) return "ai";
+  if (["eps", "postscript"].includes(type)) return "eps";
+  if (["psd", "psb", "photoshop"].includes(type)) return "psd";
+  if (type === "pdf") return "pdf";
+  return null;
+};
+
+const shareFileTypes = (values: string[]) =>
+  [...new Set(values.map(shareFileType).filter(Boolean))] as string[];
+
+export function getPortalShareSummary({
+  paidPreview,
+  publicationSnapshot,
+}: {
+  paidPreview: ResolvedPortalAccess["paidPreview"];
+  publicationSnapshot: Json | null | undefined;
+}): PortalShareSummary {
+  if (paidPreview) {
+    return {
+      colors: paidPreview.colors,
+      colorCount: paidPreview.colors.length,
+      fileTypes: shareFileTypes(
+        paidPreview.sampleFiles.map((file) => file.assetType),
+      ),
+      imageCount: paidPreview.totalImages,
+      totalBytes: paidPreview.totalBytes,
+      totalFiles: paidPreview.totalFiles,
+    };
+  }
+
+  const summary = snapshotAssetSummary(publicationSnapshot);
+  return {
+    colors: previewColorValues(publicationSnapshot),
+    colorCount: previewColorValues(publicationSnapshot).length,
+    fileTypes: shareFileTypes(summary.files.map((file) => file.assetType)),
+    imageCount: summary.imageCount,
+    totalBytes: summary.totalBytes,
+    totalFiles: summary.totalFiles,
+  };
+}
+
 async function enrichPaidPreview(
   portalId: string,
   preview: ResolvedPortalAccess["paidPreview"],

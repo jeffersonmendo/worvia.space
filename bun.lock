@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "portals-design",
+      "name": "worvia",
       "dependencies": {
         "@ai-sdk/openai": "^4.0.42",
         "@base-ui/react": "^1.6.0",

@@ -28,7 +28,7 @@ export function PublicPortalShell({
     <div className="min-h-dvh pt-20 [--portal-sidebar-offset:5rem]">
       <header className="fixed top-2 left-1/2 z-40 flex w-[calc(100%-1rem)] max-w-[900px] -translate-x-1/2 items-center justify-between gap-4 rounded-3xl border border-border/50 bg-background/70 px-4 py-3 backdrop-blur-xl">
         <Link
-          aria-label="Portals Design"
+          aria-label="Worvia"
           className="inline-flex items-center"
           href="/"
         >

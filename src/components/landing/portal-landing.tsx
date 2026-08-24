@@ -92,11 +92,11 @@ function InitialLandingHeaderNav({
 }: LandingHeaderNavProps) {
   return (
     <nav
-      aria-label="Portals Design"
+      aria-label="Worvia"
       className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
       <Link
-        aria-label="Portals Design"
+        aria-label="Worvia"
         className="inline-flex items-center"
         href="/"
       >
@@ -137,11 +137,11 @@ function ScrollLandingHeaderNav({
 }: LandingHeaderNavProps) {
   return (
     <nav
-      aria-label="Portals Design"
+      aria-label="Worvia"
       className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
       <Link
-        aria-label="Portals Design"
+        aria-label="Worvia"
         className="inline-flex items-center"
         href="/"
       >

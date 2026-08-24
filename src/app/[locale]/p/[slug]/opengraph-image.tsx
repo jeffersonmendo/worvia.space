@@ -1,14 +1,18 @@
 import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
+import { HomeOpenGraphCard } from "@/components/home-open-graph-card";
 import { OpenGraphCard } from "@/components/open-graph-card";
-import { resolvePortalAccess } from "@/lib/portal/server-access";
+import {
+  getPortalShareSummary,
+  resolvePortalAccess,
+} from "@/lib/portal/server-access";
 import {
   OPEN_GRAPH_SIZE,
   resolvePortalSharePresentation,
 } from "@/lib/public-metadata";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 
-export const alt = "Portal shared with Portals Design";
+export const alt = "Portal shared with Worvia";
 export const contentType = "image/png";
 export const size = OPEN_GRAPH_SIZE;
 
@@ -26,10 +30,20 @@ export default async function PortalOpenGraphImage({
     decision: "not_found",
     fallback: { description: t("description"), title: t("title") },
   });
+  let summary = getPortalShareSummary({
+    paidPreview: null,
+    publicationSnapshot: null,
+  });
+  let badge = t("freeBadge");
+  let isPremium = false;
+  let updatedAt = new Date().toISOString();
 
   if (hasSupabaseEnv()) {
     try {
       const access = await resolvePortalAccess(slug);
+      if (access.decision === "not_found") {
+        return new ImageResponse(<HomeOpenGraphCard />, size);
+      }
       presentation = resolvePortalSharePresentation({
         decision: access.decision,
         fallback: { description: t("description"), title: t("title") },
@@ -44,6 +58,16 @@ export default async function PortalOpenGraphImage({
             }
           : null,
       });
+      summary = getPortalShareSummary({
+        paidPreview: access.paidPreview,
+        publicationSnapshot: access.publication?.snapshot,
+      });
+      badge =
+        access.portal?.visibility === "paid"
+          ? t("premiumBadge")
+          : t("freeBadge");
+      isPremium = access.portal?.visibility === "paid";
+      updatedAt = access.portal?.updated_at || updatedAt;
     } catch {
       // Render the localized generic card when portal lookup is unavailable.
     }
@@ -51,8 +75,24 @@ export default async function PortalOpenGraphImage({
 
   return new ImageResponse(
     <OpenGraphCard
+      badge={badge}
+      colors={summary.colors}
+      colorCount={summary.colorCount}
       description={presentation.description}
+      fileTypes={summary.fileTypes}
+      imageCount={summary.imageCount}
+      isPremium={isPremium}
+      labels={{
+        colors: t("colorsLabel"),
+        files: t("filesLabel"),
+        images: t("imagesLabel"),
+        lastUpdated: t("lastUpdatedLabel"),
+        totalSize: t("totalSizeLabel"),
+      }}
       title={presentation.title}
+      totalBytes={summary.totalBytes}
+      totalFiles={summary.totalFiles}
+      updatedAt={updatedAt}
     />,
     size,
   );

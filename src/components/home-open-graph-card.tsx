@@ -3,7 +3,7 @@ import { IconSpiral } from "@tabler/icons-react";
 export function HomeOpenGraphCard() {
   return (
     <div
-      aria-label="Portals Design"
+      aria-label="Worvia"
       role="img"
       style={{
         alignItems: "center",
@@ -32,7 +32,7 @@ export function HomeOpenGraphCard() {
           stroke={1.45}
         />
         <span style={{ fontSize: 54, fontWeight: 650, letterSpacing: -2.5 }}>
-          Portals Design
+          Worvia
         </span>
       </div>
     </div>

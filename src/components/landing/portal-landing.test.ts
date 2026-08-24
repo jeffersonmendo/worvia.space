@@ -210,10 +210,10 @@ describe("PortalLanding", () => {
 
   test("keeps brand marks in the two header navs only", () => {
     expect(source.match(/<IconSpiral/g)).toHaveLength(2);
-    expect(source).toContain('aria-label="Portals Design"');
+    expect(source).toContain('aria-label="Worvia"');
     expect(source).not.toContain('role="img"');
     expect(source).not.toContain(
-      '<IconSpiral\n                  aria-label="Portals Design"',
+      '<IconSpiral\n                  aria-label="Worvia"',
     );
     expect(source).not.toContain("PORTAL_LANDING_LAYOUT.logo");
     expect(source).not.toContain("eyebrow");
@@ -269,14 +269,14 @@ describe("PortalLanding", () => {
     expect(source).toContain("{plan.pricing}");
     expect(source).toContain("from-brand-surface-strong");
     expect(english.Landing.details.pricing).toEqual({
-      title: "Put a price on your portal.",
+      title: "Put a price on your project.",
       description:
-        "Designers can set a price for portal access and turn a finished presentation into a paid experience for their clients.",
+        "Designers can set a price for project access and turn a finished presentation into a paid experience for their clients.",
     });
     expect(spanish.Landing.details.pricing).toEqual({
-      title: "Ponle precio a tu portal.",
+      title: "Ponle precio a tu proyecto.",
       description:
-        "Los diseñadores pueden fijar un precio para el acceso al portal y convertir una presentación terminada en una experiencia de pago para sus clientes.",
+        "Los diseñadores pueden fijar un precio para el acceso al proyecto y convertir una presentación terminada en una experiencia de pago para sus clientes.",
     });
 
     for (const locale of [english, spanish]) {
@@ -469,16 +469,16 @@ describe("PortalLanding", () => {
     expect(source).toContain("details.plans.free");
     expect(source).toContain('id="landing-plans-title"');
     expect(english.Landing.details.plans.free.features).toContain(
-      "100 MB for this portal",
+      "100 MB for this project",
     );
     expect(english.Landing.details.plans.premium.features).toContain(
-      "2 GB dedicated to this portal",
+      "2 GB dedicated to this project",
     );
     expect(spanish.Landing.details.plans.free.features).toContain(
-      "100 MB para este portal",
+      "100 MB para este proyecto",
     );
     expect(spanish.Landing.details.plans.premium.features).toContain(
-      "2 GB dedicados a este portal",
+      "2 GB dedicados a este proyecto",
     );
   });
 

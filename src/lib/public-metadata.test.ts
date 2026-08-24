@@ -15,14 +15,14 @@ describe("public metadata", () => {
     });
 
     expect(metadata.title).toBe(
-      "Diseña la marca. Entrega la experiencia. | Portals Design",
+      "Diseña la marca. Entrega la experiencia. | Worvia",
     );
     expect(metadata.alternates?.canonical).toBe("/es");
     expect(metadata.openGraph).toMatchObject({
       description: "Presenta tu trabajo con claridad.",
       locale: "es_ES",
-      siteName: "Portals Design",
-      title: "Diseña la marca. Entrega la experiencia. | Portals Design",
+      siteName: "Worvia",
+      title: "Diseña la marca. Entrega la experiencia. | Worvia",
       type: "website",
       url: "/es",
     });
@@ -40,19 +40,19 @@ describe("public metadata", () => {
       slug: "acme-brand",
     });
 
-    expect(metadata.title).toBe("Acme Brand | Portals Design");
+    expect(metadata.title).toBe("Acme Brand | Worvia");
     expect(metadata.alternates?.canonical).toBe("/en/p/acme-brand");
     expect(metadata.openGraph).toMatchObject({
       description: "The complete identity system.",
       images: [
         {
-          alt: "Acme Brand | Portals Design",
+          alt: "Acme Brand | Worvia",
           height: 630,
           url: "/en/p/acme-brand/opengraph-image",
           width: 1200,
         },
       ],
-      title: "Acme Brand | Portals Design",
+      title: "Acme Brand | Worvia",
       url: "/en/p/acme-brand",
     });
   });
@@ -67,8 +67,8 @@ describe("public metadata", () => {
 
   test("reveals portal copy only when access is allowed", () => {
     const fallback = {
-      description: "Portal created with Portals Design.",
-      title: "Portal unavailable | Portals Design",
+      description: "Portal created with Worvia.",
+      title: "Portal unavailable | Worvia",
     };
     const portal = {
       description: "Confidential launch system.",

@@ -7,7 +7,7 @@ test("serves a reduced-quality preview with a crown watermark", () => {
   expect(routeSource).toContain(".resize(640, 400");
   expect(routeSource).toContain(".modulate({ brightness: 1 })");
   expect(routeSource).toContain(".jpeg({ quality: 65");
-  expect(routeSource).not.toContain("Portals Design");
+  expect(routeSource).not.toContain("Worvia");
   expect(routeSource).toContain('width="52" height="52"');
   expect(routeSource).toContain('d="M19 19h-14c-.5 0-.9-.3-1-.8l-2-10');
   expect(routeSource).toContain('opacity="0.7"');

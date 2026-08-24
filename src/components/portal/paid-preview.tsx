@@ -216,7 +216,7 @@ export async function PaidPreview({
           <div className="flex items-center justify-center gap-1.5">
             <span>{t("poweredBy")}</span>
             <Link className="font-medium underline underline-offset-4" href="/">
-              Portals Design
+              Worvia
             </Link>
           </div>
         </footer>

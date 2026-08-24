@@ -63,7 +63,7 @@ describe("PortalBrandFooter", () => {
       });
 
       expect(html).toContain(
-        `<footer class="flex justify-center lg:col-start-2"><p class="text-sm text-muted-foreground">${copy}<a class="underline underline-offset-4 transition-colors hover:text-blue-600" href="${href}">Portals Design</a></p></footer>`,
+        `<footer class="flex justify-center lg:col-start-2"><p class="text-sm text-muted-foreground">${copy}<a class="underline underline-offset-4 transition-colors hover:text-blue-600" href="${href}">Worvia</a></p></footer>`,
       );
       expect(html.indexOf("Portal content")).toBeLessThan(
         html.indexOf(copy.trim()),

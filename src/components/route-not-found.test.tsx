@@ -9,7 +9,7 @@ describe("RouteNotFound", () => {
       <NextIntlClientProvider locale="en" messages={{}}>
         <RouteNotFound
           description="This portal is private or has not been published."
-          goHomeLabel="Go to Portals Design"
+          goHomeLabel="Go to Worvia"
           title="Project not found"
           viewProjectsLabel="View my projects"
         />
@@ -19,6 +19,6 @@ describe("RouteNotFound", () => {
     expect(markup).toContain('href="/en/home"');
     expect(markup).toContain('href="/en"');
     expect(markup).toContain("View my projects");
-    expect(markup).toContain("Go to Portals Design");
+    expect(markup).toContain("Go to Worvia");
   });
 });

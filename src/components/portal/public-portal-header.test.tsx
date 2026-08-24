@@ -14,9 +14,9 @@ describe("PublicPortalShell", () => {
       </PublicPortalShell>,
     );
 
-    expect(markup).toContain('aria-label="Portals Design"');
+    expect(markup).toContain('aria-label="Worvia"');
     expect(markup).toContain('href="/"');
-    expect(markup).not.toContain(">Portals Design<");
+    expect(markup).not.toContain(">Worvia<");
     expect(markup).not.toContain("Ada Lovelace");
     expect(markup).toContain('aria-label="Download"');
     expect(markup).toContain(
