@@ -678,7 +678,7 @@ export async function updatePortalSettings(formData: FormData) {
     ? getString(formData, "name")
     : portal.name;
   const nextShortDescription = formData.has("short_description")
-    ? getString(formData, "short_description").slice(0, 250) || null
+    ? getString(formData, "short_description").slice(0, 500) || null
     : portal.short_description;
   const nextSlug = formData.has("slug")
     ? getString(formData, "slug")

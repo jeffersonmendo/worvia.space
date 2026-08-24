@@ -307,6 +307,7 @@ function PortalSummary({
             !editable && "pointer-events-none",
           )}
           data-portal-editor-field
+          maxLength={500}
           onChange={(event) =>
             editable &&
             onPortalChange({ description: event.currentTarget.value })

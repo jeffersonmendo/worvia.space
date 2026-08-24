@@ -404,6 +404,7 @@ export function PortalCreationQuestionnaire({ locale }: { locale: string }) {
                 </FieldLabel>
                 <Textarea
                   id="creation-description"
+                  maxLength={500}
                   onChange={(event) => setDescription(event.target.value)}
                   placeholder={t("descriptionPlaceholder")}
                   rows={4}
