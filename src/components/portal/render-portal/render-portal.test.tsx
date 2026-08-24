@@ -44,13 +44,13 @@ function renderFooter(
 describe("PortalBrandFooter", () => {
   test.each([
     {
-      copy: "This portal was created or powered by ",
+      copy: "Created with ",
       href: "/en",
       locale: "en" as const,
       messages: english,
     },
     {
-      copy: "Este portal ha sido creado o potenciado por ",
+      copy: "Creado con ",
       href: "/es",
       locale: "es" as const,
       messages: spanish,

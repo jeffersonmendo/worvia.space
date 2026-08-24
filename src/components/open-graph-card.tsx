@@ -46,6 +46,20 @@ const formatDate = (value: string) => {
       }).format(date);
 };
 
+const truncateDescription = (value: string, maxLength = 120) => {
+  const normalized = value.trim();
+  if (normalized.length <= maxLength) return normalized;
+  const truncated = normalized.slice(0, maxLength).replace(/\s+\S*$/, "");
+  return `${truncated}…`;
+};
+
+const truncateTitle = (value: string, maxLength = 32) => {
+  const normalized = value.trim();
+  if (normalized.length <= maxLength) return normalized;
+  const truncated = normalized.slice(0, maxLength).replace(/\s+\S*$/, "");
+  return `${truncated}…`;
+};
+
 function OpenGraphFileBadge({ type }: { type: string }) {
   const background =
     type === "psd" ? "#001e36" : type === "pdf" ? "#ff2116" : "#330000";
@@ -145,9 +159,10 @@ export function OpenGraphCard({
             letterSpacing: -3.6,
             lineHeight: 1.02,
             maxWidth: 1060,
+            whiteSpace: "nowrap",
           }}
         >
-          {title}
+          {truncateTitle(title)}
         </div>
         <div
           style={{
@@ -157,7 +172,7 @@ export function OpenGraphCard({
             maxWidth: 1020,
           }}
         >
-          {description}
+          {truncateDescription(description)}
         </div>
         <div
           style={{
