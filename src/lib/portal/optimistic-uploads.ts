@@ -112,11 +112,14 @@ export async function reconcileOptimisticUpload<T>({
     return false;
   }
   try {
-    commit(asset);
+    // Remove the local preview before publishing the finalized asset. This
+    // keeps the optimistic item from surviving a synchronous render/store
+    // update triggered by commit and makes the transition one-way: the
+    // document can only receive the server-backed asset now.
     registry.remove(id);
+    commit(asset);
     return true;
   } catch (error) {
-    registry.remove(id);
     await discard(asset);
     throw error;
   }

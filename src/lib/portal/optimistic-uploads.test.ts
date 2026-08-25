@@ -116,6 +116,32 @@ describe("OptimisticUploadRegistry", () => {
     expect(discarded).toEqual(["asset-late"]);
   });
 
+  test("removes the local preview before committing the finalized asset", async () => {
+    const registry = new OptimisticUploadRegistry<string>({
+      createObjectURL: () => "blob:local",
+      createId: () => "pending-finalized",
+      revokeObjectURL: () => undefined,
+    });
+    const pending = registry.add(
+      new File(["x"], "image.png"),
+      () => "blob:local",
+    );
+    let ownsDuringCommit = true;
+
+    await reconcileOptimisticUpload({
+      asset: "https://storage.example/finalized.png",
+      commit: () => {
+        ownsDuringCommit = registry.owns(pending.id);
+      },
+      discard: async () => undefined,
+      id: pending.id,
+      registry,
+    });
+
+    expect(ownsDuringCommit).toBe(false);
+    expect(registry.getSnapshot()).toEqual([]);
+  });
+
   test("counts provisional items against a bounded comparison capacity", () => {
     expect(remainingOptimisticUploadSlots(2, 0, 0)).toBe(2);
     expect(remainingOptimisticUploadSlots(2, 0, 2)).toBe(0);
