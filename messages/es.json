@@ -10,97 +10,252 @@
     "goHome": "Ir a Worvia"
   },
   "Landing": {
-    "titleLine1": "Diseña la marca.",
-    "titleLine2": "Entrega la experiencia.",
-    "description": "Worvia convierte tus sistemas de marca en proyectos profesionales donde puedes presentar el proyecto, organizar recursos y entregar cada archivo en un solo lugar.",
-    "cta": "Crear un proyecto",
+    "titleLine1": "Presenta, entrega y vende.",
+    "titleLine2": "Todo en un proyecto.",
+    "description": "Worvia reúne tu presentación, la entrega de archivos y la venta de trabajo digital en un solo proyecto. Empieza gratis y monetiza sin pagar primero.",
+    "cta": "Crear gratis",
     "header": {
-      "createAccount": "Crear cuenta",
-      "enter": "Entrar",
-      "signIn": "Ingresar"
+      "createAccount": "Crear gratis",
+      "enter": "Ir a inicio",
+      "signIn": "Ingresar",
+      "menu": "Abrir menú",
+      "language": "Idioma"
     },
     "details": {
-      "title": "Una mejor entrega también forma parte del diseño.",
-      "description": "Worvia ofrece a los diseñadores de marca un espacio cuidado para presentar el concepto, organizar el sistema y entregar cada recurso final sin romper la experiencia.",
-      "benefits": [
+      "navigation": [
         {
-          "title": "Cuenta la historia detrás del sistema",
-          "description": "Guía al cliente por la estrategia, el lenguaje visual y las decisiones que hacen funcionar la identidad."
+          "label": "Producto",
+          "href": "#producto"
         },
         {
-          "title": "Dale un lugar claro a cada recurso",
-          "description": "Estructura logotipos, guías, colores, tipografías y archivos finales en un proyecto fácil de entender."
+          "label": "Cómo funciona",
+          "href": "#como-funciona"
         },
         {
-          "title": "Diseña también el momento final",
-          "description": "Convierte la entrega en una extensión pulida de la marca, no en una última carpeta para descargar."
+          "label": "Vender",
+          "href": "#vender"
+        },
+        {
+          "label": "IA",
+          "href": "#ia"
+        },
+        {
+          "label": "Precios",
+          "href": "#precios"
+        },
+        {
+          "label": "FAQ",
+          "href": "#faq"
         }
       ],
-      "pricing": {
-        "title": "Ponle precio a tu proyecto.",
-        "description": "Los diseñadores pueden fijar un precio para el acceso al proyecto y convertir una presentación terminada en una experiencia de pago para sus clientes."
+      "heroSecondary": "Ver cómo funciona",
+      "demo": {
+        "eyebrow": "Del editor al enlace publicado",
+        "title": "Diseña una vez. Presenta y entrega en el mismo lugar.",
+        "description": "Una representación del proyecto que construyes en Worvia: estructura, estilo, recursos y permisos permanecen conectados.",
+        "editorLabel": "Editor",
+        "publishedLabel": "Proyecto publicado",
+        "sections": [
+          "Colores",
+          "Tipografías",
+          "Galerías",
+          "Archivos y descargas"
+        ],
+        "projectTitle": "Sistema visual — Aster",
+        "projectDescription": "Una entrega clara que conserva el contexto de cada decisión y recurso."
+      },
+      "steps": {
+        "eyebrow": "Cómo funciona",
+        "title": "De tus archivos a un proyecto listo para compartir",
+        "items": [
+          {
+            "title": "Crea o importa",
+            "description": "Comienza manualmente o importa tus archivos existentes."
+          },
+          {
+            "title": "Personaliza y revisa",
+            "description": "Ajusta colores, tipografías y estructura; revisa la propuesta opcional de IA antes de aplicarla."
+          },
+          {
+            "title": "Elige el acceso",
+            "description": "Publica como proyecto público, privado, con contraseña o de pago."
+          },
+          {
+            "title": "Publica y comparte",
+            "description": "Entrega a un cliente o vende mediante un único enlace compartido."
+          }
+        ]
+      },
+      "journeys": {
+        "eyebrow": "Dos recorridos, un mismo proyecto",
+        "title": "Entrega profesional o venta directa",
+        "items": [
+          {
+            "title": "Entrega para clientes",
+            "description": "Presenta el proceso, organiza los recursos y controla qué puede descargar cada cliente.",
+            "action": "Compartir una entrega"
+          },
+          {
+            "title": "Venta de recursos digitales",
+            "description": "Configura un pago único y comparte el enlace directamente con tu audiencia.",
+            "action": "Preparar una venta"
+          }
+        ]
+      },
+      "monetization": {
+        "eyebrow": "Vender",
+        "title": "Monetiza sin pagar primero",
+        "description": "Incluso un proyecto Free puede venderse. Configura un precio entre US$4.35 y US$500.",
+        "commissionTitle": "Comisión oficial de Worvia",
+        "tiers": [
+          "5% para ventas de hasta US$100",
+          "8% para ventas por encima de US$100"
+        ],
+        "stripe": "Stripe puede aplicar tarifas adicionales de procesamiento.",
+        "examples": [
+          "Venta de US$50 → comisión Worvia de US$2.50",
+          "Venta de US$100 → comisión Worvia de US$5",
+          "Venta de US$150 → comisión Worvia de US$12"
+        ]
+      },
+      "buyer": {
+        "eyebrow": "Experiencia del comprador",
+        "title": "Compra simple, acceso que permanece",
+        "description": "El comprador ve una preview segura, se autentica y realiza un pago único. El proyecto queda en su biblioteca mientras la compra siga activa.",
+        "items": [
+          "Descargas individuales, por sección o completas según permisos",
+          "Acceso persistente desde su biblioteca",
+          "Acceso a futuras versiones publicadas"
+        ]
+      },
+      "ai": {
+        "eyebrow": "IA opcional",
+        "title": "Un acelerador, nunca el sustituto del diseñador",
+        "description": "Cada mes incluye 7 créditos. Tú revisas y decides qué se aplica al proyecto.",
+        "credits": [
+          "3 créditos para generar una propuesta",
+          "2 créditos para agregar o mejorar contenido",
+          "1 crédito para refinar texto"
+        ]
+      },
+      "security": {
+        "eyebrow": "Acceso y seguridad",
+        "title": "Comparte con el nivel de acceso correcto",
+        "items": [
+          {
+            "title": "Público",
+            "description": "Cualquier persona con el enlace puede verlo."
+          },
+          {
+            "title": "Privado",
+            "description": "Solo tú mantienes acceso al borrador."
+          },
+          {
+            "title": "Contraseña",
+            "description": "Protección disponible en Starter o superior."
+          },
+          {
+            "title": "Pago",
+            "description": "Preview segura y acceso tras un pago único."
+          }
+        ],
+        "note": "La contraseña y el acceso de pago son opciones distintas; no se combinan."
       },
       "plans": {
-        "title": "Elige el alcance de cada proyecto.",
-        "description": "Empieza gratis y elige la capacidad que necesita cada proyecto.",
-        "perPortal": "Por proyecto",
+        "title": "Capacidad clara para cada proyecto",
+        "description": "El precio del plan define la capacidad del proyecto. El precio que cobras y los créditos de IA son conceptos separados.",
+        "perPortal": "Pago único por proyecto",
         "free": {
-          "name": "Gratis",
+          "name": "Free",
           "price": "$0",
-          "pricing": "También puedes fijar un precio para acceder a este proyecto.",
-          "description": "Para presentar proyectos pequeños y empezar sin fricción.",
+          "pricing": "Puede venderse: tú defines el precio de acceso.",
+          "description": "Para comenzar y publicar sin pagar primero.",
           "features": [
-            "100 MB para este proyecto",
-            "1 sección de archivos, tipografías, colores y galería",
-            "Hasta 2 secciones de texto",
-            "Hasta 10 elementos por sección"
+            "100 MB por proyecto",
+            "2 galerías de hasta 10 imágenes",
+            "1 sección de archivos, tipografías y colores",
+            "Hasta 2 secciones de texto"
           ],
           "cta": "Empezar gratis"
         },
         "starter": {
           "name": "Starter",
           "price": "$4.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
-          "description": "Para entregas pequeñas que necesitan más espacio.",
+          "pricing": "Pago único por la capacidad del proyecto.",
+          "description": "Para entregas pequeñas con acceso protegido.",
           "features": [
-            "500 MB para este proyecto",
-            "Hasta 30 secciones",
-            "Hasta 20 archivos, colores o imágenes por sección",
-            "Protección del proyecto con contraseña"
+            "500 MB y hasta 30 secciones",
+            "2 galerías de hasta 15 imágenes",
+            "Hasta 20 archivos o colores por sección",
+            "Contraseña disponible"
           ],
           "cta": "Elegir Starter"
         },
         "pro": {
           "name": "Pro",
           "price": "$9.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
-          "description": "Para freelancers y entregas profesionales.",
+          "pricing": "Pago único por la capacidad del proyecto.",
+          "description": "Para entregas profesionales más amplias.",
           "features": [
-            "1 GB para este proyecto",
-            "Hasta 60 secciones",
-            "Hasta 30 imágenes de galería y 40 archivos o colores",
-            "Protección del proyecto con contraseña"
+            "1 GB y hasta 60 secciones",
+            "5 galerías de hasta 30 imágenes",
+            "4 secciones de archivos con hasta 40 elementos",
+            "4 secciones de tipografías con hasta 10 familias"
           ],
           "cta": "Elegir Pro"
         },
         "premium": {
           "name": "Premium",
           "price": "$19.99",
-          "pricing": "Puedes fijar el precio que pagarán los clientes para acceder a este proyecto.",
-          "description": "Para entregas más completas y proyectos con identidad propia.",
+          "pricing": "Pago único por la capacidad del proyecto.",
+          "description": "Para sistemas extensos y catálogos de recursos.",
           "features": [
-            "2 GB dedicados a este proyecto",
-            "Protección del proyecto con contraseña",
-            "Hasta 100 secciones en total",
-            "Hasta 2 secciones de archivos y tipografías",
-            "Hasta 3 galerías de 15 imágenes"
+            "2 GB y hasta 100 secciones",
+            "10 galerías de hasta 60 imágenes",
+            "8 secciones de tipografías con hasta 20 familias",
+            "8 secciones de archivos con hasta 80 elementos",
+            "500 MB máximos por archivo"
           ],
-          "cta": "Crear un proyecto Premium"
+          "cta": "Elegir Premium"
         }
       },
-      "ctaTitle": "Tu trabajo merece más que un enlace de descarga.",
-      "ctaDescription": "Crea un proyecto y haz que la entrega sea tan intencional como la identidad.",
-      "ctaLabel": "Crear cuenta"
+      "faq": {
+        "eyebrow": "Preguntas frecuentes",
+        "title": "Transparencia antes de publicar",
+        "items": [
+          {
+            "question": "¿Los planes son suscripciones?",
+            "answer": "No. Free es gratuito y Starter, Pro y Premium son pagos únicos por proyecto."
+          },
+          {
+            "question": "¿Puedo vender desde Free?",
+            "answer": "Sí. Un proyecto Free puede cobrar acceso entre US$4.35 y US$500."
+          },
+          {
+            "question": "¿Stripe cobra tarifas?",
+            "answer": "Stripe puede aplicar tarifas de procesamiento adicionales a la comisión de Worvia."
+          },
+          {
+            "question": "¿Qué comisión cobra Worvia?",
+            "answer": "5% en ventas de hasta US$100 y 8% cuando la venta supera US$100."
+          },
+          {
+            "question": "¿Puedo proteger con contraseña?",
+            "answer": "Sí, desde Starter. La contraseña es distinta del acceso de pago y no se combinan."
+          },
+          {
+            "question": "¿Qué recibe el comprador?",
+            "answer": "El proyecto queda en su biblioteca con las descargas permitidas y acceso a futuras versiones publicadas mientras la compra siga activa."
+          },
+          {
+            "question": "¿La IA diseña por mí?",
+            "answer": "No. Es opcional y acelera propuestas que siempre revisas antes de aplicar."
+          }
+        ]
+      },
+      "ctaTitle": "Presenta, entrega y vende tu próximo proyecto.",
+      "ctaDescription": "Empieza con Free y elige más capacidad solo cuando el proyecto la necesite.",
+      "ctaLabel": "Crear mi primer proyecto gratis"
     }
   },
   "Home": {

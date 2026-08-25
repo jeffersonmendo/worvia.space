@@ -131,6 +131,45 @@ describe("portal monetization policy", () => {
     expect(PORTAL_PLANS.pro.sections.text).toEqual({ sections: 8 });
   });
 
+  test("keeps every paid plan monotonic and publishes the rebalanced Premium limits", () => {
+    const ordered = [
+      PORTAL_PLANS.starter,
+      PORTAL_PLANS.pro,
+      PORTAL_PLANS.premium,
+    ];
+    for (let index = 1; index < ordered.length; index += 1) {
+      const previous = ordered[index - 1];
+      const current = ordered[index];
+      expect(current.storageBytes).toBeGreaterThanOrEqual(
+        previous.storageBytes,
+      );
+      expect(current.totalSections).toBeGreaterThanOrEqual(
+        previous.totalSections,
+      );
+      for (const type of ["files", "fonts", "gallery"] as const) {
+        expect(current.sections[type]?.sections).toBeGreaterThanOrEqual(
+          previous.sections[type]?.sections ?? 0,
+        );
+        expect(current.sections[type]?.items).toBeGreaterThanOrEqual(
+          previous.sections[type]?.items ?? 0,
+        );
+      }
+    }
+
+    expect(PORTAL_PLANS.premium.sections.gallery).toEqual({
+      items: 60,
+      sections: 10,
+    });
+    expect(PORTAL_PLANS.premium.sections.fonts).toEqual({
+      items: 20,
+      sections: 8,
+    });
+    expect(PORTAL_PLANS.premium.sections.files).toEqual({
+      items: 80,
+      sections: 8,
+    });
+  });
+
   test("rejects additions over Free section and item limits", () => {
     const previous = documentWith([{ type: "gallery", items: 10 }]);
     expect(

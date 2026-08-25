@@ -109,6 +109,13 @@ export const SHADER_BACKGROUND_VARIANTS = Object.keys(
   VARIANT_COMPONENTS,
 ) as ShaderBackgroundVariant[];
 
+export function getReducedMotionShaderProps(
+  reducedMotion: boolean | null,
+  props: Record<string, unknown>,
+) {
+  return reducedMotion && "speed" in props ? { speed: 0 } : {};
+}
+
 /**
  * Not every variant animates (e.g. dot-grid is a static pattern), so `speed`
  * is only frozen for reduced motion when the variant actually exposes it.
@@ -123,7 +130,7 @@ export function ShaderBackground({
     Record<string, unknown>
   >;
   const props = rest as Record<string, unknown>;
-  const speedProps = reducedMotion && "speed" in props ? { speed: 0 } : {};
+  const speedProps = getReducedMotionShaderProps(reducedMotion, props);
 
   return (
     <Shader

@@ -6,7 +6,7 @@ describe("getLandingEntryHref", () => {
     expect(getLandingEntryHref(true)).toBe("/home");
   });
 
-  test("sends anonymous visitors to sign in", () => {
-    expect(getLandingEntryHref(false)).toBe("/auth/sign-in");
+  test("sends anonymous visitors to registration", () => {
+    expect(getLandingEntryHref(false)).toBe("/auth/sign-up");
   });
 });

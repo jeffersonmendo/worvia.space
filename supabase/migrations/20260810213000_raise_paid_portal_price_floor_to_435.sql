@@ -1,4 +1,4 @@
--- Raise the paid portal operating floor to $4.35 while preserving the $500 cap and 10% commission.
+-- Raise the paid portal operating floor to $4.35 while preserving the $500 cap; commission is calculated by the checkout runtime.
 alter table public.paid_portal_offers
   drop constraint if exists paid_portal_offers_price_cents_check,
   add constraint paid_portal_offers_price_cents_check

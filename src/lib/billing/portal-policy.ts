@@ -109,9 +109,9 @@ export const PORTAL_PLANS: Record<PortalPlan, PortalPlanPolicy> = {
     storageBytes: 2 * GiB,
     totalSections: 100,
     sections: {
-      files: { items: 10, sections: 2 },
-      fonts: { items: 3, sections: 2 },
-      gallery: { items: 15, sections: 3 },
+      files: { items: 80, sections: 8 },
+      fonts: { items: 20, sections: 8 },
+      gallery: { items: 60, sections: 10 },
     },
   },
 };

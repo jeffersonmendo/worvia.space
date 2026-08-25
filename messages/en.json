@@ -10,97 +10,249 @@
     "goHome": "Go to Worvia"
   },
   "Landing": {
-    "titleLine1": "Design the brand.",
-    "titleLine2": "Deliver the experience.",
-    "description": "Worvia turns your brand systems into polished client projects where you can present the work, organize assets, and deliver every file in one place.",
-    "cta": "Create a project",
+    "titleLine1": "Present, deliver, and sell.",
+    "titleLine2": "All in one project.",
+    "description": "Worvia brings your presentation, file delivery, and digital work sales into one project. Start free and monetize before paying anything.",
+    "cta": "Create free",
     "header": {
-      "createAccount": "Create account",
-      "enter": "Enter",
-      "signIn": "Log in"
+      "createAccount": "Create free",
+      "enter": "Go home",
+      "signIn": "Log in",
+      "menu": "Open menu",
+      "language": "Language"
     },
     "details": {
-      "title": "A better handoff is part of the design.",
-      "description": "Worvia gives brand designers one considered space to present the thinking, organize the system, and deliver every final asset without breaking the experience.",
-      "benefits": [
+      "navigation": [
         {
-          "title": "Tell the story behind the system",
-          "description": "Guide clients through the strategy, visual language, and decisions that make the identity work."
+          "label": "Product",
+          "href": "#product"
         },
         {
-          "title": "Give every asset a clear home",
-          "description": "Structure logos, guidelines, colors, typography, and exports in a project clients can understand."
+          "label": "How it works",
+          "href": "#how-it-works"
         },
         {
-          "title": "Make the final moment feel designed",
-          "description": "Turn delivery into a polished extension of the brand instead of one last folder download."
+          "label": "Sell",
+          "href": "#sell"
+        },
+        {
+          "label": "AI",
+          "href": "#ai"
+        },
+        {
+          "label": "Pricing",
+          "href": "#pricing"
+        },
+        {
+          "label": "FAQ",
+          "href": "#faq"
         }
       ],
-      "pricing": {
-        "title": "Put a price on your project.",
-        "description": "Designers can set a price for project access and turn a finished presentation into a paid experience for their clients."
+      "heroSecondary": "See how it works",
+      "demo": {
+        "eyebrow": "From editor to published link",
+        "title": "Design once. Present and deliver in the same place.",
+        "description": "A representation of the project you build in Worvia: structure, styling, assets, and permissions stay connected.",
+        "editorLabel": "Editor",
+        "publishedLabel": "Published project",
+        "sections": [
+          "Colors",
+          "Typography",
+          "Galleries",
+          "Files and downloads"
+        ],
+        "projectTitle": "Visual system — Aster",
+        "projectDescription": "A clear handoff that preserves the context behind every decision and asset."
+      },
+      "steps": {
+        "eyebrow": "How it works",
+        "title": "From your files to a project ready to share",
+        "items": [
+          {
+            "title": "Create or import",
+            "description": "Start manually or import your existing files."
+          },
+          {
+            "title": "Customize and review",
+            "description": "Adjust colors, typography, and structure; review the optional AI proposal before applying it."
+          },
+          {
+            "title": "Choose access",
+            "description": "Publish as public, private, password-protected, or paid."
+          },
+          {
+            "title": "Publish and share",
+            "description": "Deliver to a client or sell through one shared link."
+          }
+        ]
+      },
+      "journeys": {
+        "eyebrow": "Two paths, one project",
+        "title": "Professional delivery or direct sales",
+        "items": [
+          {
+            "title": "Client delivery",
+            "description": "Present the process, organize assets, and control what each client can download.",
+            "action": "Share a handoff"
+          },
+          {
+            "title": "Digital resource sales",
+            "description": "Set a one-time payment and share the link directly with your audience.",
+            "action": "Prepare a sale"
+          }
+        ]
+      },
+      "monetization": {
+        "eyebrow": "Sell",
+        "title": "Monetize before paying anything",
+        "description": "Even a Free project can be sold. Set a price from US$4.35 to US$500.",
+        "commissionTitle": "Official Worvia commission",
+        "tiers": ["5% for sales up to US$100", "8% for sales above US$100"],
+        "stripe": "Stripe may apply additional processing fees.",
+        "examples": [
+          "US$50 sale → US$2.50 Worvia commission",
+          "US$100 sale → US$5 Worvia commission",
+          "US$150 sale → US$12 Worvia commission"
+        ]
+      },
+      "buyer": {
+        "eyebrow": "Buyer experience",
+        "title": "A simple purchase, access that lasts",
+        "description": "The buyer sees a secure preview, authenticates, and makes a one-time payment. The project stays in their library while the purchase remains active.",
+        "items": [
+          "Individual, section, or complete downloads according to permissions",
+          "Persistent access from their library",
+          "Access to future published versions"
+        ]
+      },
+      "ai": {
+        "eyebrow": "Optional AI",
+        "title": "An accelerator, never a designer replacement",
+        "description": "Every month includes 7 credits. You review and decide what reaches the project.",
+        "credits": [
+          "3 credits to generate a proposal",
+          "2 credits to add or improve content",
+          "1 credit to refine text"
+        ]
+      },
+      "security": {
+        "eyebrow": "Access and security",
+        "title": "Share with the right access level",
+        "items": [
+          {
+            "title": "Public",
+            "description": "Anyone with the link can view it."
+          },
+          {
+            "title": "Private",
+            "description": "Only you retain access to the draft."
+          },
+          {
+            "title": "Password",
+            "description": "Protection available on Starter or higher."
+          },
+          {
+            "title": "Paid",
+            "description": "Secure preview and access after one payment."
+          }
+        ],
+        "note": "Password and paid access are separate options; they cannot be combined."
       },
       "plans": {
-        "title": "Choose the scope for each project.",
-        "description": "Start free and choose the capacity each project needs.",
-        "perPortal": "Per project",
+        "title": "Clear capacity for every project",
+        "description": "The plan price defines project capacity. Your selling price and AI credits are separate concepts.",
+        "perPortal": "One-time payment per project",
         "free": {
           "name": "Free",
           "price": "$0",
-          "pricing": "You can still set a price for access to this project.",
-          "description": "For presenting smaller projects and getting started without friction.",
+          "pricing": "Can be sold: you set the access price.",
+          "description": "Start and publish before paying anything.",
           "features": [
-            "100 MB for this project",
-            "1 section each for files, typography, colors, and galleries",
-            "Up to 2 text sections",
-            "Up to 10 items per section"
+            "100 MB per project",
+            "2 galleries with up to 10 images",
+            "1 section each for files, typography, and colors",
+            "Up to 2 text sections"
           ],
           "cta": "Start free"
         },
         "starter": {
           "name": "Starter",
           "price": "$4.99",
-          "pricing": "You can set the price clients pay to access this project.",
-          "description": "For small client deliveries that need more room.",
+          "pricing": "One-time payment for project capacity.",
+          "description": "Small handoffs with protected access.",
           "features": [
-            "500 MB for this project",
-            "Up to 30 sections",
-            "Up to 20 files, colors, or images per section",
-            "Password protection for the project"
+            "500 MB and up to 30 sections",
+            "2 galleries with up to 15 images",
+            "Up to 20 files or colors per section",
+            "Password available"
           ],
           "cta": "Choose Starter"
         },
         "pro": {
           "name": "Pro",
           "price": "$9.99",
-          "pricing": "You can set the price clients pay to access this project.",
-          "description": "For freelancers and professional handoffs.",
+          "pricing": "One-time payment for project capacity.",
+          "description": "Larger professional handoffs.",
           "features": [
-            "1 GB for this project",
-            "Up to 60 sections",
-            "Up to 30 gallery images and 40 files or colors",
-            "Password protection for the project"
+            "1 GB and up to 60 sections",
+            "5 galleries with up to 30 images",
+            "4 file sections with up to 40 items",
+            "4 typography sections with up to 10 families"
           ],
           "cta": "Choose Pro"
         },
         "premium": {
           "name": "Premium",
           "price": "$19.99",
-          "pricing": "You can set the price clients pay to access this project.",
-          "description": "For fuller handoffs and projects with a distinct identity.",
+          "pricing": "One-time payment for project capacity.",
+          "description": "Extensive systems and resource catalogs.",
           "features": [
-            "2 GB dedicated to this project",
-            "Password protection for the project",
-            "Up to 100 sections in total",
-            "Up to 2 files and typography sections",
-            "Up to 3 galleries with 15 images"
+            "2 GB and up to 100 sections",
+            "10 galleries with up to 60 images",
+            "8 typography sections with up to 20 families",
+            "8 file sections with up to 80 items",
+            "500 MB maximum per file"
           ],
-          "cta": "Create a Premium project"
+          "cta": "Choose Premium"
         }
       },
-      "ctaTitle": "Your work deserves more than a download link.",
-      "ctaDescription": "Create a project and make the handoff as intentional as the identity.",
-      "ctaLabel": "Create account"
+      "faq": {
+        "eyebrow": "Frequently asked questions",
+        "title": "Transparency before you publish",
+        "items": [
+          {
+            "question": "Are plans subscriptions?",
+            "answer": "No. Free is free, while Starter, Pro, and Premium are one-time payments per project."
+          },
+          {
+            "question": "Can I sell from Free?",
+            "answer": "Yes. A Free project can charge between US$4.35 and US$500 for access."
+          },
+          {
+            "question": "Does Stripe charge fees?",
+            "answer": "Stripe may apply processing fees in addition to Worvia's commission."
+          },
+          {
+            "question": "What commission does Worvia charge?",
+            "answer": "5% on sales up to US$100 and 8% when a sale is above US$100."
+          },
+          {
+            "question": "Can I use password protection?",
+            "answer": "Yes, from Starter. Password protection is separate from paid access and cannot be combined."
+          },
+          {
+            "question": "What does the buyer receive?",
+            "answer": "The project stays in their library with permitted downloads and future published versions while the purchase remains active."
+          },
+          {
+            "question": "Does AI design for me?",
+            "answer": "No. It is optional and accelerates proposals that you always review before applying."
+          }
+        ]
+      },
+      "ctaTitle": "Present, deliver, and sell your next project.",
+      "ctaDescription": "Start with Free and choose more capacity only when the project needs it.",
+      "ctaLabel": "Create my first project free"
     }
   },
   "Home": {
