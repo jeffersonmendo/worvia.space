@@ -51,6 +51,18 @@ test("successful uploads flush the document before reporting completion", () => 
   expect(controls).toContain("finalized.sizeBytes");
 });
 
+test("fresh signed image previews are not normalized before autosave authorizes the stable route", () => {
+  expect(renderer).toContain(
+    'withStablePortalAssetPreviews(document, editor?.slug ?? "")',
+  );
+  expect(renderer).toContain(
+    "const renderDocument = editor\n    ? orderDocumentItemsForRender(activeDocument)",
+  );
+  expect(renderer).not.toContain(
+    "orderDocumentItemsForRender(\n        withStablePortalAssetPreviews(activeDocument",
+  );
+});
+
 test("optimistic upload callbacks keep their registry context", () => {
   expect(optimisticUploads).toContain("this.add = this.add.bind(this)");
   expect(optimisticUploads).toContain("this.owns = this.owns.bind(this)");

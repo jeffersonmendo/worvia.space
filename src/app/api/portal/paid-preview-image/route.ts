@@ -64,25 +64,40 @@ export async function GET(request: Request) {
 
   try {
     const source = Buffer.from(await data.arrayBuffer());
+    const metadata = await sharp(source).metadata();
     const watermark = Buffer.from(`
-      <svg width="52" height="52" viewBox="0 0 52 52" opacity="0.7" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0.5" y="0.5" width="51" height="51" rx="25.5" fill="#000" fill-opacity="0.42" stroke="#fff" stroke-opacity="0.3"/>
-        <g transform="translate(8 8) scale(1.5)" fill="#fff" stroke="none">
+      <svg width="64" height="64" viewBox="0 0 64 64" opacity="0.82" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="52" height="52" rx="26" fill="#000" fill-opacity="0.48" stroke="#f5c542" stroke-opacity="0.7"/>
+        <g transform="translate(14 14) scale(1.5)" fill="#f5c542" stroke="none">
           <path d="M19 19h-14c-.5 0-.9-.3-1-.8l-2-10c0-.4.1-.8.5-1.1c.4-.2.8-.2 1.1 0l4.1 3.3l3.4-5.1c.4-.6 1.3-.6 1.7 0l3.4 5.1l4.1-3.3c.3-.3.8-.3 1.1 0c.4.2.5.6.5 1.1l-2 10c0 .5-.5.8-1 .8z"/>
         </g>
       </svg>
     `);
-    const preview = await sharp(source)
-      .resize(640, 400, { fit: "cover", withoutEnlargement: true })
+    const pipeline = sharp(source)
+      .resize(640, 400, {
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+        fit: "contain",
+        withoutEnlargement: true,
+      })
       .modulate({ brightness: 1 })
-      .composite([{ input: watermark, gravity: "center" }])
-      .jpeg({ quality: 65, progressive: true })
-      .toBuffer();
+      .composite([{ input: watermark, gravity: "southeast" }]);
+    const preservesTransparency =
+      metadata.hasAlpha || metadata.format === "svg";
+    const contentType = preservesTransparency
+      ? "image/png"
+      : metadata.format === "webp"
+        ? "image/webp"
+        : "image/jpeg";
+    const preview = preservesTransparency
+      ? await pipeline.png({ compressionLevel: 9 }).toBuffer()
+      : metadata.format === "webp"
+        ? await pipeline.webp({ quality: 90, alphaQuality: 100 }).toBuffer()
+        : await pipeline.jpeg({ quality: 90, progressive: true }).toBuffer();
 
     return new NextResponse(new Uint8Array(preview), {
       headers: {
         "Cache-Control": "private, no-store",
-        "Content-Type": "image/jpeg",
+        "Content-Type": contentType,
         "X-Content-Type-Options": "nosniff",
       },
     });

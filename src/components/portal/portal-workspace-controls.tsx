@@ -129,6 +129,10 @@ import {
   sourceNameFromStoragePath,
 } from "@/lib/portal/asset-names";
 import {
+  editorPortalImagePreviewUrl,
+  stablePortalAssetPreviewUrl,
+} from "@/lib/portal/asset-preview-reference";
+import {
   flushPortalAutosave,
   schedulePortalAutosave,
 } from "@/lib/portal/autosave-coordinator";
@@ -1194,7 +1198,28 @@ function ImageTile({
         : image.fit === "auto"
           ? "object-scale-down"
           : "object-cover";
-  const imageUrl = getStableEditorPreviewUrl(image, portalSlug);
+  const [useStablePreview, setUseStablePreview] = useState(false);
+  const [previewRetry, setPreviewRetry] = useState(0);
+  const previewRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stableImageUrl = portalSlug
+    ? stablePortalAssetPreviewUrl(
+        portalSlug,
+        image.asset_id,
+        image.storage_path,
+      )
+    : null;
+  const imageUrl =
+    useStablePreview && stableImageUrl
+      ? stableImageUrl
+      : editorPortalImagePreviewUrl(image, portalSlug);
+  useEffect(() => {
+    return () => {
+      if (previewRetryTimer.current) {
+        clearTimeout(previewRetryTimer.current);
+        previewRetryTimer.current = null;
+      }
+    };
+  }, []);
   const [settingsOpen, setSettingsOpen] = useState(false);
   return (
     <figure
@@ -1226,6 +1251,17 @@ function ImageTile({
           )}
           ref={dragHandleRef}
           src={imageUrl}
+          key={`${imageUrl}:${previewRetry}`}
+          onError={() => {
+            if (!stableImageUrl || imageUrl === stableImageUrl) return;
+            if (previewRetry < 3) {
+              previewRetryTimer.current = setTimeout(() => {
+                setPreviewRetry((current) => current + 1);
+              }, 400);
+              return;
+            }
+            setUseStablePreview(true);
+          }}
         />
         {pending ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 text-white">
@@ -2086,35 +2122,6 @@ function GalleryDropTarget({
       {children}
     </div>
   );
-}
-
-function getStableEditorPreviewUrl(
-  image: PortalImageItem,
-  portalSlug?: string,
-) {
-  if (!portalSlug) return image.image_url;
-  if (image.image_url.startsWith("/api/portal-assets/preview")) {
-    return image.image_url;
-  }
-
-  const params = new URLSearchParams({ slug: portalSlug });
-  if (image.asset_id) {
-    params.set("assetId", image.asset_id);
-  } else if (image.storage_path) {
-    params.set("path", image.storage_path);
-  } else {
-    try {
-      const pathname = new URL(image.image_url, "http://portal.local").pathname;
-      const match = pathname.match(
-        /^\/storage\/v1\/object\/(?:public|sign)\/portal-assets\/(.+)$/,
-      );
-      if (!match) return image.image_url;
-      params.set("path", decodeURIComponent(match[1]));
-    } catch {
-      return image.image_url;
-    }
-  }
-  return `/api/portal-assets/preview?${params.toString()}`;
 }
 
 function GalleryEditor({

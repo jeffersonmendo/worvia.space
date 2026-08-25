@@ -1,12 +1,46 @@
 import { describe, expect, test } from "bun:test";
 import {
   containsPortalAssetReference,
+  editorPortalImagePreviewUrl,
   stablePortalAssetPreviewUrl,
   stablePortalImagePreviewUrl,
   withStablePortalAssetPreviews,
 } from "./asset-preview-reference";
 
 describe("portal asset preview references", () => {
+  test("preserves a signed URL returned by a fresh upload without a stable reference", () => {
+    const signedUrl =
+      "https://signed.example/storage/v1/object/sign/portal-assets/fresh.png?token=abc";
+
+    expect(
+      editorPortalImagePreviewUrl(
+        {
+          asset_id: "asset-fresh",
+          image_url: signedUrl,
+          storage_path: "owner/portal/fresh.png",
+        },
+        "portal",
+      ),
+    ).toBe(signedUrl);
+  });
+
+  test("preserves an authorized preview route URL in the editor", () => {
+    const previewUrl = "/api/portal-assets/preview?slug=portal&assetId=asset-1";
+
+    expect(
+      editorPortalImagePreviewUrl({ image_url: previewUrl }, "portal"),
+    ).toBe(previewUrl);
+  });
+
+  test("keeps legacy storage URLs usable in the editor", () => {
+    const signedUrl =
+      "https://supabase.test/storage/v1/object/sign/portal-assets/owner%2Fportal%2Flegacy.png?token=abc";
+
+    expect(
+      editorPortalImagePreviewUrl({ image_url: signedUrl }, "portal"),
+    ).toBe(signedUrl);
+  });
+
   test("recognizes canonical asset id references", () => {
     expect(
       containsPortalAssetReference(

@@ -25,6 +25,8 @@ describe("public portal header integration", () => {
     expect(accessSource).toContain("stringValue(file?.file_type)");
     expect(accessSource).toContain("orderedPreviewImageAssets.slice(0, 6)");
     expect(accessSource).toContain("orderedPreviewImageAssets.slice(0, 6)");
+    expect(accessSource).not.toContain("...imageAssets.filter(");
+    expect(accessSource).toContain("orderedPreviewImageAssets.length > 0");
     expect(accessSource).toContain("asset_id=");
     expect(accessSource).toContain('.order("position", { ascending: true })');
   });

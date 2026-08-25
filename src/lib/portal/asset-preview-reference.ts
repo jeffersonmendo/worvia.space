@@ -59,6 +59,27 @@ export function stablePortalImagePreviewUrl(slug: string, reference: string) {
   return reference;
 }
 
+/**
+ * Resolve an image reference for the editor without replacing a fresh upload's
+ * signed URL before its stable asset reference is ready for the preview route.
+ */
+export function editorPortalImagePreviewUrl(
+  image: Pick<PortalImageItem, "asset_id" | "image_url" | "storage_path">,
+  portalSlug?: string,
+) {
+  if (!portalSlug || image.image_url.startsWith("/api/portal-assets/preview")) {
+    return image.image_url;
+  }
+
+  // Fresh uploads already have asset metadata, but the protected preview
+  // route cannot authorize them until the async autosave persists the
+  // reference. Hydrated documents are normalized by
+  // withStablePortalAssetPreviews, so keep the current URL here.
+  return (
+    stablePortalImagePreviewUrl(portalSlug, image.image_url) ?? image.image_url
+  );
+}
+
 function stableImagePreview(image: PortalImageItem, slug: string) {
   const url = stablePortalAssetPreviewUrl(
     slug,

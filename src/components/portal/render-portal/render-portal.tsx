@@ -822,9 +822,7 @@ export function RenderPortal({
   }, [editor?.focus]);
 
   const renderDocument = editor
-    ? orderDocumentItemsForRender(
-        withStablePortalAssetPreviews(activeDocument, editor.slug ?? ""),
-      )
+    ? orderDocumentItemsForRender(activeDocument)
     : activeDocument;
 
   const visibleSections = renderDocument.sections.filter((section) => {

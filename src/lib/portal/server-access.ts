@@ -460,9 +460,6 @@ async function enrichPaidPreview(
     if (asset.mime_type?.startsWith("image/")) totalImages += 1;
   }
   const selected = readyAssets;
-  const hasPreviewImage = readyAssets.some((asset) =>
-    asset.mime_type?.startsWith("image/"),
-  );
   const sampleFiles = selected.map((asset) => ({
     assetType: assetType(asset),
   }));
@@ -499,12 +496,8 @@ async function enrichPaidPreview(
         ),
       )
       .filter((asset): asset is (typeof imageAssets)[number] => Boolean(asset)),
-    ...imageAssets.filter(
-      (asset) =>
-        !publishedImageKeys.includes(`id:${asset.id}`) &&
-        !publishedImageKeys.includes(`path:${asset.file_path}`),
-    ),
   ];
+  const hasPreviewImage = orderedPreviewImageAssets.length > 0;
   return {
     ...preview,
     assetSummary: summary.size ? [...summary.values()] : preview.assetSummary,
