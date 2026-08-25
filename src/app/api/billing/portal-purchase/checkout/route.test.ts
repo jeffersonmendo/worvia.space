@@ -15,9 +15,10 @@ test("uses persisted offer amount/currency and never accepts a body price", () =
   expect(source).not.toContain("body.currency");
 });
 
-test("keeps buyer metadata separate and uses a ten percent direct-charge application fee", () => {
+test("keeps buyer metadata separate and uses the tiered direct-charge application fee", () => {
   expect(source).toContain('product: "paid_portal_purchase_v1"');
-  expect(source).toContain("Math.floor(attempt.amount_total * 0.1)");
+  expect(source).toContain("amountTotal <= 10_000 ? 0.05 : 0.08");
+  expect(source).toContain("Math.floor(amountTotal * rate)");
   expect(source).toContain("managed_payments: { enabled: false }");
   expect(source).not.toContain("transfer_data");
   expect(source).not.toContain("on_behalf_of");

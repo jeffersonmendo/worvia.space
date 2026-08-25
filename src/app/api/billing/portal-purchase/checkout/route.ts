@@ -25,6 +25,11 @@ function validLocale(value: unknown) {
     : "en";
 }
 
+function paidPortalApplicationFee(amountTotal: number) {
+  const rate = amountTotal <= 10_000 ? 0.05 : 0.08;
+  return Math.floor(amountTotal * rate);
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     locale?: string;
@@ -133,7 +138,7 @@ export async function POST(request: Request) {
         managed_payments: { enabled: false } as never,
         mode: "payment",
         payment_intent_data: {
-          application_fee_amount: Math.floor(attempt.amount_total * 0.1),
+          application_fee_amount: paidPortalApplicationFee(attempt.amount_total),
           metadata: {
             buyer_id: attempt.buyer_id,
             checkout_attempt_id: attempt.idempotency_key,
@@ -146,7 +151,8 @@ export async function POST(request: Request) {
       {
         idempotencyKey: attempt.idempotency_key,
         // Direct charge: the connected merchant is the Stripe account of
-        // record, while application_fee_amount retains the platform's 10%.
+        // record, while application_fee_amount retains the platform's
+        // 5% fee up to $100 and 8% above $100.
         stripeAccount: account.stripe_account_id,
       },
     );
