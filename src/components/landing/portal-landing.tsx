@@ -1,6 +1,8 @@
 "use client";
 
 import { IconArrowDown, IconSpiral } from "@tabler/icons-react";
+import { Blobatar } from "blobatar/react";
+import "blobatar/motion.css";
 import {
   motion,
   useReducedMotion,
@@ -28,25 +30,43 @@ type PortalLandingProps = {
   details: LandingDetails;
   entryHref: "/home" | "/auth/sign-up";
   heroButtonLabel: string;
+  headerCreateAccountHref: "/auth/sign-up" | "/home";
   headerCreateAccountLabel: string;
+  headerEntryHref: "/auth/sign-in" | "/home";
   headerEntryLabel: string;
+  authenticatedUserName?: string;
+  isAuthenticated: boolean;
   title: string[];
 };
 
 type LandingHeaderNavProps = Pick<
   PortalLandingProps,
-  "headerCreateAccountLabel" | "headerEntryLabel"
+  | "headerCreateAccountHref"
+  | "headerCreateAccountLabel"
+  | "headerEntryHref"
+  | "headerEntryLabel"
+  | "authenticatedUserName"
+  | "isAuthenticated"
 > &
   Pick<PortalLandingProps, "details">;
 
 type HeaderActionProps = Pick<
   PortalLandingProps,
-  "headerCreateAccountLabel" | "headerEntryLabel"
+  | "headerCreateAccountHref"
+  | "headerCreateAccountLabel"
+  | "headerEntryHref"
+  | "headerEntryLabel"
+  | "authenticatedUserName"
+  | "isAuthenticated"
 >;
 
 function HeaderActions({
   headerCreateAccountLabel,
+  headerCreateAccountHref,
+  headerEntryHref,
   headerEntryLabel,
+  authenticatedUserName,
+  isAuthenticated,
   inverted = false,
 }: HeaderActionProps & { inverted?: boolean }) {
   return (
@@ -56,19 +76,28 @@ function HeaderActions({
           buttonVariants({ size: "sm", variant: "link" }),
           inverted && "text-white hover:text-white/80",
         )}
-        href="/auth/sign-up"
+        href={headerCreateAccountHref}
       >
         {headerCreateAccountLabel}
       </Link>
       <Link
         className={cn(
           buttonVariants({ size: "sm" }),
-          "rounded-full",
+          "gap-0.5 rounded-full",
           inverted && "bg-white text-black hover:bg-white/90",
         )}
-        href="/auth/sign-in"
+        href={headerEntryHref}
       >
         {headerEntryLabel}
+        {isAuthenticated ? (
+          <Blobatar
+            name={authenticatedUserName ?? "Worvia"}
+            size={24}
+            animate="always"
+            aria-hidden="true"
+            className="size-6! shrink-0"
+          />
+        ) : null}
       </Link>
     </div>
   );
@@ -99,8 +128,12 @@ function LandingNavigation({
 
 function InitialLandingHeaderNav({
   details,
+  headerCreateAccountHref,
   headerCreateAccountLabel,
+  headerEntryHref,
   headerEntryLabel,
+  authenticatedUserName,
+  isAuthenticated,
 }: LandingHeaderNavProps) {
   return (
     <nav
@@ -121,7 +154,11 @@ function InitialLandingHeaderNav({
         inverted
         {...{
           headerCreateAccountLabel,
+          headerCreateAccountHref,
+          headerEntryHref,
           headerEntryLabel,
+          authenticatedUserName,
+          isAuthenticated,
         }}
       />
     </nav>
@@ -130,8 +167,12 @@ function InitialLandingHeaderNav({
 
 function ScrollLandingHeaderNav({
   details,
+  headerCreateAccountHref,
   headerCreateAccountLabel,
+  headerEntryHref,
   headerEntryLabel,
+  authenticatedUserName,
+  isAuthenticated,
 }: LandingHeaderNavProps) {
   return (
     <nav
@@ -148,7 +189,11 @@ function ScrollLandingHeaderNav({
       <HeaderActions
         {...{
           headerCreateAccountLabel,
+          headerCreateAccountHref,
+          headerEntryHref,
           headerEntryLabel,
+          authenticatedUserName,
+          isAuthenticated,
         }}
       />
     </nav>
@@ -161,8 +206,12 @@ export function PortalLanding({
   details,
   entryHref,
   heroButtonLabel,
+  headerCreateAccountHref,
   headerCreateAccountLabel,
+  headerEntryHref,
   headerEntryLabel,
+  authenticatedUserName,
+  isAuthenticated,
   title,
 }: PortalLandingProps) {
   const [isInitialHeaderInteractive, setIsInitialHeaderInteractive] =
@@ -258,8 +307,12 @@ export function PortalLanding({
       >
         <ScrollLandingHeaderNav
           details={details}
+          headerCreateAccountHref={headerCreateAccountHref}
           headerCreateAccountLabel={headerCreateAccountLabel}
+          headerEntryHref={headerEntryHref}
           headerEntryLabel={headerEntryLabel}
+          authenticatedUserName={authenticatedUserName}
+          isAuthenticated={isAuthenticated}
         />
       </motion.header>
 
@@ -287,8 +340,12 @@ export function PortalLanding({
             >
               <InitialLandingHeaderNav
                 details={details}
+                headerCreateAccountHref={headerCreateAccountHref}
                 headerCreateAccountLabel={headerCreateAccountLabel}
+                headerEntryHref={headerEntryHref}
                 headerEntryLabel={headerEntryLabel}
+                authenticatedUserName={authenticatedUserName}
+                isAuthenticated={isAuthenticated}
               />
             </motion.header>
 

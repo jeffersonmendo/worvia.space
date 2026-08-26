@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PortalLanding } from "@/components/landing/portal-landing";
-import { getLandingActionCopyKeys } from "@/lib/landing/actions";
+import {
+  getLandingActionCopyKeys,
+  getLandingActionHrefs,
+} from "@/lib/landing/actions";
 import { getLandingEntryHref } from "@/lib/landing/entry-route";
 import { buildHomeMetadata } from "@/lib/public-metadata";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
@@ -28,20 +31,29 @@ export default async function Home({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "Landing" });
-  const isAuthenticated = hasSupabaseEnv()
-    ? Boolean((await (await createClient()).auth.getUser()).data.user)
-    : false;
+  const user = hasSupabaseEnv()
+    ? (await (await createClient()).auth.getUser()).data.user
+    : null;
+  const isAuthenticated = Boolean(user);
   const actionCopyKeys = getLandingActionCopyKeys(isAuthenticated);
+  const entryHref = getLandingEntryHref(isAuthenticated);
+  const actionHrefs = getLandingActionHrefs(entryHref);
 
   return (
     <PortalLanding
       buttonLabel={t(actionCopyKeys.primary)}
       description={t("description")}
       details={t.raw("details")}
-      entryHref={getLandingEntryHref(isAuthenticated)}
+      entryHref={entryHref}
       heroButtonLabel={t("cta")}
+      headerCreateAccountHref={actionHrefs.create}
       headerCreateAccountLabel={t("header.createAccount")}
-      headerEntryLabel={t("header.signIn")}
+      headerEntryHref={actionHrefs.enter}
+      headerEntryLabel={
+        isAuthenticated ? t("header.enter") : t("header.signIn")
+      }
+      isAuthenticated={isAuthenticated}
+      authenticatedUserName={user?.email ?? "Worvia"}
       title={[t("titleLine1"), t("titleLine2")]}
     />
   );

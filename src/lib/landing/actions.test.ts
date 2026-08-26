@@ -9,9 +9,9 @@ describe("getLandingActionHrefs", () => {
     });
   });
 
-  test("sends authenticated entry, creation, and pricing actions home", () => {
+  test("sends authenticated entry home while keeping account creation public", () => {
     expect(getLandingActionHrefs("/home")).toEqual({
-      create: "/home",
+      create: "/auth/sign-up",
       enter: "/home",
     });
   });

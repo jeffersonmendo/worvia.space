@@ -52,6 +52,7 @@ describe("PortalLanding", () => {
     expect(PORTAL_LANDING_SCROLL.headerRevealEnd).toBe(300);
     expect(source).toContain("reducedMotion ? false");
     expect(source).toContain("reducedMotion ? [0, 0]");
+    expect(source).not.toContain("details.demo.eyebrow");
   });
 
   test("renders auth-aware primary actions and an internal demo action", () => {
@@ -73,10 +74,10 @@ describe("PortalLanding", () => {
     expect(source).toContain("[0, -18]");
     expect(pageSource).toContain("getLandingActionCopyKeys(isAuthenticated)");
     expect(pageSource).toContain("buttonLabel={t(actionCopyKeys.primary)}");
-    expect(pageSource).toContain(
-      'headerCreateAccountLabel={t("header.createAccount")}',
-    );
-    expect(pageSource).toContain('headerEntryLabel={t("header.signIn")}');
+    expect(pageSource).toContain("headerCreateAccountLabel=");
+    expect(pageSource).toContain('t("header.createAccount")');
+    expect(pageSource).toContain("headerEntryLabel={");
+    expect(pageSource).toContain('t("header.enter")');
     expect(sections).toContain("{actionLabel}");
     expect(sections).toContain("href={entryHref}");
     expect(sections).not.toContain('href="/auth/sign-up"');
@@ -91,8 +92,9 @@ describe("PortalLanding", () => {
       'buttonVariants({ variant: "ghost", size: "sm" })',
     );
     expect(source).toContain('buttonVariants({ size: "sm", variant: "link" })');
-    expect(source).toContain('href="/auth/sign-in"');
-    expect(source).toContain('href="/auth/sign-up"');
+    expect(source).toContain("isAuthenticated ? (");
+    expect(source).toContain("href={headerEntryHref}");
+    expect(source).toContain("<Blobatar");
     expect(source).toContain('"rounded-full"');
     expect(source).toContain(
       'buttonVariants({ variant: "ghost", size: "sm" })',

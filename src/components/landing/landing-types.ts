@@ -13,7 +13,6 @@ export type LandingDetails = {
   demo: {
     description: string;
     editorLabel: string;
-    eyebrow: string;
     projectDescription: string;
     projectTitle: string;
     publishedLabel: string;

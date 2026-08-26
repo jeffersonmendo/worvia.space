@@ -15,8 +15,8 @@
     "description": "Worvia reúne tu presentación, la entrega de archivos y la venta de trabajo digital en un solo proyecto. Empieza gratis y monetiza sin pagar primero.",
     "cta": "Crear gratis",
     "header": {
-      "createAccount": "Crear gratis",
-      "enter": "Ir a inicio",
+      "createAccount": "Crear cuenta",
+      "enter": "Entrar",
       "signIn": "Ingresar",
       "menu": "Abrir menú",
       "language": "Idioma"
@@ -50,7 +50,6 @@
       ],
       "heroSecondary": "Ver cómo funciona",
       "demo": {
-        "eyebrow": "Del editor al enlace publicado",
         "title": "Diseña una vez. Presenta y entrega en el mismo lugar.",
         "description": "Una representación del proyecto que construyes en Worvia: estructura, estilo, recursos y permisos permanecen conectados.",
         "editorLabel": "Editor",

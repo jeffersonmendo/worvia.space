@@ -36,12 +36,12 @@ function SectionHeading({
   title,
 }: {
   description?: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
 }) {
   return (
     <header className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-      <Badge variant="outline">{eyebrow}</Badge>
+      {eyebrow ? <Badge variant="outline">{eyebrow}</Badge> : null}
       <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-5xl">
         {title}
       </h2>
@@ -74,7 +74,6 @@ export function LandingSections({
       >
         <SectionHeading
           description={details.demo.description}
-          eyebrow={details.demo.eyebrow}
           title={details.demo.title}
         />
         <div className="mx-auto mt-12 grid max-w-6xl overflow-hidden rounded-2xl border bg-card shadow-2xl lg:grid-cols-[0.7fr_1.3fr]">
