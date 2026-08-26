@@ -37,7 +37,10 @@ describe("PortalLanding", () => {
     expect(source).toContain("useReducedMotion");
     expect(source).toContain("IntersectionObserver");
     expect(source).toContain("!bg-background !backdrop-blur-none");
-    expect(source).toContain("!bg-brand-surface-strong !backdrop-blur-xl");
+    expect(source).toContain("!bg-background/50 !backdrop-blur-xl");
+    expect(source).toContain(
+      "color-mix(in oklab, var(--background) 50%, transparent)",
+    );
     expect(source).toContain(
       'backdropFilter: isHeaderPastHero ? "blur(24px)" : "none"',
     );

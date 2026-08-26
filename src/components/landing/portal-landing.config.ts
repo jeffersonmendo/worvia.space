@@ -14,7 +14,8 @@ export const PORTAL_LANDING_LAYOUT = {
   content:
     "relative z-10 flex h-full select-none flex-col items-center justify-center px-5 text-center [@media(max-height:500px)]:px-3!",
   fallback: "portal-landing-fallback pointer-events-none absolute inset-0",
-  header: "fixed inset-x-0 top-0 z-30 h-16",
+  header:
+    "fixed inset-x-0 top-0 z-30 h-16 transition-[background-color,backdrop-filter] duration-300 ease-out",
   initialHeader: "absolute inset-x-0 top-0 z-20 h-16",
   heroCopy: "contents",
   title:

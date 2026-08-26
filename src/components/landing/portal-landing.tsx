@@ -240,7 +240,7 @@ export function PortalLanding({
         className={cn(
           PORTAL_LANDING_LAYOUT.header,
           isHeaderPastHero
-            ? "!bg-brand-surface-strong !backdrop-blur-xl"
+            ? "!bg-background/50 !backdrop-blur-xl"
             : "!bg-background !backdrop-blur-none",
         )}
         style={{
@@ -248,7 +248,7 @@ export function PortalLanding({
           visibility: headerVisibility,
           y: headerY,
           backgroundColor: isHeaderPastHero
-            ? "var(--brand-surface-strong)"
+            ? "color-mix(in oklab, var(--background) 50%, transparent)"
             : "var(--background)",
           backdropFilter: isHeaderPastHero ? "blur(24px)" : "none",
           WebkitBackdropFilter: isHeaderPastHero ? "blur(24px)" : "none",
