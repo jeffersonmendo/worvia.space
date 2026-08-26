@@ -32,6 +32,8 @@ describe("PortalLanding", () => {
     );
     expect(PORTAL_SHADER_PRESENTATION.speed).toBeGreaterThanOrEqual(0.5);
     expect(PORTAL_LANDING_ENTRY.expandedHeight).toBe("100dvh");
+    expect(PORTAL_LANDING_LAYOUT.title).toContain("text-5xl");
+    expect(PORTAL_LANDING_LAYOUT.content).toContain("select-none");
     expect(source).toContain("useReducedMotion");
     expect(source).toContain("reducedMotion ? false");
     expect(source).toContain("reducedMotion ? [0, 0]");
@@ -42,7 +44,18 @@ describe("PortalLanding", () => {
     expect(source).toContain("href={entryHref}");
     expect(source).toContain("heroButtonLabel");
     expect(source).toContain('buttonVariants({ size: "lg" })');
+    expect(source).toContain("bg-white text-black hover:bg-white/90");
     expect(source).not.toContain("details.heroSecondary");
+    expect(source).toContain("IconArrowDown");
+    expect(source).toContain("absolute bottom-6 left-1/2");
+    expect(source).toContain("-translate-x-1/2");
+    expect(source).toContain("text-white");
+    expect(source).toContain("<IconArrowDown size={28} />");
+    expect(source).toContain("repeat: Number.POSITIVE_INFINITY");
+    expect(source).toContain(
+      "initial={reducedMotion ? false : { opacity: 0 }}",
+    );
+    expect(source).toContain("[0, -18]");
     expect(pageSource).toContain("getLandingActionCopyKeys(isAuthenticated)");
     expect(pageSource).toContain("buttonLabel={t(actionCopyKeys.primary)}");
     expect(pageSource).toContain(

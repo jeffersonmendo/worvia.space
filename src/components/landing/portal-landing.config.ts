@@ -12,14 +12,14 @@ export const PORTAL_LANDING_LAYOUT = {
     "absolute left-1/2 top-1/2 h-dvh w-screen -translate-x-1/2 -translate-y-1/2",
   ignitionLayer: "absolute inset-0",
   content:
-    "relative z-10 flex h-full flex-col items-center justify-center px-5 text-center [@media(max-height:500px)]:px-3!",
+    "relative z-10 flex h-full select-none flex-col items-center justify-center px-5 text-center [@media(max-height:500px)]:px-3!",
   fallback: "portal-landing-fallback pointer-events-none absolute inset-0",
   header:
     "fixed inset-x-0 top-0 z-30 h-16 bg-brand-surface-strong backdrop-blur-xl",
   initialHeader: "absolute inset-x-0 top-0 z-20 h-16",
   heroCopy: "contents",
   title:
-    "max-w-5xl text-balance text-4xl font-medium leading-[0.94] tracking-[-0.055em] text-white sm:text-6xl md:text-7xl lg:text-8xl [@media(max-height:500px)]:text-3xl!",
+    "max-w-5xl text-balance text-5xl font-medium leading-[0.94] tracking-[-0.055em] text-white sm:text-6xl md:text-7xl lg:text-8xl [@media(max-height:500px)]:text-4xl!",
   description:
     "mt-7 max-w-lg text-balance text-sm leading-relaxed text-white/80 sm:text-base [@media(max-height:500px)]:mt-3! [@media(max-height:500px)]:max-w-xl! [@media(max-height:500px)]:text-xs! [@media(max-height:500px)]:leading-snug!",
   cta: "mt-9 [@media(max-height:500px)]:mt-4!",

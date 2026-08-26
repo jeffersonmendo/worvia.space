@@ -1,6 +1,6 @@
 "use client";
 
-import { IconSpiral } from "@tabler/icons-react";
+import { IconArrowDown, IconSpiral } from "@tabler/icons-react";
 import {
   motion,
   useReducedMotion,
@@ -210,6 +210,11 @@ export function PortalLanding({
   const headerVisibility = useTransform(scrollY, (value) =>
     value < PORTAL_LANDING_SCROLL.headerRevealStart ? "hidden" : "visible",
   );
+  const scrollCueY = useTransform(
+    scrollY,
+    reducedMotion ? [0, 1] : [0, PORTAL_LANDING_SCROLL.distance],
+    [0, -18],
+  );
   return (
     <main className={PORTAL_LANDING_LAYOUT.viewport}>
       <motion.header
@@ -394,13 +399,38 @@ export function PortalLanding({
                   href={entryHref}
                   className={cn(
                     buttonVariants({ size: "lg" }),
-                    "min-w-32 rounded-full",
+                    "min-w-32 rounded-full bg-white text-black hover:bg-white/90",
                   )}
                 >
                   {heroButtonLabel}
                 </Link>
               </motion.div>
             </motion.section>
+
+            <motion.div
+              aria-hidden="true"
+              animate={{ opacity: 1, y: 0 }}
+              className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-white"
+              initial={reducedMotion ? false : { opacity: 0 }}
+              style={{ y: scrollCueY }}
+              transition={{
+                delay: reducedMotion ? 0 : PORTAL_LANDING_ENTRY.ctaDelay,
+                duration: reducedMotion
+                  ? 0
+                  : PORTAL_LANDING_ENTRY.contentDuration,
+              }}
+            >
+              <motion.div
+                animate={reducedMotion ? undefined : { y: [0, 5, 0] }}
+                transition={{
+                  duration: 2,
+                  ease: "easeInOut",
+                  repeat: Number.POSITIVE_INFINITY,
+                }}
+              >
+                <IconArrowDown size={28} />
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>
