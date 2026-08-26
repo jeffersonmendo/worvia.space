@@ -105,7 +105,7 @@ function InitialLandingHeaderNav({
   return (
     <nav
       aria-label="Worvia"
-      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4"
     >
       <div className="flex items-center gap-4">
         <Link aria-label="Worvia" className="inline-flex items-center" href="/">
@@ -136,7 +136,7 @@ function ScrollLandingHeaderNav({
   return (
     <nav
       aria-label="Worvia"
-      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4"
     >
       <div className="flex items-center gap-4">
         <Link aria-label="Worvia" className="inline-flex items-center" href="/">
@@ -239,6 +239,8 @@ export function PortalLanding({
       <motion.header
         className={cn(
           PORTAL_LANDING_LAYOUT.header,
+          isHeaderPastHero &&
+            "inset-x-auto top-2 left-1/2 w-[calc(100%-1rem)] max-w-7xl -translate-x-1/2 rounded-3xl border border-border/50",
           isHeaderPastHero
             ? "!bg-background/50 !backdrop-blur-xl"
             : "!bg-background !backdrop-blur-none",

@@ -39,6 +39,9 @@ describe("PortalLanding", () => {
     expect(source).toContain("!bg-background !backdrop-blur-none");
     expect(source).toContain("!bg-background/50 !backdrop-blur-xl");
     expect(source).toContain(
+      '"inset-x-auto top-2 left-1/2 w-[calc(100%-1rem)] max-w-7xl -translate-x-1/2 rounded-3xl border border-border/50"',
+    );
+    expect(source).toContain(
       "color-mix(in oklab, var(--background) 50%, transparent)",
     );
     expect(source).toContain(
