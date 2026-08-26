@@ -40,23 +40,35 @@ describe("PortalLanding", () => {
   test("renders auth-aware primary actions and an internal demo action", () => {
     expect(pageSource).toContain("getLandingEntryHref(isAuthenticated)");
     expect(source).toContain("href={entryHref}");
-    expect(source).toContain("details.heroSecondary");
-    expect(source).toContain("details.navigation[0]?.href");
+    expect(source).toContain("heroButtonLabel");
+    expect(source).toContain('buttonVariants({ size: "lg" })');
+    expect(source).not.toContain("details.heroSecondary");
     expect(pageSource).toContain("getLandingActionCopyKeys(isAuthenticated)");
     expect(pageSource).toContain("buttonLabel={t(actionCopyKeys.primary)}");
     expect(pageSource).toContain(
-      "headerCreateAccountLabel={t(actionCopyKeys.primary)}",
+      'headerCreateAccountLabel={t("header.createAccount")}',
     );
+    expect(pageSource).toContain('headerEntryLabel={t("header.signIn")}');
     expect(sections).toContain("{actionLabel}");
     expect(sections).toContain("href={entryHref}");
     expect(sections).not.toContain('href="/auth/sign-up"');
   });
 
-  test("provides anchor navigation, language switching, and an accessible mobile sheet", () => {
+  test("provides ghost anchor navigation and static auth actions", () => {
     expect(source).toContain("details.navigation.map");
-    expect(source).toContain("<SheetTitle>Worvia</SheetTitle>");
-    expect(source).toContain("aria-label={headerMenuLabel}");
-    expect(source).toContain("locale={alternateLocale}");
+    expect(source).not.toContain("Sheet");
+    expect(source).toContain('className="flex items-center gap-1 sm:gap-2"');
+    expect(source).not.toContain("headerLanguageLabel");
+    expect(source).toContain(
+      'buttonVariants({ variant: "ghost", size: "sm" })',
+    );
+    expect(source).toContain('buttonVariants({ size: "sm", variant: "link" })');
+    expect(source).toContain('href="/auth/sign-in"');
+    expect(source).toContain('href="/auth/sign-up"');
+    expect(source).toContain('"rounded-full"');
+    expect(source).toContain(
+      'buttonVariants({ variant: "ghost", size: "sm" })',
+    );
     for (const { Landing } of messages) {
       expect(Landing.details.navigation).toHaveLength(6);
       expect(

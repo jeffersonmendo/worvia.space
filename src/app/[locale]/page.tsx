@@ -39,11 +39,9 @@ export default async function Home({ params }: Props) {
       description={t("description")}
       details={t.raw("details")}
       entryHref={getLandingEntryHref(isAuthenticated)}
-      headerCreateAccountLabel={t(actionCopyKeys.primary)}
-      headerEntryLabel={t(actionCopyKeys.secondary)}
-      headerLanguageLabel={t("header.language")}
-      headerMenuLabel={t("header.menu")}
-      locale={locale}
+      heroButtonLabel={t("cta")}
+      headerCreateAccountLabel={t("header.createAccount")}
+      headerEntryLabel={t("header.signIn")}
       title={[t("titleLine1"), t("titleLine2")]}
     />
   );

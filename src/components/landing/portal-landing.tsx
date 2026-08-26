@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArrowUpRight, IconMenu2, IconSpiral } from "@tabler/icons-react";
+import { IconSpiral } from "@tabler/icons-react";
 import {
   motion,
   useReducedMotion,
@@ -11,16 +11,7 @@ import { useEffect, useState } from "react";
 import { ShaderBackground } from "@/components/motion/shader-background";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
-import { getLandingActionHrefs } from "@/lib/landing/actions";
 import { cn } from "@/lib/utils";
 import { LandingSections } from "./landing-sections";
 import type { LandingDetails } from "./landing-types";
@@ -36,175 +27,101 @@ type PortalLandingProps = {
   description: string;
   details: LandingDetails;
   entryHref: "/home" | "/auth/sign-up";
+  heroButtonLabel: string;
   headerCreateAccountLabel: string;
   headerEntryLabel: string;
-  headerLanguageLabel: string;
-  headerMenuLabel: string;
-  locale: string;
   title: string[];
 };
 
 type LandingHeaderNavProps = Pick<
   PortalLandingProps,
-  "entryHref" | "headerCreateAccountLabel" | "headerEntryLabel"
+  "headerCreateAccountLabel" | "headerEntryLabel"
 > &
-  Pick<
-    PortalLandingProps,
-    "details" | "headerLanguageLabel" | "headerMenuLabel" | "locale"
-  >;
+  Pick<PortalLandingProps, "details">;
+
+type HeaderActionProps = Pick<
+  PortalLandingProps,
+  "headerCreateAccountLabel" | "headerEntryLabel"
+>;
 
 function HeaderActions({
-  details,
-  entryHref,
   headerCreateAccountLabel,
   headerEntryLabel,
-  headerLanguageLabel,
-  headerMenuLabel,
-  locale,
   inverted = false,
-}: LandingHeaderNavProps & { inverted?: boolean }) {
-  const alternateLocale = locale === "es" ? "en" : "es";
-  const actionHrefs = getLandingActionHrefs(entryHref);
+}: HeaderActionProps & { inverted?: boolean }) {
   return (
-    <>
-      <div className="hidden items-center gap-5 lg:flex">
-        {details.navigation.map((item) => (
-          <a
-            className={cn(
-              "text-sm transition-colors",
-              inverted
-                ? "text-white/75 hover:text-white"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-            href={item.href}
-            key={item.href}
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
-      <div className="hidden items-center gap-2 sm:flex">
-        <Link
-          aria-label={`${headerLanguageLabel}: ${alternateLocale.toUpperCase()}`}
+    <div className="flex items-center gap-1 sm:gap-2">
+      <Link
+        className={cn(
+          buttonVariants({ size: "sm", variant: "link" }),
+          inverted && "text-white hover:text-white/80",
+        )}
+        href="/auth/sign-up"
+      >
+        {headerCreateAccountLabel}
+      </Link>
+      <Link
+        className={cn(
+          buttonVariants({ size: "sm" }),
+          "rounded-full",
+          inverted && "bg-white text-black hover:bg-white/90",
+        )}
+        href="/auth/sign-in"
+      >
+        {headerEntryLabel}
+      </Link>
+    </div>
+  );
+}
+
+function LandingNavigation({
+  details,
+  inverted = false,
+}: Pick<LandingHeaderNavProps, "details"> & { inverted?: boolean }) {
+  return (
+    <div className="hidden items-center gap-1 lg:flex">
+      {details.navigation.map((item) => (
+        <a
           className={cn(
-            buttonVariants({ size: "sm", variant: "ghost" }),
-            inverted && "text-white hover:bg-white/10 hover:text-white",
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "rounded-full",
+            inverted && "text-white/75 hover:bg-white/10 hover:text-white",
           )}
-          href="/"
-          locale={alternateLocale}
+          href={item.href}
+          key={item.href}
         >
-          {alternateLocale.toUpperCase()}
-        </Link>
-        <Link
-          className={cn(
-            buttonVariants({ size: "sm", variant: "ghost" }),
-            inverted && "text-white hover:bg-white/10 hover:text-white",
-          )}
-          href={actionHrefs.enter}
-        >
-          {headerEntryLabel}
-        </Link>
-        <Link
-          className={cn(
-            buttonVariants({ size: "sm" }),
-            inverted && "bg-white text-black hover:bg-white/90",
-          )}
-          href={actionHrefs.create}
-        >
-          {headerCreateAccountLabel}
-        </Link>
-      </div>
-      <Sheet>
-        <SheetTrigger
-          className={cn(
-            buttonVariants({ size: "icon", variant: "ghost" }),
-            "sm:hidden",
-            inverted && "text-white hover:bg-white/10 hover:text-white",
-          )}
-          aria-label={headerMenuLabel}
-        >
-          <IconMenu2 />
-        </SheetTrigger>
-        <SheetContent aria-describedby={undefined}>
-          <SheetHeader>
-            <SheetTitle>Worvia</SheetTitle>
-          </SheetHeader>
-          <nav
-            aria-label={headerMenuLabel}
-            className="flex flex-col gap-1 px-4"
-          >
-            {details.navigation.map((item) => (
-              <SheetClose
-                key={item.href}
-                render={
-                  <a
-                    aria-label={item.label}
-                    className={buttonVariants({ variant: "ghost" })}
-                    href={item.href}
-                  >
-                    <span className="sr-only">{item.label}</span>
-                  </a>
-                }
-              >
-                {item.label}
-              </SheetClose>
-            ))}
-          </nav>
-          <div className="mt-auto flex flex-col gap-2 p-4">
-            <Link
-              className={buttonVariants({ variant: "outline" })}
-              href="/"
-              locale={alternateLocale}
-            >
-              {headerLanguageLabel}: {alternateLocale.toUpperCase()}
-            </Link>
-            <Link
-              className={buttonVariants({ variant: "outline" })}
-              href={actionHrefs.enter}
-            >
-              {headerEntryLabel}
-            </Link>
-            <Link className={buttonVariants()} href={actionHrefs.create}>
-              {headerCreateAccountLabel}
-            </Link>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+          {item.label}
+        </a>
+      ))}
+    </div>
   );
 }
 
 function InitialLandingHeaderNav({
   details,
-  entryHref,
   headerCreateAccountLabel,
   headerEntryLabel,
-  headerLanguageLabel,
-  headerMenuLabel,
-  locale,
 }: LandingHeaderNavProps) {
   return (
     <nav
       aria-label="Worvia"
       className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
-      <Link aria-label="Worvia" className="inline-flex items-center" href="/">
-        <IconSpiral
-          aria-hidden="true"
-          className="size-8 stroke-[1.5] text-white"
-        />
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link aria-label="Worvia" className="inline-flex items-center" href="/">
+          <IconSpiral
+            aria-hidden="true"
+            className="size-8 stroke-[1.5] text-white"
+          />
+        </Link>
+        <LandingNavigation details={details} inverted />
+      </div>
 
       <HeaderActions
         inverted
         {...{
-          details,
-          entryHref,
           headerCreateAccountLabel,
           headerEntryLabel,
-          headerLanguageLabel,
-          headerMenuLabel,
-          locale,
         }}
       />
     </nav>
@@ -213,31 +130,25 @@ function InitialLandingHeaderNav({
 
 function ScrollLandingHeaderNav({
   details,
-  entryHref,
   headerCreateAccountLabel,
   headerEntryLabel,
-  headerLanguageLabel,
-  headerMenuLabel,
-  locale,
 }: LandingHeaderNavProps) {
   return (
     <nav
       aria-label="Worvia"
       className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
-      <Link aria-label="Worvia" className="inline-flex items-center" href="/">
-        <IconSpiral aria-hidden="true" className="size-8 stroke-[1.5]" />
-      </Link>
+      <div className="flex items-center gap-4">
+        <Link aria-label="Worvia" className="inline-flex items-center" href="/">
+          <IconSpiral aria-hidden="true" className="size-8 stroke-[1.5]" />
+        </Link>
+        <LandingNavigation details={details} />
+      </div>
 
       <HeaderActions
         {...{
-          details,
-          entryHref,
           headerCreateAccountLabel,
           headerEntryLabel,
-          headerLanguageLabel,
-          headerMenuLabel,
-          locale,
         }}
       />
     </nav>
@@ -249,11 +160,9 @@ export function PortalLanding({
   description,
   details,
   entryHref,
+  heroButtonLabel,
   headerCreateAccountLabel,
   headerEntryLabel,
-  headerLanguageLabel,
-  headerMenuLabel,
-  locale,
   title,
 }: PortalLandingProps) {
   const [isInitialHeaderInteractive, setIsInitialHeaderInteractive] =
@@ -313,12 +222,8 @@ export function PortalLanding({
       >
         <ScrollLandingHeaderNav
           details={details}
-          entryHref={entryHref}
           headerCreateAccountLabel={headerCreateAccountLabel}
           headerEntryLabel={headerEntryLabel}
-          headerLanguageLabel={headerLanguageLabel}
-          headerMenuLabel={headerMenuLabel}
-          locale={locale}
         />
       </motion.header>
 
@@ -345,12 +250,8 @@ export function PortalLanding({
             >
               <InitialLandingHeaderNav
                 details={details}
-                entryHref={entryHref}
                 headerCreateAccountLabel={headerCreateAccountLabel}
                 headerEntryLabel={headerEntryLabel}
-                headerLanguageLabel={headerLanguageLabel}
-                headerMenuLabel={headerMenuLabel}
-                locale={locale}
               />
             </motion.header>
 
@@ -492,22 +393,12 @@ export function PortalLanding({
                 <Link
                   href={entryHref}
                   className={cn(
-                    buttonVariants({ size: "lg", variant: "outline" }),
+                    buttonVariants({ size: "lg" }),
                     "min-w-32 rounded-full",
                   )}
                 >
-                  {buttonLabel}
-                  <IconArrowUpRight data-icon="inline-end" />
+                  {heroButtonLabel}
                 </Link>
-                <a
-                  className={cn(
-                    buttonVariants({ size: "lg", variant: "ghost" }),
-                    "rounded-full text-white",
-                  )}
-                  href={details.navigation[0]?.href ?? "#product"}
-                >
-                  {details.heroSecondary}
-                </a>
               </motion.div>
             </motion.section>
           </div>
