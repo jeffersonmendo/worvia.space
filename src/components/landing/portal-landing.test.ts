@@ -35,6 +35,15 @@ describe("PortalLanding", () => {
     expect(PORTAL_LANDING_LAYOUT.title).toContain("text-5xl");
     expect(PORTAL_LANDING_LAYOUT.content).toContain("select-none");
     expect(source).toContain("useReducedMotion");
+    expect(source).toContain("IntersectionObserver");
+    expect(source).toContain("!bg-background !backdrop-blur-none");
+    expect(source).toContain("!bg-brand-surface-strong !backdrop-blur-xl");
+    expect(source).toContain(
+      'backdropFilter: isHeaderPastHero ? "blur(24px)" : "none"',
+    );
+    expect(source).toContain("const initialHeaderOpacity = useTransform");
+    expect(PORTAL_LANDING_SCROLL.headerRevealStart).toBe(240);
+    expect(PORTAL_LANDING_SCROLL.headerRevealEnd).toBe(300);
     expect(source).toContain("reducedMotion ? false");
     expect(source).toContain("reducedMotion ? [0, 0]");
   });

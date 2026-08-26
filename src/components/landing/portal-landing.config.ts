@@ -14,8 +14,7 @@ export const PORTAL_LANDING_LAYOUT = {
   content:
     "relative z-10 flex h-full select-none flex-col items-center justify-center px-5 text-center [@media(max-height:500px)]:px-3!",
   fallback: "portal-landing-fallback pointer-events-none absolute inset-0",
-  header:
-    "fixed inset-x-0 top-0 z-30 h-16 bg-brand-surface-strong backdrop-blur-xl",
+  header: "fixed inset-x-0 top-0 z-30 h-16",
   initialHeader: "absolute inset-x-0 top-0 z-20 h-16",
   heroCopy: "contents",
   title:
@@ -30,8 +29,8 @@ export const PORTAL_LANDING_LAYOUT = {
 export const PORTAL_LANDING_SCROLL = {
   contentOffset: 68,
   distance: 240,
-  headerRevealEnd: 460,
-  headerRevealStart: 400,
+  headerRevealEnd: 300,
+  headerRevealStart: 240,
   inset: 24,
   radius: 20,
 } as const;

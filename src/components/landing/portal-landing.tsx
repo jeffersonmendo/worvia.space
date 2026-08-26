@@ -7,7 +7,7 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShaderBackground } from "@/components/motion/shader-background";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { buttonVariants } from "@/components/ui/button";
@@ -105,7 +105,7 @@ function InitialLandingHeaderNav({
   return (
     <nav
       aria-label="Worvia"
-      className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
       <div className="flex items-center gap-4">
         <Link aria-label="Worvia" className="inline-flex items-center" href="/">
@@ -136,7 +136,7 @@ function ScrollLandingHeaderNav({
   return (
     <nav
       aria-label="Worvia"
-      className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+      className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
     >
       <div className="flex items-center gap-4">
         <Link aria-label="Worvia" className="inline-flex items-center" href="/">
@@ -167,6 +167,8 @@ export function PortalLanding({
 }: PortalLandingProps) {
   const [isInitialHeaderInteractive, setIsInitialHeaderInteractive] =
     useState(false);
+  const [isHeaderPastHero, setIsHeaderPastHero] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   useEffect(() => {
     if (reducedMotion) {
@@ -174,6 +176,18 @@ export function PortalLanding({
     }
   }, [reducedMotion]);
   const { scrollY } = useScroll();
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsHeaderPastHero(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(hero);
+
+    return () => observer.disconnect();
+  }, []);
   const clipPath = useTransform(
     scrollY,
     reducedMotion ? [0, 1] : [0, PORTAL_LANDING_SCROLL.distance],
@@ -191,6 +205,11 @@ export function PortalLanding({
     scrollY,
     reducedMotion ? [0, 1] : [0, PORTAL_LANDING_SCROLL.distance],
     [0, 20],
+  );
+  const initialHeaderOpacity = useTransform(
+    scrollY,
+    reducedMotion ? [0, 1] : [0, PORTAL_LANDING_SCROLL.distance],
+    reducedMotion ? [1, 1] : [1, 0],
   );
   const headerRevealRange = reducedMotion
     ? [
@@ -218,11 +237,21 @@ export function PortalLanding({
   return (
     <main className={PORTAL_LANDING_LAYOUT.viewport}>
       <motion.header
-        className={PORTAL_LANDING_LAYOUT.header}
+        className={cn(
+          PORTAL_LANDING_LAYOUT.header,
+          isHeaderPastHero
+            ? "!bg-brand-surface-strong !backdrop-blur-xl"
+            : "!bg-background !backdrop-blur-none",
+        )}
         style={{
           opacity: headerOpacity,
           visibility: headerVisibility,
           y: headerY,
+          backgroundColor: isHeaderPastHero
+            ? "var(--brand-surface-strong)"
+            : "var(--background)",
+          backdropFilter: isHeaderPastHero ? "blur(24px)" : "none",
+          WebkitBackdropFilter: isHeaderPastHero ? "blur(24px)" : "none",
         }}
       >
         <ScrollLandingHeaderNav
@@ -233,7 +262,7 @@ export function PortalLanding({
       </motion.header>
 
       <div className={PORTAL_LANDING_LAYOUT.heroTrack}>
-        <div className={PORTAL_LANDING_LAYOUT.hero}>
+        <div className={PORTAL_LANDING_LAYOUT.hero} ref={heroRef}>
           <div className={PORTAL_LANDING_LAYOUT.frame}>
             <motion.header
               animate={{ opacity: 1, y: 0 }}
@@ -242,6 +271,7 @@ export function PortalLanding({
               initial={reducedMotion ? false : { opacity: 0, y: -12 }}
               onAnimationComplete={() => setIsInitialHeaderInteractive(true)}
               style={{
+                opacity: initialHeaderOpacity,
                 paddingLeft: initialHeaderPadding,
                 paddingRight: initialHeaderPadding,
                 paddingTop: initialHeaderPadding,
