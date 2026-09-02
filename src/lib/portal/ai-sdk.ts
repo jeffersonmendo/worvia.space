@@ -2,6 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import sharp from "sharp";
 import { z } from "zod";
+import type { PortalDocument, PortalSection } from "@/domain/portal/document";
 import {
   type PortalPlan,
   portalGalleryItemLimit,
@@ -9,7 +10,6 @@ import {
 } from "@/lib/billing/portal-policy";
 import type { AiAssetInput } from "@/lib/portal/ai-proposal";
 import { isRenderableImageMimeType } from "@/lib/portal/asset-validation";
-import type { PortalDocument, PortalSection } from "@/lib/portal/document";
 
 const enhancementSchema = z.object({
   assetInsights: z.array(

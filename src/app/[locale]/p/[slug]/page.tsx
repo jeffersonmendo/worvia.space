@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PaidPreview } from "@/components/portal/paid-preview";
-import { isPaidPreviewDecision } from "@/components/portal/paid-preview-projection";
-import { PortalDocumentSidebarReadOnly } from "@/components/portal/portal-document-sidebar-read-only";
-import { PortalEntryTransition } from "@/components/portal/portal-entry-transition";
-import { PublicPortalShell } from "@/components/portal/public-portal-header";
-import { RenderPortal } from "@/components/portal/render-portal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,23 +17,29 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { confirmPaidPortalCheckout } from "@/lib/billing/confirm-paid-portal-checkout";
 import {
   hasPublicSectionContent,
   normalizePortalDocument,
   type PortalDocument,
-} from "@/lib/portal/document";
-import { portalExportHref } from "@/lib/portal/export-manifest";
+} from "@/domain/portal/document";
+import { isPaidPreviewDecision } from "@/domain/portal/paid-preview";
 import {
   getSnapshotDocument,
   resolvePortalAccess,
-} from "@/lib/portal/server-access";
-import { prepareDocumentForRendering } from "@/lib/portal/server-assets";
+} from "@/infrastructure/portal/server-access";
+import { prepareDocumentForRendering } from "@/infrastructure/portal/server-assets";
+import { confirmPaidPortalCheckout } from "@/lib/billing/confirm-paid-portal-checkout";
+import { portalExportHref } from "@/lib/portal/export-manifest";
 import {
   buildPortalMetadata,
   resolvePortalSharePresentation,
 } from "@/lib/public-metadata";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { PortalDocumentSidebarReadOnly } from "./_components/document-sidebar";
+import { PortalEntryTransition } from "./_components/entry-transition";
+import { PaidPreview } from "./_components/paid-preview";
+import { PortalProjectView } from "./_components/portal-project-view";
+import { PublicPortalShell } from "./_components/public-portal-header";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -201,7 +201,7 @@ export default async function PublicPortalPage({
         iconUrl={renderDocument.portal.icon_url ?? null}
         name={renderDocument.portal.name}
       >
-        <RenderPortal
+        <PortalProjectView
           document={renderDocument}
           actionConfig={{
             public: {

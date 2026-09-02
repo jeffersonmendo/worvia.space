@@ -57,10 +57,14 @@ export async function GET(request: Request) {
     });
   }
   const projectionIsComplete = Boolean(
-    account.account_email && account.country && account.display_name && account.last_synced_at,
+    account.account_email &&
+      account.country &&
+      account.display_name &&
+      account.last_synced_at,
   );
   const projectionIsFresh = account.last_synced_at
-    ? Date.now() - new Date(account.last_synced_at).getTime() < 24 * 60 * 60 * 1000
+    ? Date.now() - new Date(account.last_synced_at).getTime() <
+      24 * 60 * 60 * 1000
     : false;
   if (projectionIsComplete && projectionIsFresh) {
     return NextResponse.json({
@@ -97,20 +101,23 @@ export async function GET(request: Request) {
     detailsSubmitted && chargesEnabled && payoutsEnabled
       ? "complete"
       : "pending";
-  const { error } = await supabase.rpc("upsert_creator_stripe_account_projection", {
-    account_charges_enabled: chargesEnabled,
-    account_details_submitted: detailsSubmitted,
-    account_id: account.stripe_account_id,
-    account_onboarding_status: onboardingStatus,
-    account_payouts_enabled: payoutsEnabled,
-    account_email: stripeAccount.contact_email ?? null,
-    account_country: stripeAccount.identity?.country ?? null,
-    account_display_name: stripeAccount.display_name ?? null,
-    account_requirements_pending:
-      stripeAccount.requirements?.entries?.length ?? 0,
-    account_verification_state: verificationState,
-    account_last_synced_at: new Date().toISOString(),
-  } as never);
+  const { error } = await supabase.rpc(
+    "upsert_creator_stripe_account_projection",
+    {
+      account_charges_enabled: chargesEnabled,
+      account_details_submitted: detailsSubmitted,
+      account_id: account.stripe_account_id,
+      account_onboarding_status: onboardingStatus,
+      account_payouts_enabled: payoutsEnabled,
+      account_email: stripeAccount.contact_email ?? null,
+      account_country: stripeAccount.identity?.country ?? null,
+      account_display_name: stripeAccount.display_name ?? null,
+      account_requirements_pending:
+        stripeAccount.requirements?.entries?.length ?? 0,
+      account_verification_state: verificationState,
+      account_last_synced_at: new Date().toISOString(),
+    } as never,
+  );
   if (error)
     return NextResponse.json(
       { error: "connect_status_failed" },

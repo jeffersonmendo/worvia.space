@@ -5,7 +5,7 @@ import { OpenGraphCard } from "@/components/open-graph-card";
 import {
   getPortalShareSummary,
   resolvePortalAccess,
-} from "@/lib/portal/server-access";
+} from "@/infrastructure/portal/server-access";
 import {
   OPEN_GRAPH_SIZE,
   resolvePortalSharePresentation,

@@ -5,53 +5,51 @@ import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import {
-  IconAlertCircle,
   IconBubbleTextFilled,
   IconClipboardTypographyFilled,
-  IconColorPicker,
-  IconDeviceFloppy,
   IconFilesFilled,
-  IconGripVertical,
-  IconInfoCircle,
   IconLayoutGridFilled,
   IconLoader2,
-  IconMoon,
-  IconPackageExport,
   IconPaletteFilled,
   IconPhotoFilled,
   IconPlus,
-  IconSettings,
   IconSparkles,
-  IconStack2,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
-import type { ComponentProps, FormEvent, ReactElement, ReactNode } from "react";
-import { useEffect, useId, useRef, useState } from "react";
-import { parseColor } from "react-aria-components";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { flushPortalAutosave } from "@/application/portal/autosave-coordinator";
+import { usePortalEditorStore } from "@/application/portal/editor-store";
+import { fontWeightMessageKey } from "@/application/portal/font-utils";
 import {
-  checkPortalSlugAvailability,
-  savePrivacySettings,
-  updatePortalSettings,
-} from "@/app/[locale]/_actions/portals";
+  createSyncedTextDraft,
+  handleSyncedTextDraftChange,
+  syncTextDraftSource,
+} from "@/application/portal/image-settings-draft";
+import { applyContainedDemoOverlayOpenChange } from "@/application/portal/local-editor";
 import {
   PORTAL_FILE_ACCEPT,
   PORTAL_IMAGE_ACCEPT,
   PortalFilePreview,
   portalFileTypeFromName,
 } from "@/components/portal/file-preview";
-import { usePortalPlan } from "@/components/portal/portal-plan-provider";
-import { fontWeightMessageKey } from "@/components/portal/render-portal/font-utils";
 import {
   PortalActionTriggerButton,
   PortalItemActionsOverlay,
-} from "@/components/portal/render-portal/portal-actions";
-import { PortalTypographyShowcase } from "@/components/portal/render-portal/portal-typography-showcase";
+} from "@/components/portal/portal-actions";
+import { usePortalPlan } from "@/components/portal/portal-plan-provider";
+import { PortalTypographyShowcase } from "@/components/portal/portal-typography-showcase";
+import {
+  type ColorFormat,
+  formatPickerColor,
+  normalizeHexInput,
+  VisualColorPicker,
+  visualColorPickerValue,
+} from "@/components/portal/visual-color-picker";
 import {
   Attachment,
   AttachmentAction,
@@ -63,16 +61,6 @@ import {
 } from "@/components/ui/attachment";
 import { Button } from "@/components/ui/button";
 import {
-  ColorArea,
-  ColorPicker,
-  ColorSlider,
-  ColorSwatch,
-  ColorSwatchPicker,
-  ColorSwatchPickerItem,
-  ColorThumb,
-  SliderTrack,
-} from "@/components/ui/color";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -83,7 +71,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -107,13 +94,32 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  applySectionImagePresentation,
+  createImageItem,
+  defaultContentForType,
+  defaultLayoutForType,
+  type ImageAspectRatio,
+  type ImageFit,
+  type PortalColorItem,
+  type PortalDocument,
+  type PortalFileItem,
+  type PortalFontItem,
+  type PortalImageItem,
+  type PortalSection,
+  type PortalSectionType,
+  portalQuickColors,
+  uniqueForRender,
+} from "@/domain/portal/document";
+import {
+  deleteManagedPortalAsset,
+  type PortalAssetCategory,
+  releaseManagedPortalAsset,
+  shouldUseServerOwnedUpload,
+  uploadManagedPortalAsset,
+  uploadManagedPortalAssetServerOwned,
+} from "@/infrastructure/portal/portal-assets-client";
 import {
   aiCreditsQueryKey,
   canAffordAiOperation,
@@ -133,64 +139,15 @@ import {
   stablePortalAssetPreviewUrl,
 } from "@/lib/portal/asset-preview-reference";
 import {
-  flushPortalAutosave,
-  schedulePortalAutosave,
-} from "@/lib/portal/autosave-coordinator";
-import {
-  applySectionImagePresentation,
-  createImageItem,
-  createPortalSection,
-  defaultContentForType,
-  defaultLayoutForType,
-  type ImageAspectRatio,
-  type ImageFit,
-  type PortalColorItem,
-  type PortalDocument,
-  type PortalFileItem,
-  type PortalFontItem,
-  type PortalImageItem,
-  type PortalSection,
-  type PortalSectionType,
-  portalQuickColors,
-  uniqueForRender,
-} from "@/lib/portal/document";
-import { flushThenExport } from "@/lib/portal/editor-export";
-import { usePortalEditorStore } from "@/lib/portal/editor-store";
-import {
   reconcileOptimisticUpload,
   remainingOptimisticUploadSlots,
   rollbackOptimisticFontFile,
   useOptimisticUploads,
 } from "@/lib/portal/optimistic-uploads";
-import {
-  deleteManagedPortalAsset,
-  type PortalAssetCategory,
-  reconcilePersistedPortalAssets,
-  releaseManagedPortalAsset,
-  shouldUseServerOwnedUpload,
-  uploadManagedPortalAsset,
-  uploadManagedPortalAssetServerOwned,
-} from "@/lib/portal/portal-assets-client";
-import {
-  dismissPortalAutosaveError,
-  showPortalAutosaveError,
-} from "@/lib/portal/portal-error-feedback";
-import type {
-  PortalPublicationIssue,
-  PortalPublicationTarget,
-} from "@/lib/portal/publication-readiness";
-import {
-  focusPortalPublicationTarget,
-  focusPortalSectionTitle,
-  PORTAL_OPEN_ADD_SECTION_DIALOG_EVENT,
-  scrollToPortalSection,
-} from "@/lib/portal/scroll-to-section";
+import { PORTAL_OPEN_ADD_SECTION_DIALOG_EVENT } from "@/lib/portal/scroll-to-section";
+import { createRandomId } from "@/lib/random-id";
 import { createClient } from "@/lib/supabase/client";
-import type { Portal, PortalVisibility } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
-
-/** Stable empty snapshot for Zustand selectors — never inline `?? []`. */
-const EMPTY_PUBLICATION_ISSUES: PortalPublicationIssue[] = [];
 
 type SectionOption = {
   accentClassName: string;
@@ -332,7 +289,7 @@ function ImproveWithAiButton({
     setImproving(true);
     try {
       const documentForAi = documentWithRenderedImageDimensions(document);
-      const requestId = crypto.randomUUID();
+      const requestId = createRandomId();
       const response = await fetch("/api/ai/portal-content", {
         body: JSON.stringify({
           currentDocument: documentForAi,
@@ -459,16 +416,6 @@ function ImproveSectionWithAiPopover({
   );
 }
 
-type ColorFormat =
-  | "hex"
-  | "hexa"
-  | "hsb"
-  | "hsba"
-  | "hsl"
-  | "hsla"
-  | "rgb"
-  | "rgba";
-
 const colorFormats: ColorFormat[] = [
   "hex",
   "hexa",
@@ -479,21 +426,6 @@ const colorFormats: ColorFormat[] = [
   "rgb",
   "rgba",
 ];
-
-function clampNumber(value: string, min: number, max: number) {
-  const normalized = value.replace(/[^0-9.]/g, "");
-  if (!normalized) return "";
-  const number = Number(normalized);
-  if (Number.isNaN(number)) return "";
-  return String(Math.min(max, Math.max(min, number)));
-}
-
-function normalizeHexInput(value: string, maxLength = 8) {
-  return value
-    .replace(/[^0-9a-f]/gi, "")
-    .slice(0, maxLength)
-    .toUpperCase();
-}
 
 function toHexColor(value: string) {
   const hex = normalizeHexInput(value);
@@ -507,28 +439,13 @@ function completeHexColor(value: string, format: ColorFormat) {
   return `#${(hex || fallback).padEnd(length, "0")}`;
 }
 
-function parseRgb(value = "") {
-  const matches = value.match(/\d+(?:\.\d+)?/g) ?? [];
-  return [0, 1, 2].map((index) =>
-    clampNumber(matches[index] ?? "", 0, 255),
-  ) as [string, string, string];
-}
-
-function rgbToHex(value: string) {
-  const rgb = parseRgb(value);
-  if (rgb.some((part) => part === "")) return "#FF0000";
-  return `#${rgb
-    .map((part) => Number(part).toString(16).padStart(2, "0"))
-    .join("")}`;
-}
-
 function createColorDraft(color?: PortalColorItem): PortalColorItem {
   return color
     ? { ...color }
     : {
         color_code: "#FF0000",
         color_name: "",
-        id: `color_${crypto.randomUUID()}`,
+        id: createRandomId("color"),
         position: 0,
         visible: true,
       };
@@ -546,184 +463,7 @@ function detectColorFormat(color?: PortalColorItem): ColorFormat {
   return "hex";
 }
 
-function getPickerValue(color: PortalColorItem) {
-  const code = color.color_code.trim();
-  try {
-    parseColor(code);
-    return code;
-  } catch {
-    if (code.toLowerCase().startsWith("rgb")) return rgbToHex(code);
-    return "#FF0000";
-  }
-}
-
-function formatPickerColor(value: string, format: ColorFormat) {
-  try {
-    return parseColor(value).toString(format);
-  } catch {
-    return parseColor("#FF0000").toString(format);
-  }
-}
-
 const colorNameMaxLength = 40;
-const colorSwatches = ["#F00", "#F90", "#0F0", "#08F", "#00F"];
-
-function VisualColorPicker({
-  format,
-  onChange,
-  paletteColors = [],
-  value,
-}: {
-  format: ColorFormat;
-  onChange: (value: string) => void;
-  paletteColors?: string[];
-  value: string;
-}) {
-  const t = useTranslations("PortalEditor.colors");
-  const hexInputId = useId();
-  const [eyeDropperSupported, setEyeDropperSupported] = useState(false);
-  const [hexDraft, setHexDraft] = useState(() =>
-    normalizeHexInput(formatPickerColor(value, "hex"), 6),
-  );
-  const quickColors = paletteColors.length ? paletteColors : colorSwatches;
-
-  useEffect(() => {
-    setEyeDropperSupported("EyeDropper" in window);
-  }, []);
-
-  useEffect(() => {
-    setHexDraft(normalizeHexInput(formatPickerColor(value, "hex"), 6));
-  }, [value]);
-
-  function commitHexDraft() {
-    const normalized = normalizeHexInput(hexDraft, 6);
-    const complete =
-      normalized.length === 3
-        ? normalized
-            .split("")
-            .map((character) => `${character}${character}`)
-            .join("")
-        : normalized;
-    if (complete.length === 6) {
-      onChange(`#${complete}`);
-      return;
-    }
-    setHexDraft(normalizeHexInput(formatPickerColor(value, "hex"), 6));
-  }
-
-  async function pickFromScreen() {
-    const EyeDropperConstructor = (
-      window as Window & {
-        EyeDropper?: new () => {
-          open: () => Promise<{ sRGBHex: string }>;
-        };
-      }
-    ).EyeDropper;
-    if (!EyeDropperConstructor) return;
-
-    try {
-      const eyeDropper = new EyeDropperConstructor();
-      const result = await eyeDropper.open();
-      onChange(result.sRGBHex);
-    } catch (error) {
-      if (!(error instanceof DOMException && error.name === "AbortError")) {
-        console.error("Screen color selection failed", error);
-      }
-    }
-  }
-
-  return (
-    <ColorPicker
-      value={value}
-      onChange={(color) => onChange(color.toString(format))}
-    >
-      <Popover>
-        <PopoverTrigger
-          render={
-            <Button
-              className="w-full justify-start rounded-md"
-              type="button"
-              variant="outline"
-            />
-          }
-        >
-          <ColorSwatch className="size-4 rounded-sm border" />
-          {t("choose")}
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-auto" side="bottom">
-          <div className="flex flex-col gap-4 outline-none">
-            <div>
-              <ColorArea
-                className="h-[164px] rounded-b-none border-b-0"
-                colorSpace="hsb"
-                xChannel="saturation"
-                yChannel="brightness"
-              >
-                <ColorThumb className="z-50" />
-              </ColorArea>
-              <ColorSlider colorSpace="hsb" channel="hue">
-                <SliderTrack className="rounded-t-none border-t-0">
-                  <ColorThumb className="top-1/2" />
-                </SliderTrack>
-              </ColorSlider>
-            </div>
-
-            <ColorSwatchPicker className="w-[192px]">
-              {quickColors.map((swatch) => (
-                <ColorSwatchPickerItem color={swatch} key={swatch}>
-                  <ColorSwatch />
-                </ColorSwatchPickerItem>
-              ))}
-            </ColorSwatchPicker>
-            <Field>
-              <FieldLabel htmlFor={hexInputId}>{t("hexCode")}</FieldLabel>
-              <div className="flex h-9 items-center rounded-md border border-input bg-transparent shadow-xs focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
-                <span className="px-2.5 text-muted-foreground text-sm">#</span>
-                <Input
-                  className="border-none px-0 shadow-none focus-visible:ring-0"
-                  id={hexInputId}
-                  maxLength={6}
-                  onBlur={commitHexDraft}
-                  onChange={(event) => {
-                    const next = normalizeHexInput(
-                      event.currentTarget.value,
-                      6,
-                    );
-                    setHexDraft(next);
-                    if (next.length === 6) onChange(`#${next}`);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key !== "Enter") return;
-                    event.preventDefault();
-                    commitHexDraft();
-                  }}
-                  placeholder="E5E5E5"
-                  value={hexDraft}
-                />
-              </div>
-            </Field>
-            {eyeDropperSupported ? (
-              <Button
-                className="w-full rounded-md"
-                onClick={() => void pickFromScreen()}
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                <IconColorPicker data-icon="inline-start" />
-                {t("pickFromScreen")}
-              </Button>
-            ) : null}
-          </div>
-        </PopoverContent>
-      </Popover>
-    </ColorPicker>
-  );
-}
-
-function reindex<T extends { position: number }>(items: T[]) {
-  return items.map((item, index) => ({ ...item, position: index }));
-}
 
 function reindexUnique<T extends { id: string; position: number }>(
   items: T[],
@@ -732,10 +472,7 @@ function reindexUnique<T extends { id: string; position: number }>(
   const seen = new Set<string>();
 
   return items.map((item, index) => {
-    const id =
-      item.id && !seen.has(item.id)
-        ? item.id
-        : `${prefix}_${crypto.randomUUID()}`;
+    const id = item.id && !seen.has(item.id) ? item.id : createRandomId(prefix);
     seen.add(id);
     return { ...item, id, position: index };
   });
@@ -856,6 +593,9 @@ function FileContainerPresentationControls({
   labels,
   onChange,
   portalId,
+  quickColors,
+  overlayContainer,
+  targetPrefix,
 }: {
   backgroundColor?: string;
   containerPadding?: number;
@@ -866,12 +606,15 @@ function FileContainerPresentationControls({
     container_padding: number;
   }) => void;
   portalId: string;
+  quickColors?: string[];
+  overlayContainer?: HTMLElement | null;
+  targetPrefix?: string;
 }) {
   const isTransparent = backgroundColor === "transparent";
   const document = usePortalEditorStore(
     (state) => state.documentsByPortalId[portalId],
   );
-  const paletteColors = portalQuickColors(document);
+  const paletteColors = quickColors ?? portalQuickColors(document);
 
   return (
     <>
@@ -917,6 +660,7 @@ function FileContainerPresentationControls({
           </FieldLabel>
           <VisualColorPicker
             format="hex"
+            overlayContainer={overlayContainer}
             onChange={(value) =>
               onChange({
                 background_color: value,
@@ -927,6 +671,7 @@ function FileContainerPresentationControls({
               backgroundColor === "secondary" ? "#E5E5E5" : backgroundColor
             }
             paletteColors={paletteColors}
+            targetPrefix={targetPrefix}
           />
         </Field>
       ) : null}
@@ -935,13 +680,19 @@ function FileContainerPresentationControls({
 }
 
 function ImageContainerPresentationControls({
+  demoTargetPrefix,
   image,
   onSave,
+  overlayContainer,
   portalId,
+  quickColors,
 }: {
+  demoTargetPrefix?: string;
   image: PortalImageItem;
   onSave: (image: PortalImageItem) => void;
+  overlayContainer?: HTMLElement | null;
   portalId: string;
+  quickColors?: string[];
 }) {
   const t = useTranslations("PortalEditor.image");
   return (
@@ -965,24 +716,35 @@ function ImageContainerPresentationControls({
         onSave(nextImage);
       }}
       portalId={portalId}
+      quickColors={quickColors}
+      overlayContainer={overlayContainer}
+      targetPrefix={demoTargetPrefix}
     />
   );
 }
 
 function ImageSettingsPopover({
+  demoTargetPrefix,
   image,
   onOpenChange,
   onSave,
   portalId,
   open,
   trigger,
+  localMode = false,
+  overlayContainer,
+  quickColors,
 }: {
+  demoTargetPrefix?: string;
   image: PortalImageItem;
   onOpenChange: (open: boolean) => void;
   onSave: (image: PortalImageItem) => void;
   portalId: string;
   open: boolean;
   trigger: ReactElement;
+  localMode?: boolean;
+  overlayContainer?: HTMLElement | null;
+  quickColors?: string[];
 }) {
   const t = useTranslations("PortalEditor");
   const imageFitItems = imageFits.map((value) => ({
@@ -993,14 +755,53 @@ function ImageSettingsPopover({
     label: value === "auto" ? t("image.ratioAuto") : value,
     value,
   }));
+  const imageName = image.display_name ?? "";
+  const imageDownloadName = displayNameWithoutExtension(
+    image.download_name || sourceNameFromStoragePath(image.storage_path),
+  );
+  const [nameDraft, setNameDraft] = useState(() =>
+    createSyncedTextDraft(imageName),
+  );
+  const [downloadNameDraft, setDownloadNameDraft] = useState(() =>
+    createSyncedTextDraft(imageDownloadName),
+  );
+  useEffect(
+    () => setNameDraft((state) => syncTextDraftSource(state, imageName)),
+    [imageName],
+  );
+  useEffect(
+    () =>
+      setDownloadNameDraft((state) =>
+        syncTextDraftSource(state, imageDownloadName),
+      ),
+    [imageDownloadName],
+  );
   function updateImage(nextImage: PortalImageItem) {
     onSave(nextImage);
   }
 
   return (
-    <Popover onOpenChange={onOpenChange} open={open}>
+    <Popover
+      modal={overlayContainer ? false : undefined}
+      onOpenChange={(nextOpen, details) =>
+        applyContainedDemoOverlayOpenChange(
+          Boolean(overlayContainer),
+          nextOpen,
+          onOpenChange,
+          { ...details, container: overlayContainer },
+        )
+      }
+      open={open}
+    >
       <PopoverTrigger render={trigger} />
-      <PopoverContent align="end" className="w-80" side="bottom">
+      <PopoverContent
+        align="end"
+        className="w-80"
+        collisionBoundary={overlayContainer ?? undefined}
+        portalContainer={overlayContainer}
+        positionMethod={overlayContainer ? "absolute" : "fixed"}
+        side="bottom"
+      >
         <PopoverHeader>
           <PopoverTitle>{t("image.settings")}</PopoverTitle>
           <PopoverDescription>
@@ -1008,29 +809,40 @@ function ImageSettingsPopover({
           </PopoverDescription>
         </PopoverHeader>
         <FieldGroup>
-          <ImproveWithAiButton
-            buttonLabel={t("ai.improveTextLabel")}
-            className="rounded-full"
-            portalId={portalId}
-            showIcon={false}
-            target={{
-              altText: image.alt_text,
-              id: image.id,
-              kind: "image",
-              name: image.display_name ?? image.image_url,
-            }}
-            variant="default"
-          />
+          {!localMode ? (
+            <ImproveWithAiButton
+              buttonLabel={t("ai.improveTextLabel")}
+              className="rounded-full"
+              portalId={portalId}
+              showIcon={false}
+              target={{
+                altText: image.alt_text,
+                id: image.id,
+                kind: "image",
+                name: image.display_name ?? image.image_url,
+              }}
+              variant="default"
+            />
+          ) : null}
           <Field>
             <FieldLabel>{t("image.name")}</FieldLabel>
             <Input
-              defaultValue={image.display_name ?? ""}
-              onBlur={(event) =>
+              demo-id={
+                demoTargetPrefix ? `${demoTargetPrefix}-name` : undefined
+              }
+              data-portal-demo-target={
+                demoTargetPrefix ? `${demoTargetPrefix}-name` : undefined
+              }
+              value={nameDraft.draft}
+              onChange={(event) =>
+                handleSyncedTextDraftChange(setNameDraft, event)
+              }
+              onBlur={() =>
                 updateImage(
                   markImageFieldManual(
                     {
                       ...image,
-                      display_name: event.currentTarget.value.trim(),
+                      display_name: nameDraft.draft.trim(),
                     },
                     "display_name",
                   ),
@@ -1042,17 +854,17 @@ function ImageSettingsPopover({
           <Field>
             <FieldLabel>{t("image.downloadName")}</FieldLabel>
             <Input
-              defaultValue={displayNameWithoutExtension(
-                image.download_name ||
-                  sourceNameFromStoragePath(image.storage_path),
-              )}
-              onBlur={(event) =>
+              value={downloadNameDraft.draft}
+              onChange={(event) =>
+                handleSyncedTextDraftChange(setDownloadNameDraft, event)
+              }
+              onBlur={() =>
                 updateImage(
                   markImageFieldManual(
                     {
                       ...image,
                       download_name: normalizeAssetDownloadName(
-                        event.currentTarget.value,
+                        downloadNameDraft.draft,
                         sourceNameFromStoragePath(image.storage_path),
                       ),
                     },
@@ -1124,9 +936,12 @@ function ImageSettingsPopover({
             </Field>
           </div>
           <ImageContainerPresentationControls
+            demoTargetPrefix={demoTargetPrefix}
             image={image}
             onSave={updateImage}
+            overlayContainer={overlayContainer}
             portalId={portalId}
+            quickColors={quickColors}
           />
           <Field className="flex flex-row items-center justify-between gap-3">
             <FieldLabel htmlFor={`${image.id}-visible`}>
@@ -1145,6 +960,12 @@ function ImageSettingsPopover({
               {t("common.allowDownload")}
             </FieldLabel>
             <Switch
+              demo-id={
+                demoTargetPrefix ? `${demoTargetPrefix}-download` : undefined
+              }
+              data-portal-demo-target={
+                demoTargetPrefix ? `${demoTargetPrefix}-download` : undefined
+              }
               checked={image.allow_download}
               id={`${image.id}-download`}
               onCheckedChange={(checked) =>
@@ -1168,6 +989,10 @@ function ImageTile({
   portalId,
   portalSlug,
   pending = false,
+  localMode = false,
+  overlayContainer,
+  quickColors,
+  demoTargetPrefix,
 }: {
   captionEditable?: boolean;
   dragHandleRef?: (element: Element | null) => void;
@@ -1178,6 +1003,10 @@ function ImageTile({
   portalId: string;
   portalSlug?: string;
   pending?: boolean;
+  localMode?: boolean;
+  overlayContainer?: HTMLElement | null;
+  quickColors?: string[];
+  demoTargetPrefix?: string;
 }) {
   const t = useTranslations("PortalEditor.image");
   const ratioClass =
@@ -1224,9 +1053,12 @@ function ImageTile({
   return (
     <figure
       aria-busy={pending}
-      className={cn("flex flex-col gap-2", pending && "animate-pulse")}
+      className={cn("flex h-fit flex-col gap-2", pending && "animate-pulse")}
     >
       <div
+        data-portal-demo-target={
+          demoTargetPrefix ? `${demoTargetPrefix}-card` : undefined
+        }
         className={cn(
           "group/item relative overflow-hidden rounded-xl bg-muted",
           ratioClass,
@@ -1238,31 +1070,35 @@ function ImageTile({
             !image.background_color || image.background_color === "secondary"
               ? "var(--secondary)"
               : image.background_color,
-          padding: image.container_padding ?? 0,
         }}
       >
-        {/* biome-ignore lint/performance/noImgElement: user uploaded Storage asset. */}
-        <img
-          alt={image.alt_text}
-          className={cn(
-            "size-full",
-            fitClass,
-            dragHandleRef && "cursor-grab active:cursor-grabbing",
-          )}
-          ref={dragHandleRef}
-          src={imageUrl}
-          key={`${imageUrl}:${previewRetry}`}
-          onError={() => {
-            if (!stableImageUrl || imageUrl === stableImageUrl) return;
-            if (previewRetry < 3) {
-              previewRetryTimer.current = setTimeout(() => {
-                setPreviewRetry((current) => current + 1);
-              }, 400);
-              return;
-            }
-            setUseStablePreview(true);
-          }}
-        />
+        <div
+          className="absolute inset-0"
+          style={{ padding: image.container_padding ?? 0 }}
+        >
+          {/* biome-ignore lint/performance/noImgElement: user uploaded Storage asset. */}
+          <img
+            alt={image.alt_text}
+            className={cn(
+              "size-full",
+              fitClass,
+              dragHandleRef && "cursor-grab active:cursor-grabbing",
+            )}
+            ref={dragHandleRef}
+            src={imageUrl}
+            key={`${imageUrl}:${previewRetry}`}
+            onError={() => {
+              if (!stableImageUrl || imageUrl === stableImageUrl) return;
+              if (previewRetry < 3) {
+                previewRetryTimer.current = setTimeout(() => {
+                  setPreviewRetry((current) => current + 1);
+                }, 400);
+                return;
+              }
+              setUseStablePreview(true);
+            }}
+          />
+        </div>
         {pending ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 text-white">
             <IconLoader2 className="size-4 animate-spin" />
@@ -1270,34 +1106,47 @@ function ImageTile({
           </div>
         ) : null}
         {!pending ? (
-          <PortalItemActionsOverlay
-            forceVisible={settingsOpen}
-            position="top-3-right"
-          >
+          <PortalItemActionsOverlay forceVisible position="top-3-right">
             <ImageSettingsPopover
               image={image}
+              demoTargetPrefix={demoTargetPrefix}
               onOpenChange={setSettingsOpen}
               onSave={onSave}
               portalId={portalId}
               open={settingsOpen}
+              localMode={localMode}
+              overlayContainer={overlayContainer}
+              quickColors={quickColors}
               trigger={
                 <PortalActionTriggerButton
+                  demo-id={
+                    demoTargetPrefix
+                      ? `${demoTargetPrefix}-settings`
+                      : undefined
+                  }
+                  data-portal-demo-target={
+                    demoTargetPrefix
+                      ? `${demoTargetPrefix}-settings`
+                      : undefined
+                  }
                   icon="settings"
                   label={t("settings")}
-                  variant="secondary"
+                  variant="ghost"
                 />
               }
             />
-            <Button
-              aria-label={t("remove")}
-              className="rounded-full"
-              onClick={onRemove}
-              size="icon-sm"
-              type="button"
-              variant="secondary"
-            >
-              <IconX data-icon="inline-start" />
-            </Button>
+            {!localMode ? (
+              <Button
+                aria-label={t("remove")}
+                className="rounded-full"
+                onClick={onRemove}
+                size="icon-sm"
+                type="button"
+                variant="ghost"
+              >
+                <IconX data-icon="inline-start" />
+              </Button>
+            ) : null}
           </PortalItemActionsOverlay>
         ) : null}
       </div>
@@ -2059,6 +1908,10 @@ function SortableGalleryItem({
   portalId,
   portalSlug,
   sectionId,
+  localMode = false,
+  overlayContainer,
+  quickColors,
+  demoTargetPrefix,
 }: {
   captionEditable?: boolean;
   image: PortalImageItem;
@@ -2068,6 +1921,10 @@ function SortableGalleryItem({
   portalId: string;
   portalSlug: string;
   sectionId: string;
+  localMode?: boolean;
+  overlayContainer?: HTMLElement | null;
+  quickColors?: string[];
+  demoTargetPrefix?: string;
 }) {
   const { handleRef, isDragging, ref } = useSortable({
     group: sectionId,
@@ -2078,7 +1935,7 @@ function SortableGalleryItem({
   });
 
   return (
-    <div ref={ref}>
+    <div className="h-fit self-start" ref={ref}>
       <ImageTile
         captionEditable={captionEditable}
         dragHandleRef={handleRef}
@@ -2088,6 +1945,10 @@ function SortableGalleryItem({
         onSave={onSave}
         portalId={portalId}
         portalSlug={portalSlug}
+        localMode={localMode}
+        overlayContainer={overlayContainer}
+        quickColors={quickColors}
+        demoTargetPrefix={demoTargetPrefix}
       />
     </div>
   );
@@ -2114,7 +1975,7 @@ function GalleryDropTarget({
   return (
     <div
       className={cn(
-        "order-last grid w-full",
+        "order-last grid h-fit w-full self-start",
         isDropTarget && "rounded-xl ring-2 ring-primary",
       )}
       ref={ref}
@@ -2124,26 +1985,64 @@ function GalleryDropTarget({
   );
 }
 
-function GalleryEditor({
-  portalId,
-  portalSlug,
-  section,
-  updateSection,
-}: {
+type GalleryEditorProps = {
   portalId: string;
   portalSlug: string;
   section: PortalSection;
   updateSection: (section: PortalSection) => void;
-}) {
+  localMode?: boolean;
+  overlayContainer?: HTMLElement | null;
+  quickColors?: string[];
+};
+
+function GalleryEditor(props: GalleryEditorProps) {
+  if (props.localMode) {
+    return (
+      <GalleryEditorContent {...props} maxImages={Number.POSITIVE_INFINITY} />
+    );
+  }
+  return <ManagedGalleryEditor {...props} />;
+}
+
+function ManagedGalleryEditor(props: GalleryEditorProps) {
   const { requestUpgrade, snapshot, status } = usePortalPlan();
-  const t = useTranslations("PortalEditor.gallery");
   const isComparison =
-    section.layout.mode === "comparison" || section.type === "image_comparison";
+    props.section.layout.mode === "comparison" ||
+    props.section.type === "image_comparison";
   const maxImages = isComparison
     ? 2
     : status === "ready"
       ? (snapshot.policy.sections.gallery?.items ?? Number.POSITIVE_INFINITY)
       : Number.POSITIVE_INFINITY;
+  return (
+    <GalleryEditorContent
+      {...props}
+      maxImages={maxImages}
+      requestUpgrade={requestUpgrade}
+      status={status}
+    />
+  );
+}
+
+function GalleryEditorContent({
+  portalId,
+  portalSlug,
+  section,
+  updateSection,
+  localMode = false,
+  overlayContainer,
+  quickColors,
+  maxImages,
+  requestUpgrade,
+  status = "unavailable",
+}: GalleryEditorProps & {
+  maxImages: number;
+  requestUpgrade?: (code: "gallery_items") => void;
+  status?: "error" | "loading" | "ready" | "unavailable";
+}) {
+  const t = useTranslations("PortalEditor.gallery");
+  const isComparison =
+    section.layout.mode === "comparison" || section.type === "image_comparison";
   const images = uniqueForRender(section.content.images ?? [], "img").slice(
     0,
     maxImages,
@@ -2190,10 +2089,12 @@ function GalleryEditor({
     <div className="flex flex-col gap-4">
       <div
         className={cn(
-          "grid gap-4",
+          "grid items-start gap-4",
           columns === 2 && "grid-cols-2",
-          columns === 3 && "grid-cols-2 lg:grid-cols-3",
-          columns === 4 && "grid-cols-3 lg:grid-cols-4",
+          columns === 3 &&
+            "grid-cols-2 lg:grid-cols-3 group-data-[style-mode=desktop]/portal:grid-cols-3! group-data-[style-mode=mobile]/portal:grid-cols-2!",
+          columns === 4 &&
+            "grid-cols-3 lg:grid-cols-4 group-data-[style-mode=desktop]/portal:grid-cols-4! group-data-[style-mode=mobile]/portal:grid-cols-3!",
         )}
       >
         {images.map((image, index) => (
@@ -2205,6 +2106,12 @@ function GalleryEditor({
             portalId={portalId}
             portalSlug={portalSlug}
             sectionId={section.id}
+            localMode={localMode}
+            overlayContainer={overlayContainer}
+            quickColors={quickColors}
+            demoTargetPrefix={
+              localMode && index === 0 ? "first-image" : undefined
+            }
             onRemove={() => {
               saveImages(images.filter((item) => item.id !== image.id));
             }}
@@ -2217,7 +2124,7 @@ function GalleryEditor({
             }
           />
         ))}
-        {images.length < maxImages ? (
+        {!localMode && images.length < maxImages ? (
           <GalleryDropTarget index={images.length} sectionId={section.id}>
             <AddImageTile
               aspectRatio={addImageAspectRatio}
@@ -2246,7 +2153,7 @@ function GalleryEditor({
           <button
             aria-label={t("limitReached")}
             className="flex aspect-square items-center justify-center rounded-xl border border-dashed text-muted-foreground"
-            onClick={() => requestUpgrade("gallery_items")}
+            onClick={() => requestUpgrade?.("gallery_items")}
             type="button"
           >
             <span className="text-center text-sm">{t("limitReached")}</span>
@@ -2260,10 +2167,12 @@ function GalleryEditor({
 function ColorDialog({
   color,
   onSave,
+  overlayContainer,
   trigger,
 }: {
   color?: PortalColorItem;
   onSave: (color: PortalColorItem) => void;
+  overlayContainer?: HTMLElement | null;
   trigger: ReactElement;
 }) {
   const t = useTranslations("PortalEditor");
@@ -2284,7 +2193,7 @@ function ColorDialog({
   const hexValue = draft.color_code.startsWith("#")
     ? normalizeHexInput(draft.color_code)
     : "";
-  const pickerValue = getPickerValue(draft);
+  const pickerValue = visualColorPickerValue(draft.color_code);
   const colorFormatItems = colorFormats.map((value) => ({
     label: t(`colors.formats.${value}`),
     value,
@@ -2300,15 +2209,34 @@ function ColorDialog({
   }
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      disablePointerDismissal={Boolean(overlayContainer)}
+      modal={overlayContainer ? false : undefined}
+      onOpenChange={(nextOpen) =>
+        applyContainedDemoOverlayOpenChange(
+          Boolean(overlayContainer),
+          nextOpen,
+          setOpen,
+        )
+      }
+      open={open}
+    >
       <DialogTrigger render={trigger} />
-      <DialogContent>
+      <DialogContent
+        className={
+          overlayContainer
+            ? "w-[min(28rem,calc(100%-2rem))] max-w-none"
+            : undefined
+        }
+        contained={Boolean(overlayContainer)}
+        portalContainer={overlayContainer}
+      >
         <DialogHeader>
           <DialogTitle>{t("colors.dialogTitle")}</DialogTitle>
           <DialogDescription>{t("colors.dialogDescription")}</DialogDescription>
         </DialogHeader>
         <FieldGroup>
-          <div className="grid gap-3 sm:grid-cols-[160px_1fr]">
+          <div className="grid gap-3 sm:grid-cols-[160px_1fr] group-data-[style-mode=desktop]/portal:grid-cols-[160px_1fr]">
             <Field>
               <FieldLabel>{t("colors.format")}</FieldLabel>
               <Select
@@ -2349,6 +2277,8 @@ function ColorDialog({
               <div className="flex h-9 items-center rounded-md border border-input bg-transparent shadow-xs focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
                 <span className="px-2.5 text-muted-foreground text-sm">#</span>
                 <Input
+                  demo-id={!color ? "color-code" : undefined}
+                  data-portal-demo-target={!color ? "color-code" : undefined}
                   className="border-none px-0 shadow-none focus-visible:ring-0"
                   maxLength={format === "hexa" ? 8 : 6}
                   placeholder={format === "hexa" ? "FF0000FF" : "FF0000"}
@@ -2400,6 +2330,8 @@ function ColorDialog({
         </FieldGroup>
         <DialogFooter>
           <Button
+            demo-id={!color ? "save-color" : undefined}
+            data-portal-demo-target={!color ? "save-color" : undefined}
             onClick={() => {
               onSave({
                 ...draft,
@@ -2487,7 +2419,7 @@ function SortableColorItem({
           ) : null}
         </div>
       ) : null}
-      <PortalItemActionsOverlay position="top-3-right">
+      <PortalItemActionsOverlay forceVisible position="top-3-right">
         <ColorDialog
           color={color}
           onSave={onSave}
@@ -2495,7 +2427,7 @@ function SortableColorItem({
             <PortalActionTriggerButton
               icon="edit"
               label={t("edit")}
-              variant="secondary"
+              variant="ghost"
             />
           }
         />
@@ -2504,7 +2436,7 @@ function SortableColorItem({
           onClick={onRemove}
           size="icon-sm"
           type="button"
-          variant="secondary"
+          variant="ghost"
         >
           <IconX data-icon="inline-start" />
         </Button>
@@ -2516,9 +2448,11 @@ function SortableColorItem({
 function ColorsEditor({
   section,
   updateSection,
+  overlayContainer,
 }: {
   section: PortalSection;
   updateSection: (section: PortalSection) => void;
+  overlayContainer?: HTMLElement | null;
 }) {
   const colors = uniqueForRender(section.content.colors ?? [], "color");
   const isStack = section.layout.mode === "stack";
@@ -2552,10 +2486,18 @@ function ColorsEditor({
         <div
           className={cn(
             isStack ? "flex flex-col gap-4" : "grid gap-4",
-            !isStack && columns === 3 && "grid-cols-2 lg:grid-cols-3",
-            !isStack && columns === 4 && "grid-cols-3 lg:grid-cols-4",
-            !isStack && columns === 5 && "grid-cols-4 lg:grid-cols-5",
-            !isStack && columns === 6 && "grid-cols-5 lg:grid-cols-6",
+            !isStack &&
+              columns === 3 &&
+              "grid-cols-2 lg:grid-cols-3 group-data-[style-mode=desktop]/portal:grid-cols-3! group-data-[style-mode=mobile]/portal:grid-cols-2!",
+            !isStack &&
+              columns === 4 &&
+              "grid-cols-3 lg:grid-cols-4 group-data-[style-mode=desktop]/portal:grid-cols-4! group-data-[style-mode=mobile]/portal:grid-cols-3!",
+            !isStack &&
+              columns === 5 &&
+              "grid-cols-4 lg:grid-cols-5 group-data-[style-mode=desktop]/portal:grid-cols-5! group-data-[style-mode=mobile]/portal:grid-cols-4!",
+            !isStack &&
+              columns === 6 &&
+              "grid-cols-5 lg:grid-cols-6 group-data-[style-mode=desktop]/portal:grid-cols-6! group-data-[style-mode=mobile]/portal:grid-cols-5!",
           )}
         >
           {colors.map((color, index) => (
@@ -2579,11 +2521,13 @@ function ColorsEditor({
             />
           ))}
           <ColorDialog
+            overlayContainer={overlayContainer}
             onSave={(color) =>
               saveColors([...colors, { ...color, position: colors.length }])
             }
             trigger={
               <button
+                data-portal-demo-target="add-color"
                 className={cn(
                   "flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed bg-background text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                   isStack ? "size-14 shrink-0" : "aspect-square",
@@ -2670,7 +2614,7 @@ function FontDialog({
       ? { ...font }
       : {
           font_name: "",
-          id: `font_${crypto.randomUUID()}`,
+          id: createRandomId("font"),
           position: 0,
           sample_description: viewerT("sampleDescription"),
           sample_text: viewerT("sampleTitle"),
@@ -3619,7 +3563,7 @@ function FilesEditor({
                 file_type: fileType,
                 file_url: finalized.previewUrl,
                 storage_path: finalized.path,
-                id: `file_${crypto.randomUUID()}`,
+                id: createRandomId("file"),
                 position: filesRef.current.length,
                 visible: true,
               },
@@ -3671,8 +3615,10 @@ function FilesEditor({
         <div
           className={cn(
             "grid gap-4",
-            columns === 3 && "grid-cols-2 lg:grid-cols-3",
-            columns === 4 && "grid-cols-3 lg:grid-cols-4",
+            columns === 3 &&
+              "grid-cols-2 lg:grid-cols-3 group-data-[style-mode=desktop]/portal:grid-cols-3! group-data-[style-mode=mobile]/portal:grid-cols-2!",
+            columns === 4 &&
+              "grid-cols-3 lg:grid-cols-4 group-data-[style-mode=desktop]/portal:grid-cols-4! group-data-[style-mode=mobile]/portal:grid-cols-3!",
           )}
         >
           {files.map((file, index) => (
@@ -3757,13 +3703,19 @@ function FilesEditor({
 }
 
 export function SectionContentEditor({
+  localMode = false,
+  overlayContainer,
   portalId,
   portalSlug,
+  quickColors,
   section,
   updateSection,
 }: {
+  localMode?: boolean;
+  overlayContainer?: HTMLElement | null;
   portalId: string;
   portalSlug: string;
+  quickColors?: string[];
   section: PortalSection;
   updateSection: (section: PortalSection) => void;
 }) {
@@ -3802,14 +3754,23 @@ export function SectionContentEditor({
   if (section.type === "gallery")
     return (
       <GalleryEditor
+        localMode={localMode}
+        overlayContainer={overlayContainer}
         portalId={portalId}
         portalSlug={portalSlug}
+        quickColors={quickColors}
         section={section}
         updateSection={updateSection}
       />
     );
   if (section.type === "colors")
-    return <ColorsEditor section={section} updateSection={updateSection} />;
+    return (
+      <ColorsEditor
+        overlayContainer={overlayContainer}
+        section={section}
+        updateSection={updateSection}
+      />
+    );
   if (section.type === "fonts")
     return (
       <FontsEditor
@@ -3841,217 +3802,6 @@ export function SectionContentEditor({
       />
     );
   return null;
-}
-
-function usePortalDocumentDraft(portalId: string, document: PortalDocument) {
-  const storeDocument = usePortalEditorStore(
-    (state) => state.documentsByPortalId[portalId],
-  );
-  const hydrateDocument = usePortalEditorStore(
-    (state) => state.hydrateDocument,
-  );
-
-  useEffect(() => {
-    hydrateDocument(portalId, document);
-  }, [document, hydrateDocument, portalId]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void reconcilePersistedPortalAssets({ portalId })
-      .then(({ assets, discardedIds }) => {
-        if (cancelled) return;
-        if (assets.length || discardedIds.length) {
-          window.dispatchEvent(new Event("portal-assets-reconciled"));
-        }
-      })
-      .catch(() => {
-        // A transient reconciliation failure must not block the editor.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [portalId]);
-
-  return storeDocument ?? document;
-}
-
-export function PortalDocumentSidebar({
-  document,
-  exportHref,
-  locale: _locale,
-  portalId,
-}: {
-  document: PortalDocument;
-  exportHref?: string;
-  locale: string;
-  portalId: string;
-}) {
-  const draft = usePortalDocumentDraft(portalId, document);
-  const [sections, setSections] = useState(() =>
-    uniqueForRender(
-      draft.sections.filter(
-        (section) => section.visible && section.type !== "empty",
-      ),
-      "sec",
-    ),
-  );
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  useEffect(() => {
-    setSections(
-      uniqueForRender(
-        draft.sections.filter(
-          (section) => section.visible && section.type !== "empty",
-        ),
-        "sec",
-      ),
-    );
-  }, [draft]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              Math.abs(a.boundingClientRect.top) -
-              Math.abs(b.boundingClientRect.top),
-          )[0];
-
-        if (visibleEntry?.target.id) {
-          setActiveId(visibleEntry.target.id);
-        }
-      },
-      { rootMargin: "-25% 0px -60% 0px", threshold: 0 },
-    );
-
-    for (const section of sections) {
-      const element = window.document.getElementById(section.id);
-      if (element) observer.observe(element);
-    }
-
-    const assetsElement = window.document.getElementById("assets");
-    if (assetsElement) observer.observe(assetsElement);
-
-    return () => observer.disconnect();
-  }, [sections]);
-
-  return (
-    <nav className="flex h-full min-h-0 flex-col gap-1 text-sm text-muted-foreground">
-      <div className="flex min-h-0 flex-col gap-1 overflow-y-auto">
-        {sections.map((section) => (
-          <SidebarItem
-            isActive={activeId === section.id}
-            key={section.id}
-            section={section}
-          />
-        ))}
-      </div>
-      <SidebarFooterActions exportHref={exportHref} portalId={portalId} />
-    </nav>
-  );
-}
-
-function SidebarItem({
-  isActive,
-  section,
-}: {
-  isActive: boolean;
-  section: PortalSection;
-}) {
-  const t = useTranslations("PortalEditor.sections");
-  return (
-    <SidebarLink
-      href={`#${section.id}`}
-      isActive={isActive}
-      label={section.title || t(`types.${section.type}.label`)}
-    />
-  );
-}
-
-function SidebarLink({
-  href,
-  icon,
-  isActive = false,
-  label,
-  onClick,
-}: {
-  href?: string;
-  icon?: ReactNode;
-  isActive?: boolean;
-  label?: string;
-  onClick?: () => void;
-}) {
-  const className = cn(
-    "flex items-center gap-2 rounded-md py-1.5 hover:text-foreground",
-    isActive && "text-primary",
-  );
-  const content = (
-    <div className="flex items-center">
-      {icon && (
-        <span className="flex ml-3 shrink-0 items-center justify-center">
-          {icon}
-        </span>
-      )}
-      {label ? (
-        <div className="min-w-0 px-2 flex-1 first-letter:uppercase truncate">
-          {label}
-        </div>
-      ) : null}
-    </div>
-  );
-
-  if (onClick) {
-    return (
-      <button className={className} onClick={onClick} type="button">
-        {content}
-      </button>
-    );
-  }
-
-  return (
-    <a className={className} href={href}>
-      {content}
-    </a>
-  );
-}
-
-function SidebarFooterActions({
-  exportHref,
-  portalId,
-}: {
-  exportHref?: string;
-  portalId: string;
-}) {
-  const t = useTranslations("PortalEditor.sidebar");
-  const { resolvedTheme, setTheme } = useTheme();
-  const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
-
-  return (
-    <div className="mt-auto flex flex-col gap-1">
-      <SidebarLink
-        icon={<IconMoon className="size-4" />}
-        label={t("theme")}
-        onClick={() => setTheme(nextTheme)}
-      />
-      {exportHref ? (
-        <SidebarLink
-          icon={<IconPackageExport className="size-4" />}
-          label={t("exportAssets")}
-          onClick={() => {
-            void flushThenExport({
-              flush: () => flushPortalAutosave(portalId),
-              href: exportHref,
-              navigate: (href) => window.location.assign(href),
-            }).catch(() => {
-              // Autosave retains the draft and exposes its existing retry UI.
-            });
-          }}
-        />
-      ) : null}
-    </div>
-  );
 }
 
 export function SectionActionToolbar({
@@ -4147,883 +3897,5 @@ export function SectionActionToolbar({
         <IconTrash data-icon="inline-start" />
       </Button>
     </>
-  );
-}
-
-function SectionOrderItem({
-  index,
-  section,
-}: {
-  index: number;
-  section: PortalSection;
-}) {
-  const t = useTranslations("PortalEditor.sections");
-  const sectionName = section.title || t(`types.${section.type}.label`);
-  const { handleRef, isDragging, ref } = useSortable({
-    id: section.id,
-    index,
-    type: "portal-section-order",
-  });
-
-  return (
-    <div
-      className={cn(
-        "flex items-center gap-2 rounded-md border px-2 py-2 text-sm",
-        isDragging && "opacity-50",
-      )}
-      ref={ref}
-    >
-      <button
-        aria-label={t("move", { name: sectionName })}
-        className="flex shrink-0 cursor-grab gap-2 items-center justify-center active:cursor-grabbing"
-        ref={handleRef}
-        type="button"
-      >
-        <IconGripVertical className="size-3 text-muted-foreground" />
-        <span className="min-w-0 flex-1 truncate first-letter:uppercase">
-          {sectionName}
-        </span>
-      </button>
-    </div>
-  );
-}
-
-export function SectionOrderPopover({
-  document,
-  portalId,
-  triggerless = false,
-}: {
-  document: PortalDocument;
-  portalId: string;
-  triggerless?: boolean;
-}) {
-  const t = useTranslations("PortalEditor.sections");
-  const triggerId = "portal-section-order-trigger";
-  const draft = usePortalDocumentDraft(portalId, document);
-  const updateDraft = usePortalEditorStore((state) => state.updateDocument);
-  const { guardDocumentChange } = usePortalPlan();
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!triggerless) return;
-    const openOrder = () => setOpen(true);
-    window.addEventListener("portal-workspace:order", openOrder);
-    return () =>
-      window.removeEventListener("portal-workspace:order", openOrder);
-  }, [triggerless]);
-  const pendingSectionIdRef = useRef<string | null>(null);
-  const sections = uniqueForRender(
-    draft.sections.filter(
-      (section) => section.visible && section.type !== "empty",
-    ),
-    "sec",
-  );
-
-  function save(
-    update: (current: PortalDocument) => PortalDocument,
-    retry?: { kind: "add-section"; type: Exclude<PortalSectionType, "empty"> },
-  ) {
-    const current =
-      usePortalEditorStore.getState().documentsByPortalId[portalId] ?? document;
-    const candidate = update(current);
-    if (!guardDocumentChange(current, candidate, retry)) return;
-    const updated = updateDraft(portalId, () => candidate);
-    if (updated) {
-      schedulePortalAutosave(portalId, updated);
-    }
-  }
-
-  function addSection(type: Exclude<PortalSectionType, "empty">) {
-    save(
-      (current) => {
-        const section = createPortalSection(type, current.sections.length);
-        pendingSectionIdRef.current = section.id;
-        return { ...current, sections: [...current.sections, section] };
-      },
-      { kind: "add-section", type },
-    );
-  }
-
-  return (
-    <Popover
-      onOpenChange={setOpen}
-      onOpenChangeComplete={(isOpen) => {
-        const sectionId = pendingSectionIdRef.current;
-        if (isOpen || !sectionId) return;
-
-        pendingSectionIdRef.current = null;
-        scrollToPortalSection(sectionId);
-        focusPortalSectionTitle(sectionId);
-      }}
-      open={open}
-      triggerId={triggerless ? triggerId : undefined}
-    >
-      {!triggerless ? (
-        <Tooltip>
-          <TooltipTrigger render={<span />}>
-            <PopoverTrigger
-              render={
-                <Button
-                  aria-label={t("order")}
-                  className="rounded-full"
-                  size="icon-lg"
-                  type="button"
-                  variant="ghost"
-                />
-              }
-            >
-              <IconStack2 />
-              <span className="sr-only">{t("order")}</span>
-            </PopoverTrigger>
-          </TooltipTrigger>
-          <TooltipContent>{t("order")}</TooltipContent>
-        </Tooltip>
-      ) : (
-        <PopoverTrigger
-          id={triggerId}
-          nativeButton={false}
-          render={
-            <span
-              aria-hidden="true"
-              className="fixed bottom-20 left-1/2 size-px"
-            />
-          }
-        />
-      )}
-      <PopoverContent align="center" className="w-72" side="top" sideOffset={8}>
-        <PopoverHeader>
-          <PopoverTitle>{t("orderTitle")}</PopoverTitle>
-          <PopoverDescription>{t("orderDescription")}</PopoverDescription>
-        </PopoverHeader>
-        <SectionTypeDialog
-          onSelect={addSection}
-          onSelectComplete={() => setOpen(false)}
-          trigger={
-            <Button
-              aria-label={t("add")}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              <IconPlus data-icon="inline-start" />
-              {t("add")}
-            </Button>
-          }
-        />
-        <DragDropProvider
-          onDragEnd={(event) => {
-            if (!event.canceled) {
-              const nextSections = move(sections, event);
-              const orderedIds = nextSections.map((section) => section.id);
-              save((current) => {
-                const sectionsById = new Map(
-                  current.sections.map((section) => [section.id, section]),
-                );
-                const orderedSections = orderedIds.flatMap((id) => {
-                  const section = sectionsById.get(id);
-                  return section ? [section] : [];
-                });
-                const orderedIdSet = new Set(orderedIds);
-                const remainingVisibleSections = current.sections.filter(
-                  (section) =>
-                    section.visible &&
-                    section.type !== "empty" &&
-                    !orderedIdSet.has(section.id),
-                );
-                const hiddenSections = current.sections.filter(
-                  (section) => section.type === "empty" || !section.visible,
-                );
-                return {
-                  ...current,
-                  sections: reindex([
-                    ...orderedSections,
-                    ...remainingVisibleSections,
-                    ...hiddenSections,
-                  ]),
-                };
-              });
-            }
-          }}
-        >
-          <div className="flex max-h-80 flex-col gap-2 overflow-y-auto">
-            {sections.map((section, index) => (
-              <SectionOrderItem
-                index={index}
-                key={section.id}
-                section={section}
-              />
-            ))}
-          </div>
-        </DragDropProvider>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-function SettingsDialogTrigger({
-  icon,
-  label,
-}: {
-  icon: ReactElement;
-  label: string;
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger render={<span />}>
-        <DialogTrigger
-          render={
-            <Button
-              aria-label={label}
-              className="rounded-full"
-              size="icon-lg"
-              type="button"
-              variant="ghost"
-            />
-          }
-        >
-          {icon}
-          <span className="sr-only">{label}</span>
-        </DialogTrigger>
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
-  );
-}
-
-function SettingsTabForm({
-  action = updatePortalSettings,
-  children,
-  locale,
-  onSaved,
-  onPaidConfirmationClose,
-  paidConfirmation,
-  portal,
-}: {
-  action?: (formData: FormData) => Promise<void>;
-  children: ReactNode;
-  locale: string;
-  onSaved: () => void;
-  onPaidConfirmationClose?: () => void;
-  paidConfirmation?: {
-    cancel: string;
-    confirm: string;
-    description: string;
-    title: string;
-  };
-  portal: Portal;
-}) {
-  const t = useTranslations("PortalEditor.common");
-  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
-  const [confirmationOpen, setConfirmationOpen] = useState(false);
-  const setHasUnpublishedChanges = usePortalEditorStore(
-    (state) => state.setHasUnpublishedChanges,
-  );
-
-  async function submitAction(formData: FormData) {
-    await action(formData);
-    setHasUnpublishedChanges(portal.id, true);
-    onSaved();
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    if (
-      paidConfirmation &&
-      portal.visibility !== "paid" &&
-      new FormData(event.currentTarget).get("visibility") === "paid"
-    ) {
-      event.preventDefault();
-      setPendingFormData(new FormData(event.currentTarget));
-      setConfirmationOpen(true);
-    }
-  }
-
-  return (
-    <form action={submitAction} onSubmit={handleSubmit}>
-      <input name="locale" type="hidden" value={locale} />
-      <input name="portal_id" type="hidden" value={portal.id} />
-      {children}
-      <DialogFooter className="pt-6">
-        <Button type="submit">
-          <IconDeviceFloppy data-icon="inline-start" />
-          {t("saveSettings")}
-        </Button>
-      </DialogFooter>
-      {paidConfirmation ? (
-        <Dialog
-          onOpenChange={(open) => {
-            setConfirmationOpen(open);
-            if (!open) {
-              setPendingFormData(null);
-              onPaidConfirmationClose?.();
-            }
-          }}
-          open={confirmationOpen}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{paidConfirmation.title}</DialogTitle>
-              <DialogDescription>
-                {paidConfirmation.description}
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                onClick={() => {
-                  setConfirmationOpen(false);
-                  setPendingFormData(null);
-                  onPaidConfirmationClose?.();
-                }}
-                type="button"
-                variant="outline"
-              >
-                {paidConfirmation.cancel}
-              </Button>
-              <Button
-                onClick={() => {
-                  if (!pendingFormData) return;
-                  const formData = pendingFormData;
-                  setPendingFormData(null);
-                  setConfirmationOpen(false);
-                  void submitAction(formData);
-                }}
-                type="button"
-              >
-                {paidConfirmation.confirm}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      ) : null}
-    </form>
-  );
-}
-
-function SlugAvailabilityField({
-  locale,
-  portal,
-}: {
-  locale: string;
-  portal: Portal;
-}) {
-  const t = useTranslations("PortalEditor.settings");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [value, setValue] = useState(portal.slug);
-  const [edited, setEdited] = useState(false);
-  const [status, setStatus] = useState<
-    "checking" | "available" | "unavailable" | null
-  >(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!edited) return;
-    let current = true;
-    setStatus("checking");
-    setMessage(t("checkingSlug"));
-    const timer = window.setTimeout(async () => {
-      const result = await checkPortalSlugAvailability(
-        value,
-        portal.id,
-        locale,
-      );
-      if (!current) return;
-      setStatus(result.available ? "available" : "unavailable");
-      setMessage(result.available ? t("slugAvailable") : result.error);
-    }, 350);
-    return () => {
-      current = false;
-      window.clearTimeout(timer);
-    };
-  }, [edited, locale, portal.id, value, t]);
-
-  useEffect(() => {
-    inputRef.current?.setCustomValidity(
-      status === "unavailable" ? (message ?? t("slugUnavailable")) : "",
-    );
-  }, [message, status, t]);
-
-  const invalid = edited && status === "unavailable";
-  return (
-    <Field data-invalid={invalid || undefined}>
-      <FieldLabel htmlFor="portal-slug">{t("slug")}</FieldLabel>
-      <Input
-        aria-invalid={invalid || undefined}
-        autoComplete="off"
-        id="portal-slug"
-        maxLength={80}
-        name="slug"
-        onChange={(event) => {
-          setEdited(true);
-          setValue(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
-        }}
-        pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-        placeholder={t("slugPlaceholder")}
-        ref={inputRef}
-        required
-        value={value}
-      />
-      {edited && invalid ? <FieldError>{message}</FieldError> : null}
-      {edited && !invalid && message ? (
-        <FieldDescription aria-live="polite">{message}</FieldDescription>
-      ) : null}
-    </Field>
-  );
-}
-
-function ConnectStripeButton({
-  locale,
-  portalId,
-}: {
-  locale: string;
-  portalId: string;
-}) {
-  const t = useTranslations("PortalEditor.settings");
-  return (
-    <Button
-      onClick={() =>
-        window.location.assign(
-          `/${locale}/home?connect=onboarding&portalId=${encodeURIComponent(portalId)}`,
-        )
-      }
-      type="button"
-      variant="outline"
-    >
-      {t("configureConnect")}
-    </Button>
-  );
-}
-
-export function SettingsDialog({
-  initialConnectReady,
-  initialPaidPriceCents,
-  locale,
-  portal,
-  triggerless = false,
-}: {
-  initialConnectReady: boolean;
-  initialPaidPriceCents: number | null;
-  locale: string;
-  portal: Portal;
-  triggerless?: boolean;
-}) {
-  const t = useTranslations("PortalEditor.settings");
-  const { guardPassword } = usePortalPlan();
-  const [activeTab, setActiveTab] = useState("general");
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!triggerless) return;
-    const openSettings = () => setOpen(true);
-    window.addEventListener("portal-workspace:settings", openSettings);
-    return () =>
-      window.removeEventListener("portal-workspace:settings", openSettings);
-  }, [triggerless]);
-  const [visibility, setVisibility] = useState<PortalVisibility>(
-    portal.visibility,
-  );
-  const [paidPrice, setPaidPrice] = useState(() =>
-    initialPaidPriceCents === null
-      ? ""
-      : (initialPaidPriceCents / 100).toFixed(2),
-  );
-  const [connectReady] = useState(initialConnectReady);
-  useEffect(() => {
-    if (!open) {
-      setPaidPrice(
-        initialPaidPriceCents === null
-          ? ""
-          : (initialPaidPriceCents / 100).toFixed(2),
-      );
-    }
-  }, [initialPaidPriceCents, open]);
-  const visibilityItems: { label: string; value: PortalVisibility }[] = [
-    { label: t("public"), value: "public" },
-    { label: t("private"), value: "private" },
-    { label: t("password"), value: "password" },
-    { label: t("paid"), value: "paid" },
-  ];
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {!triggerless ? (
-        <SettingsDialogTrigger
-          icon={<IconSettings data-icon="inline-start" />}
-          label={t("generalTitle")}
-        />
-      ) : null}
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("generalTitle")}</DialogTitle>
-          <DialogDescription>
-            {activeTab === "security"
-              ? t("privacyDescription")
-              : t("generalDescription")}
-          </DialogDescription>
-        </DialogHeader>
-        <Tabs onValueChange={setActiveTab} value={activeTab}>
-          <TabsList>
-            <TabsTrigger value="general">{t("generalTab")}</TabsTrigger>
-            <TabsTrigger value="security">{t("securityTab")}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="general">
-            <SettingsTabForm
-              locale={locale}
-              onSaved={() => setOpen(false)}
-              portal={portal}
-            >
-              <FieldGroup>
-                <SlugAvailabilityField locale={locale} portal={portal} />
-                <Field>
-                  <FieldLabel>{t("designerName")}</FieldLabel>
-                  <Input
-                    name="designer_name"
-                    defaultValue={portal.designer_name ?? ""}
-                    placeholder={t("designerPlaceholder")}
-                    maxLength={80}
-                    pattern="(?:\\S+\\s+){0,7}\\S*"
-                    title={t("designerLimit")}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>{t("website")}</FieldLabel>
-                  <Input
-                    name="designer_website_url"
-                    defaultValue={portal.designer_website_url ?? ""}
-                    placeholder={t("websitePlaceholder")}
-                    inputMode="url"
-                  />
-                </Field>
-              </FieldGroup>
-            </SettingsTabForm>
-          </TabsContent>
-          <TabsContent value="security">
-            <SettingsTabForm
-              action={savePrivacySettings}
-              locale={locale}
-              onSaved={() => setOpen(false)}
-              paidConfirmation={
-                portal.visibility === "paid"
-                  ? undefined
-                  : {
-                      cancel: t("paidConfirmationCancel"),
-                      confirm: t("paidConfirmationConfirm"),
-                      description: t("paidConfirmationDescription"),
-                      title: t("paidConfirmationTitle"),
-                    }
-              }
-              onPaidConfirmationClose={() => setVisibility(portal.visibility)}
-              portal={portal}
-            >
-              <FieldGroup>
-                <Field>
-                  {portal.visibility === "paid" ? (
-                    <output
-                      aria-labelledby="paid-visibility-label"
-                      id="paid-visibility-state"
-                    >
-                      <span
-                        className="text-sm font-medium"
-                        id="paid-visibility-label"
-                      >
-                        {t("privacy")}
-                      </span>
-                      <span className="block text-sm">{t("paid")}</span>
-                      <input
-                        aria-hidden="true"
-                        name="visibility"
-                        type="hidden"
-                        value="paid"
-                      />
-                    </output>
-                  ) : (
-                    <>
-                      <FieldLabel>{t("privacy")}</FieldLabel>
-                      <input
-                        name="visibility"
-                        type="hidden"
-                        value={visibility}
-                      />
-                      <Select
-                        items={visibilityItems}
-                        onValueChange={(value) => {
-                          if (!value) return;
-                          if (value === "password" && !guardPassword()) return;
-                          setVisibility(value as PortalVisibility);
-                        }}
-                        value={visibility}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder={t("privacyPlaceholder")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {visibilityItems.map((item) => (
-                              <SelectItem key={item.value} value={item.value}>
-                                {item.label}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </>
-                  )}
-                  {visibility === "paid" ? (
-                    <FieldDescription>
-                      {portal.visibility === "paid"
-                        ? t("paidImmutable")
-                        : t("paidHelp")}
-                    </FieldDescription>
-                  ) : (
-                    <FieldDescription>
-                      {visibility === "public" && t("publicHelp")}
-                      {visibility === "private" && t("privateHelp")}
-                      {visibility === "password" && t("passwordHelp")}
-                    </FieldDescription>
-                  )}
-                </Field>
-                {visibility === "paid" ? (
-                  <Field>
-                    {connectReady === null ? (
-                      <FieldDescription>
-                        {t("connectChecking")}
-                      </FieldDescription>
-                    ) : connectReady ? (
-                      <>
-                        <FieldLabel htmlFor="portal-paid-price">
-                          {t("paidPriceLabel")}
-                        </FieldLabel>
-                        <Input
-                          id="portal-paid-price"
-                          inputMode="decimal"
-                          onChange={(event) => setPaidPrice(event.target.value)}
-                          max={500}
-                          min={4.35}
-                          name="price"
-                          placeholder="19.99"
-                          required
-                          step="0.01"
-                          type="number"
-                          value={paidPrice}
-                        />
-                        <input
-                          name="preview_metadata"
-                          type="hidden"
-                          value="{}"
-                        />
-                        <FieldDescription>
-                          {t("paidPriceHelp")}
-                        </FieldDescription>
-                      </>
-                    ) : (
-                      <>
-                        <FieldDescription>
-                          {t("connectRequiredForPaid")}
-                        </FieldDescription>
-                        <ConnectStripeButton
-                          locale={locale}
-                          portalId={portal.id}
-                        />
-                      </>
-                    )}
-                  </Field>
-                ) : null}
-                {visibility === "password" ? (
-                  <Field>
-                    <FieldLabel htmlFor="portal-new-password">
-                      {portal.visibility === "password"
-                        ? t("changePassword")
-                        : t("passwordLabel")}
-                    </FieldLabel>
-                    <Input
-                      autoComplete="new-password"
-                      id="portal-new-password"
-                      maxLength={128}
-                      minLength={8}
-                      name="password"
-                      placeholder={t("passwordPlaceholder")}
-                      required={portal.visibility !== "password"}
-                      type="password"
-                    />
-                    <FieldDescription>
-                      {portal.visibility === "password"
-                        ? t("keepPassword")
-                        : t("passwordRules")}
-                    </FieldDescription>
-                  </Field>
-                ) : null}
-              </FieldGroup>
-            </SettingsTabForm>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function UnpublishedChangesIndicator({
-  initialHasUnpublishedChanges,
-  portalId,
-}: {
-  initialHasUnpublishedChanges: boolean;
-  portalId: string;
-}) {
-  const t = useTranslations("PortalEditor.workspace");
-  const autosaveT = useTranslations("PortalEditor.autosave");
-  const storeValue = usePortalEditorStore(
-    (state) => state.hasUnpublishedChangesByPortalId[portalId],
-  );
-  const autosave = usePortalEditorStore(
-    (state) => state.autosaveByPortalId[portalId],
-  ) ?? { error: null, status: "idle" as const };
-  const publicationIssues =
-    usePortalEditorStore(
-      (state) => state.publicationIssuesByPortalId[portalId],
-    ) ?? EMPTY_PUBLICATION_ISSUES;
-  const publicationPopoverOpen = usePortalEditorStore(
-    (state) => state.publicationPopoverOpenByPortalId[portalId] ?? false,
-  );
-  const setPublicationPopoverOpen = usePortalEditorStore(
-    (state) => state.setPublicationPopoverOpen,
-  );
-  const initializeHasUnpublishedChanges = usePortalEditorStore(
-    (state) => state.initializeHasUnpublishedChanges,
-  );
-  const hasUnpublishedChanges = storeValue ?? initialHasUnpublishedChanges;
-  const pendingPublicationTargetRef = useRef<PortalPublicationTarget | null>(
-    null,
-  );
-  const hasPublicationFailure = publicationIssues.length > 0;
-  const autosaveErrorDescription = autosaveT("errorDescription");
-  const autosaveErrorMessage = autosaveT("error");
-  const autosaveRetryLabel = autosaveT("retry");
-
-  useEffect(() => {
-    initializeHasUnpublishedChanges(portalId, initialHasUnpublishedChanges);
-  }, [initialHasUnpublishedChanges, initializeHasUnpublishedChanges, portalId]);
-
-  useEffect(() => {
-    if (autosave.status !== "error") {
-      dismissPortalAutosaveError(portalId);
-      return;
-    }
-
-    return showPortalAutosaveError({
-      description: autosaveErrorDescription,
-      message: autosaveErrorMessage,
-      portalId,
-      retry: () => {
-        void flushPortalAutosave(portalId).catch(() => {
-          // The persistent toast remains available for another retry.
-        });
-      },
-      retryLabel: autosaveRetryLabel,
-    });
-  }, [
-    autosave.status,
-    autosaveErrorDescription,
-    autosaveErrorMessage,
-    autosaveRetryLabel,
-    portalId,
-  ]);
-
-  const actionLabel =
-    autosave.status === "saving"
-      ? autosaveT("saving")
-      : autosave.status === "conflict"
-        ? autosaveT("conflict")
-        : autosave.status === "error"
-          ? autosaveT("error")
-          : hasPublicationFailure
-            ? t("publication.action")
-            : t("unpublishedAction");
-
-  return (
-    <AnimatePresence initial={false}>
-      {hasUnpublishedChanges ? (
-        <motion.div
-          animate={{ opacity: 1, scale: 1, width: "auto" }}
-          className="overflow-hidden rounded-full border border-border/80 bg-background/80 shadow-lg backdrop-blur"
-          exit={{ opacity: 0, scale: 0.96, width: 0 }}
-          initial={{ opacity: 0, scale: 0.96, width: 0 }}
-          transition={{
-            opacity: { duration: 0.18, ease: "easeOut" },
-            scale: { damping: 24, stiffness: 320, type: "spring" },
-            width: { damping: 28, stiffness: 260, type: "spring" },
-          }}
-        >
-          <Popover
-            onOpenChange={(open) => setPublicationPopoverOpen(portalId, open)}
-            onOpenChangeComplete={(open) => {
-              if (open || !pendingPublicationTargetRef.current) return;
-              const target = pendingPublicationTargetRef.current;
-              pendingPublicationTargetRef.current = null;
-              focusPortalPublicationTarget(target);
-            }}
-            open={publicationPopoverOpen}
-          >
-            <PopoverTrigger
-              render={
-                <Button
-                  aria-label={actionLabel}
-                  className="rounded-full"
-                  size="icon-lg"
-                  type="button"
-                  variant="ghost"
-                />
-              }
-            >
-              {autosave.status === "saving" ? (
-                <IconLoader2 className="animate-spin" />
-              ) : autosave.status === "error" ||
-                autosave.status === "conflict" ||
-                hasPublicationFailure ? (
-                <IconAlertCircle />
-              ) : (
-                <IconInfoCircle />
-              )}
-              <output aria-atomic="true" className="sr-only">
-                {actionLabel}
-              </output>
-            </PopoverTrigger>
-            <PopoverContent align="center" className="w-72" side="top">
-              <PopoverHeader>
-                <PopoverTitle>
-                  {hasPublicationFailure
-                    ? t("publication.title")
-                    : t("unpublishedTitle")}
-                </PopoverTitle>
-                <PopoverDescription>
-                  {hasPublicationFailure
-                    ? t("publication.description")
-                    : t("unpublishedDescription")}
-                </PopoverDescription>
-              </PopoverHeader>
-              {publicationIssues.length > 0 ? (
-                <ul className="flex flex-col gap-2">
-                  {publicationIssues.map((issue) => (
-                    <li
-                      className="flex items-center justify-between gap-3 rounded-md border p-2"
-                      key={`${issue.code}-${"sectionId" in issue ? issue.sectionId : "portal"}`}
-                    >
-                      <span className="text-sm">
-                        {t(`publication.issues.${issue.code}`)}
-                      </span>
-                      <Button
-                        onClick={() => {
-                          pendingPublicationTargetRef.current = issue.target;
-                          setPublicationPopoverOpen(portalId, false);
-                        }}
-                        size="sm"
-                        type="button"
-                        variant="secondary"
-                      >
-                        {t("publication.fix")}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </PopoverContent>
-          </Popover>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
   );
 }

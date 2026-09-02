@@ -1,4 +1,4 @@
-import type { PortalAutosaveState } from "./editor-store";
+import type { PortalAutosaveState } from "@/application/portal/editor-store";
 
 export function canRefreshCompletedDocumentJob(
   autosave: PortalAutosaveState | undefined,

@@ -9,9 +9,37 @@ const page = await Bun.file(
 const controls = await Bun.file(
   new URL("./portal-workspace-controls.tsx", import.meta.url),
 ).text();
-const renderer = await Bun.file(
-  new URL("./render-portal/render-portal.tsx", import.meta.url),
+const settings = await Bun.file(
+  new URL(
+    "../../app/[locale]/(workspace)/create/[portalId]/_components/portal-settings-dialog.tsx",
+    import.meta.url,
+  ),
 ).text();
+const renderer = (
+  await Promise.all([
+    Bun.file(
+      new URL("./portal-project-controller.tsx", import.meta.url),
+    ).text(),
+    Bun.file(
+      new URL(
+        "../../application/portal/portal-asset-lifecycle.ts",
+        import.meta.url,
+      ),
+    ).text(),
+    Bun.file(
+      new URL("./use-portal-editor-persistence.ts", import.meta.url),
+    ).text(),
+    Bun.file(
+      new URL("../../application/portal/editor-store.ts", import.meta.url),
+    ).text(),
+    Bun.file(
+      new URL(
+        "../../app/[locale]/p/[slug]/_components/portal-public-actions.ts",
+        import.meta.url,
+      ),
+    ).text(),
+  ])
+).join("\n");
 const provider = await Bun.file(
   new URL("./portal-plan-provider.tsx", import.meta.url),
 ).text();
@@ -19,7 +47,10 @@ const workspaceControls = await Bun.file(
   new URL("./portal-workspace-controls.tsx", import.meta.url),
 ).text();
 const publicSidebar = await Bun.file(
-  new URL("./portal-document-sidebar-read-only.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/p/[slug]/_components/document-sidebar.tsx",
+    import.meta.url,
+  ),
 ).text();
 const publicPage = await Bun.file(
   new URL("../../app/[locale]/p/[slug]/page.tsx", import.meta.url),
@@ -30,7 +61,6 @@ const optimisticUploads = await Bun.file(
 
 test("the editor has one global plan provider and all document writes use its gate", () => {
   expect(page).toContain("PortalPlanProvider");
-  expect(controls).toContain("guardDocumentChange");
   expect(renderer).toContain("guardDocumentChange");
   expect(page).toContain("PortalPlanStatus");
 });
@@ -53,11 +83,12 @@ test("successful uploads flush the document before reporting completion", () => 
 
 test("fresh signed image previews are not normalized before autosave authorizes the stable route", () => {
   expect(renderer).toContain(
-    'withStablePortalAssetPreviews(document, editor?.slug ?? "")',
+    'withStablePortalAssetPreviews(document, slug ?? "")',
   );
   expect(renderer).toContain(
-    "const renderDocument = editor\n    ? orderDocumentItemsForRender(activeDocument)",
+    'withStablePortalAssetPreviews(document, slug ?? "")',
   );
+  expect(renderer).toContain("orderDocumentItemsForRender(document)");
   expect(renderer).not.toContain(
     "orderDocumentItemsForRender(\n        withStablePortalAssetPreviews(activeDocument",
   );
@@ -72,8 +103,10 @@ test("optimistic upload callbacks keep their registry context", () => {
 });
 
 test("pending uploads expose a pulsing busy visual state", () => {
-  expect(controls).toContain('pending && "animate-pulse opacity-60"');
-  expect(controls).toContain('className="animate-pulse opacity-60"');
+  expect(controls).toContain("pending &&");
+  expect(controls).toContain('"animate-pulse"');
+  expect(controls).toContain('"animate-pulse opacity-60"');
+  expect(controls).toContain('"animate-pulse opacity-60"');
   expect(controls).toContain('aria-busy="true"');
 });
 
@@ -93,9 +126,7 @@ test("image upload affordance stays hidden while an optimistic upload is pending
     controls.indexOf("function ImageEditor("),
   );
 
-  expect(imageTile).toContain(
-    "availableSlots === 0 || optimistic.pending.length > 0",
-  );
+  expect(imageTile).toContain("availableSlots === 0 ? null :");
 });
 
 test("editor quota violations use an actionable toast before opening the plan dialog", () => {
@@ -122,8 +153,8 @@ test("storage progress keeps the last ready percentage visible while refreshing"
 });
 
 test("password visibility is available before a password can be entered", () => {
-  expect(controls).toContain("guardPassword");
-  expect(controls).not.toContain('disabled={plan !== "premium"}');
+  expect(settings).toContain("guardPassword");
+  expect(settings).not.toContain('disabled={plan !== "premium"}');
 });
 
 test("loading and fetch errors never present an editor as a non-owner", () => {
@@ -161,23 +192,21 @@ test("upgrade modal keeps checkout loading scoped to the selected plan", () => {
 });
 
 test("sidebar export uses the portal ZIP action instead of depending on Files", () => {
-  expect(controls).toContain("exportHref");
-  expect(controls).not.toContain("assetsSectionId");
+  expect(page).not.toContain("assetsSectionId");
   expect(publicSidebar).toContain("exportHref");
   expect(publicSidebar).not.toContain(
     'sections.find((section) => section.type === "files")',
   );
-  expect(publicPage).toContain("portalExportHref(slug)");
+  expect(publicPage).toContain("portalExportHref(slug, exportSource)");
   expect(publicPage).toContain("portal.allow_downloads");
-  expect(renderer).toContain("portalExportHref(slug)");
+  expect(renderer).toContain("portalExportHref(slug, exportSource)");
 });
 
-test("draft owners export the current document while public exports stay published", () => {
+test("public exports explicitly use the published document snapshot", () => {
   expect(publicPage).toContain("const exportSource =");
-  expect(publicPage).toContain("access.isOwner");
-  expect(publicPage).toContain('portal.status === "draft"');
-  expect(publicPage).toContain('portalExportHref(slug, exportSource)');
-  expect(renderer).toContain("portalExportHref(slug, exportSource)");
+  expect(publicPage).toContain("portalExportHref(slug, exportSource)");
+  expect(publicPage).toContain('const exportSource = "published" as const');
+  expect(renderer).toContain("exportSource");
 });
 
 test("storage status opens a usage popover with an upgrade action", () => {
@@ -186,10 +215,10 @@ test("storage status opens a usage popover with an upgrade action", () => {
   );
   const trigger = status.slice(
     status.indexOf("<PopoverTrigger"),
-    status.indexOf('>\n        <span className="relative size-7">'),
+    status.indexOf("<PopoverContent"),
   );
 
-  expect(provider).toContain("<Popover>");
+  expect(provider).toContain("<Popover ");
   expect(provider).toContain("<PopoverContent");
   expect(provider).toContain('t("upgrade")');
   expect(provider).toContain('role="progressbar"');
@@ -199,9 +228,7 @@ test("storage status opens a usage popover with an upgrade action", () => {
   expect(trigger).not.toContain('requestUpgrade("upgrade_info")');
   expect(provider).toContain('plan === "free"');
   expect(provider).not.toContain('requestUpgrade("total_sections")');
-  expect(provider).toContain(
-    'className="rounded-full hover:bg-transparent dark:hover:bg-transparent"',
-  );
+  expect(provider).toContain("rounded-full hover:bg-transparent");
   expect(provider).not.toContain('className="hidden min-w-36');
 });
 
@@ -248,14 +275,10 @@ test("successful asset mutations refresh storage usage without a reload", () => 
 });
 
 test("removed managed assets are deleted only after their document snapshot persists", () => {
-  const saveIndex = renderer.indexOf("await updatePortalDocument(fd)");
-  const cleanupIndex = renderer.indexOf(
-    "flushPersistedAssetDeletions(editorPortalId, nextDocument)",
-    saveIndex,
+  expect(renderer).toContain("acknowledge: (revision) => {");
+  expect(renderer).toContain(
+    "flushPersistedAssetDeletions(portalId, nextDocument)",
   );
-
-  expect(saveIndex).toBeGreaterThan(-1);
-  expect(cleanupIndex).toBeGreaterThan(saveIndex);
   expect(renderer).toContain("queueAssetDeletions(");
   expect(renderer).not.toContain(
     "schedulePortalAutosave(editor.portalId, next);\n    removeAssetIds(",

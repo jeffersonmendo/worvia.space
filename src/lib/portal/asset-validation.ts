@@ -1,4 +1,4 @@
-import type { PortalAssetCategory } from "./portal-assets-client";
+import type { PortalAssetCategory } from "@/infrastructure/portal/portal-assets-client";
 
 const mimeByExtension: Record<string, readonly string[]> = {
   ai: [
@@ -111,7 +111,7 @@ export function validateAssetDeclaration(input: {
   if (["cover", "gallery", "icon", "image"].includes(input.category)) {
     return (
       input.mimeType.startsWith("image/") &&
-      input.mimeType !== "image/svg+xml" &&
+      (input.category === "gallery" || input.mimeType !== "image/svg+xml") &&
       input.mimeType !== "image/tiff" &&
       input.mimeType !== "image/x-tiff" &&
       input.mimeType !== "image/vnd.adobe.photoshop" &&

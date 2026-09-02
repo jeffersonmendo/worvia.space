@@ -1,0 +1,81 @@
+{
+  "portal": {
+    "name": "Mart POS",
+    "description": "",
+    "icon_url": "/logo-light.svg",
+    "cover_url": null,
+    "theme": "dark"
+  },
+  "sections": [
+    {
+      "id": "mart-pos-products",
+      "type": "gallery",
+      "title": "Archivos SVG",
+      "description": "Documentos y archivos de referencia del proyecto.",
+      "position": 0,
+      "visible": true,
+      "allow_download": true,
+      "layout": {
+        "columns": 3,
+        "gap": "md",
+        "mode": "grid"
+      },
+      "content": {
+        "images": [
+          {
+            "id": "pos-1",
+            "image_url": "/mart-pos-logotipo-light.svg",
+            "alt_text": "Producto Mart POS 1",
+            "display_name": "Light brand logo",
+            "position": 1,
+            "visible": true,
+            "allow_download": true,
+            "fit": "contain",
+            "aspect_ratio": "1/1",
+            "background_color": "#000000",
+            "container_padding": 30
+          },
+          {
+            "id": "pos-2",
+            "image_url": "/logo-light.svg",
+            "alt_text": "Producto Mart POS 2",
+            "display_name": "",
+            "position": 0,
+            "visible": true,
+            "allow_download": false,
+            "fit": "contain",
+            "aspect_ratio": "1/1",
+            "background_color": "secondary",
+            "container_padding": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "mart-pos-colors",
+      "type": "colors",
+      "title": "Colores",
+      "description": "Descripción breve opcional",
+      "position": 1,
+      "visible": true,
+      "allow_download": true,
+      "layout": {
+        "columns": 3,
+        "gap": "md",
+        "mode": "palette"
+      },
+      "content": {
+        "colors": [
+          {
+            "id": "white",
+            "color_name": "Blanco",
+            "color_code": "#FFFFFF",
+            "position": 0,
+            "visible": true
+          }
+        ]
+      }
+    }
+  ],
+  "version": 1
+}

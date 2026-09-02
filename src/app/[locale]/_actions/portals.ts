@@ -3,11 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { isAuthenticationRequiredError } from "@/lib/auth/auth-error";
 import {
   normalizePortalDocument,
   portalDocumentToJson,
-} from "@/lib/portal/document";
+} from "@/domain/portal/document";
+import {
+  createUniqueSlugCandidate,
+  normalizeDesignerName,
+  normalizeSlug,
+  normalizeWebsiteUrl,
+  validateDesignerName,
+  validateSlug,
+} from "@/domain/portal/settings";
+import { isAuthenticationRequiredError } from "@/lib/auth/auth-error";
 import {
   PAID_PORTAL_MAX_PRICE_CENTS,
   PAID_PORTAL_MIN_PRICE_CENTS,
@@ -20,14 +28,6 @@ import {
   normalizePortalCardImageCount,
   normalizePortalCardImages,
 } from "@/lib/portal/portal-card-metadata";
-import {
-  createUniqueSlugCandidate,
-  normalizeDesignerName,
-  normalizeSlug,
-  normalizeWebsiteUrl,
-  validateDesignerName,
-  validateSlug,
-} from "@/lib/portal/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Json,

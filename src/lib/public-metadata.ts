@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { PortalAccessDecision } from "@/lib/portal/access";
+import type { PortalAccessDecision } from "@/domain/portal/access";
 
 export const SITE_NAME = "Worvia";
 export const OPEN_GRAPH_SIZE = { height: 630, width: 1200 } as const;

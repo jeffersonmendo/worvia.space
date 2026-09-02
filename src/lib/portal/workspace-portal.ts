@@ -2,11 +2,11 @@ import { notFound, redirect } from "next/navigation";
 import {
   normalizePortalDocument,
   portalBlocksToDocument,
-} from "@/lib/portal/document";
+} from "@/domain/portal/document";
 import {
   getConnectStatusSummary,
   normalizeConnectStatusSummary,
-} from "@/lib/portal/workspace-read-models";
+} from "@/infrastructure/portal/workspace-read-models";
 import type { Portal } from "@/lib/supabase/database.types";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";

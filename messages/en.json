@@ -10,6 +10,20 @@
     "goHome": "Go to Worvia"
   },
   "Landing": {
+    "editorShell": {
+      "project": "Project",
+      "projects": "Projects",
+      "planUsage": "Plan usage",
+      "generalSettings": "General settings",
+      "favorites": "Favorites",
+      "back": "Back",
+      "published": "Published",
+      "publish": "Publish",
+      "sortSections": "Sort sections",
+      "addSection": "Add section",
+      "openPublication": "Open publication",
+      "addWithAi": "Add with AI"
+    },
     "titleLine1": "Present, deliver, and sell.",
     "titleLine2": "All in one project.",
     "description": "Worvia brings your presentation, file delivery, and digital work sales into one project. Start free and monetize before paying anything.",
@@ -1044,6 +1058,7 @@
       },
       "picker": "Picker",
       "choose": "Choose color",
+      "transparentBackground": "Transparent background",
       "pickFromScreen": "Pick color from screen",
       "hexCode": "Hex code",
       "code": "Code",

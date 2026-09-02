@@ -1,9 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { createDefaultPortalDocument, createPortalSection } from "./document";
+import {
+  createDefaultPortalDocument,
+  createPortalSection,
+} from "@/domain/portal/document";
 import {
   mergePersistedPortalAsset,
   reconcilePersistedPortalAssets,
-} from "./portal-assets-client";
+} from "@/infrastructure/portal/portal-assets-client";
 
 const baseAsset = {
   assetId: "asset-1",

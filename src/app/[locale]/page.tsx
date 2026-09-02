@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PortalLanding } from "@/components/landing/portal-landing";
 import {
   getLandingActionCopyKeys,
   getLandingActionHrefs,
@@ -9,6 +8,7 @@ import { getLandingEntryHref } from "@/lib/landing/entry-route";
 import { buildHomeMetadata } from "@/lib/public-metadata";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+import { PortalLanding } from "./_components/portal-landing";
 
 type Props = {
   params: Promise<{ locale: string }>;

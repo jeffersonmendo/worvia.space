@@ -4,7 +4,10 @@ const actions = await Bun.file(
   new URL("../../app/[locale]/_actions/portals.ts", import.meta.url),
 ).text();
 const portalHome = await Bun.file(
-  new URL("../../components/portal/portal-home.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/(workspace)/_components/portal-home.tsx",
+    import.meta.url,
+  ),
 ).text();
 const englishMessages = await Bun.file(
   new URL("../../../messages/en.json", import.meta.url),

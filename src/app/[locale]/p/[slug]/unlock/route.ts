@@ -4,7 +4,7 @@ import {
   createOpaqueToken,
   hashOpaqueToken,
   PORTAL_ACCESS_MAX_AGE_SECONDS,
-} from "@/lib/portal/access";
+} from "@/domain/portal/access";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(

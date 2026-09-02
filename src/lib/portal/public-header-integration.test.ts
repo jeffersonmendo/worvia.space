@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 describe("public portal header integration", () => {
   test("uses the published export URL and wraps every portal view", () => {
     const accessSource = readFileSync(
-      new URL("./server-access.ts", import.meta.url),
+      new URL("../../infrastructure/portal/server-access.ts", import.meta.url),
       "utf8",
     );
     const pageSource = readFileSync(

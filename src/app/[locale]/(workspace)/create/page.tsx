@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { PortalCreationQuestionnaire } from "@/components/portal/portal-creation-questionnaire";
-import { PortalWorkspaceToolbar } from "@/components/portal/portal-workspace-toolbar";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+import { PortalWorkspaceToolbar } from "../_components/portal-workspace-toolbar";
+import { PortalCreationQuestionnaire } from "./_components/portal-creation-questionnaire";
 
 export default async function CreatePortalPage({
   params,

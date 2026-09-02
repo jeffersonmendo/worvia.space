@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { NextIntlClientProvider } from "next-intl";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { PortalSection } from "@/lib/portal/document";
+import type { PortalSection } from "@/domain/portal/document";
 import en from "../../../messages/en.json";
 import { FontsEditor } from "./portal-workspace-controls";
 

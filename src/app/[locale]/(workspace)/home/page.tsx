@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PortalHome } from "@/components/portal/portal-home";
 import { isStripeConnectCountry } from "@/lib/billing/connect-countries";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getHomePortals } from "../../_actions/portals";
+import { PortalHome } from "../_components/portal-home";
 
 type Props = {
   params: Promise<{ locale: string }>;

@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  normalizePortalDocument,
+  type PortalDocument,
+} from "@/domain/portal/document";
+import {
   constrainImageAspectRatio,
   unifyImagePresentation,
 } from "@/lib/portal/ai";
@@ -16,10 +20,6 @@ import {
   normalizeAssetDownloadName,
   sourceNameFromStoragePath,
 } from "@/lib/portal/asset-names";
-import {
-  normalizePortalDocument,
-  type PortalDocument,
-} from "@/lib/portal/document";
 import type { Database } from "@/lib/supabase/database.types";
 
 function isTarget(value: unknown): value is AiContentTarget {

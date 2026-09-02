@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
-import { AiWorkflowReconciler } from "@/components/portal/ai-workflow-reconciler";
-import {
-  WorkspaceSidebar,
-  WorkspaceSidebarProvider,
-} from "@/components/portal/workspace-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+import { AiWorkflowReconciler } from "./_components/ai-workflow-reconciler";
+import {
+  WorkspaceConfigDrawer,
+  WorkspaceConfigSidebar,
+  WorkspaceSidebar,
+  WorkspaceSidebarProvider,
+} from "./_components/workspace-sidebar";
 
 export default async function WorkspaceLayout({
   children,
@@ -40,6 +42,8 @@ export default async function WorkspaceLayout({
           }
         />
         <SidebarInset>{children}</SidebarInset>
+        <WorkspaceConfigSidebar />
+        <WorkspaceConfigDrawer />
       </SidebarProvider>
     </WorkspaceSidebarProvider>
   );

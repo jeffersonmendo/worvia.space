@@ -1,32 +1,30 @@
 import { notFound, redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { PortalAiDialog } from "@/components/portal/portal-ai-dialog";
+import { PortalProjectController } from "@/components/portal";
 import {
   PortalPlanProvider,
   PortalPlanStatus,
 } from "@/components/portal/portal-plan-provider";
 import {
-  SectionOrderPopover,
-  SettingsDialog,
-} from "@/components/portal/portal-workspace-controls";
-import { PortalWorkspaceToolbar } from "@/components/portal/portal-workspace-toolbar";
-import { PublishPortalButton } from "@/components/portal/publish-portal-button";
-import { RenderPortal } from "@/components/portal/render-portal";
-import { WorkspaceProjectRegistration } from "@/components/portal/workspace-sidebar";
-import {
   normalizePortalDocument,
   type PortalDocument,
   portalBlocksToDocument,
   portalDocumentToJson,
-} from "@/lib/portal/document";
-import { prepareDocumentForRendering } from "@/lib/portal/server-assets";
+} from "@/domain/portal/document";
+import { prepareDocumentForRendering } from "@/infrastructure/portal/server-assets";
 import {
   getConnectStatusSummary,
   normalizeConnectStatusSummary,
-} from "@/lib/portal/workspace-read-models";
+} from "@/infrastructure/portal/workspace-read-models";
 import type { Json, Portal, PortalBlock } from "@/lib/supabase/database.types";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
+import { PortalWorkspaceToolbar } from "../../_components/portal-workspace-toolbar";
+import { WorkspaceProjectRegistration } from "../../_components/workspace-sidebar";
+import { PortalAiDialog } from "./_components/portal-ai-dialog";
+import { PortalSectionOrderPopover } from "./_components/portal-section-order-popover";
+import { SettingsDialog } from "./_components/portal-settings-dialog";
+import { PublishPortalButton } from "./_components/publish-portal-button";
 
 type Props = {
   params: Promise<{ locale: string; portalId: string }>;
@@ -256,7 +254,7 @@ export default async function CreatePortalPage({
         portalId={portal.id}
         portalSlug={portal.slug}
       />
-      <SectionOrderPopover
+      <PortalSectionOrderPopover
         document={document}
         portalId={portal.id}
         triggerless
@@ -278,10 +276,10 @@ export default async function CreatePortalPage({
           triggerless
         />
       </div>
-      <RenderPortal
+      <PortalProjectController
+        mode="editor"
         className="min-h-0"
         document={document}
-        editable
         editor={{
           documentRevision,
           focus,

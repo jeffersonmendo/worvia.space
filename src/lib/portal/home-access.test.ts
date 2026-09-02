@@ -122,6 +122,7 @@ describe("home portal access", () => {
           plan: "free",
           storageUsedBytes: 0,
           canDelete: true,
+          totalColorCount: 0,
           isFavorite: false,
           purchasedAt: undefined,
           colors: [],

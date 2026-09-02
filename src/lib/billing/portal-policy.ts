@@ -1,4 +1,7 @@
-import type { PortalDocument, PortalSectionType } from "@/lib/portal/document";
+import type {
+  PortalDocument,
+  PortalSectionType,
+} from "@/domain/portal/document";
 import type { PortalVisibility } from "@/lib/supabase/database.types";
 
 export type PortalPlan = "free" | "starter" | "pro" | "premium";

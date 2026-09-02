@@ -48,23 +48,26 @@ export async function GET(request: Request) {
     payoutsEnabled,
     verificationState,
   } = getConnectAccountStatus(stripeAccount);
-  const { error } = await supabase.rpc("upsert_creator_stripe_account_projection", {
-    account_charges_enabled: chargesEnabled,
-    account_details_submitted: detailsSubmitted,
-    account_id: account.stripe_account_id,
-    account_onboarding_status:
-      detailsSubmitted && chargesEnabled && payoutsEnabled
-        ? "complete"
-        : "pending",
-    account_payouts_enabled: payoutsEnabled,
-    account_email: stripeAccount.contact_email ?? null,
-    account_country: stripeAccount.identity?.country ?? null,
-    account_display_name: stripeAccount.display_name ?? null,
-    account_requirements_pending:
-      stripeAccount.requirements?.entries?.length ?? 0,
-    account_verification_state: verificationState,
-    account_last_synced_at: new Date().toISOString(),
-  } as never);
+  const { error } = await supabase.rpc(
+    "upsert_creator_stripe_account_projection",
+    {
+      account_charges_enabled: chargesEnabled,
+      account_details_submitted: detailsSubmitted,
+      account_id: account.stripe_account_id,
+      account_onboarding_status:
+        detailsSubmitted && chargesEnabled && payoutsEnabled
+          ? "complete"
+          : "pending",
+      account_payouts_enabled: payoutsEnabled,
+      account_email: stripeAccount.contact_email ?? null,
+      account_country: stripeAccount.identity?.country ?? null,
+      account_display_name: stripeAccount.display_name ?? null,
+      account_requirements_pending:
+        stripeAccount.requirements?.entries?.length ?? 0,
+      account_verification_state: verificationState,
+      account_last_synced_at: new Date().toISOString(),
+    } as never,
+  );
   const destination = new URL(
     portal ? `/${locale}/create/${portal.id}` : `/${locale}/home`,
     url.origin,

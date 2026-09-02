@@ -2,7 +2,7 @@ import type {
   PortalDocument,
   PortalImageItem,
   PortalSection,
-} from "./document";
+} from "@/domain/portal/document";
 
 export const EXPORT_LIMITS = {
   maxEntries: 100,

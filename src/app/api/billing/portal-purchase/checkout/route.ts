@@ -138,7 +138,9 @@ export async function POST(request: Request) {
         managed_payments: { enabled: false } as never,
         mode: "payment",
         payment_intent_data: {
-          application_fee_amount: paidPortalApplicationFee(attempt.amount_total),
+          application_fee_amount: paidPortalApplicationFee(
+            attempt.amount_total,
+          ),
           metadata: {
             buyer_id: attempt.buyer_id,
             checkout_attempt_id: attempt.idempotency_key,

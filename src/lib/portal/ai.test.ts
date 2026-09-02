@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { createImageItem } from "@/domain/portal/document";
 import {
   type AssetAnalysisInput,
   analyzeImageAsset,
@@ -6,7 +7,6 @@ import {
   constrainImageAspectRatio,
   unifyImagePresentation,
 } from "@/lib/portal/ai";
-import { createImageItem } from "@/lib/portal/document";
 
 const asset: AssetAnalysisInput = {
   id: "logo",

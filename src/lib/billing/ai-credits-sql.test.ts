@@ -42,6 +42,8 @@ describe("AI credits migration", () => {
     expect(settingsMigration).toContain(
       "drop function if exists public.set_portal_content_language(uuid, text)",
     );
-    expect(settingsMigration).toContain("content_language = portal_content_language");
+    expect(settingsMigration).toContain(
+      "content_language = portal_content_language",
+    );
   });
 });

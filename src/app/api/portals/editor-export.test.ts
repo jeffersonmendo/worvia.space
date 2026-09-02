@@ -12,7 +12,8 @@ const editorPage = await Bun.file(
 ).text();
 
 test("editor export is authenticated and reads the current portal document", () => {
-  expect(editorPage).toContain('portalExportHref(portal.slug, "editor")');
+  expect(editorPage).toContain("PortalProjectController");
+  expect(editorPage).not.toContain("assetsSectionId");
   expect(route).toContain('source === "editor"');
   expect(route).toContain('rpc("can_edit_portal"');
   expect(route).toContain('.from("portal_documents")');

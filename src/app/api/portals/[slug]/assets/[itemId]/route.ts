@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
+import { normalizePortalDocument } from "@/domain/portal/document";
+import {
+  getAuthorizedDocument,
+  resolvePortalAccess,
+} from "@/infrastructure/portal/server-access";
+import { fetchStorageEntry } from "@/infrastructure/portal/server-assets";
 import { recordPaidPortalDownload } from "@/lib/billing/paid-portal-downloads";
-import { normalizePortalDocument } from "@/lib/portal/document";
 import {
   buildExportManifest,
   EXPORT_LIMITS,
   selectManifestScope,
 } from "@/lib/portal/export-manifest";
-import {
-  getAuthorizedDocument,
-  resolvePortalAccess,
-} from "@/lib/portal/server-access";
-import { fetchStorageEntry } from "@/lib/portal/server-assets";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export const runtime = "nodejs";

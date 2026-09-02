@@ -1,6 +1,10 @@
 import { startAiPortalContent } from "@workflows/ai-portal-content";
 import { NextResponse } from "next/server";
 import {
+  normalizePortalDocument,
+  type PortalDocument,
+} from "@/domain/portal/document";
+import {
   constrainImageAspectRatio,
   unifyImagePresentation,
 } from "@/lib/portal/ai";
@@ -20,10 +24,6 @@ import {
   normalizeAssetDownloadName,
   sourceNameFromStoragePath,
 } from "@/lib/portal/asset-names";
-import {
-  normalizePortalDocument,
-  type PortalDocument,
-} from "@/lib/portal/document";
 import { createAccessTokenClient, createClient } from "@/lib/supabase/server";
 
 function isTarget(value: unknown): value is AiContentTarget {

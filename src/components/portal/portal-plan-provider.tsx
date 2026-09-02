@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PortalDocument } from "@/domain/portal/document";
 import {
   fetchPortalPlan,
   isSafePendingPortalAction,
@@ -55,7 +56,6 @@ import {
   validatePortalVisibility,
 } from "@/lib/billing/portal-policy";
 import { subscribePortalAssetUsageChanges } from "@/lib/portal/asset-usage-events";
-import type { PortalDocument } from "@/lib/portal/document";
 import { cn } from "@/lib/utils";
 
 export const PORTAL_PLAN_RETRY_EVENT = "portal-plan-retry";

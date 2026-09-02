@@ -10,6 +10,20 @@
     "goHome": "Ir a Worvia"
   },
   "Landing": {
+    "editorShell": {
+      "project": "Proyecto",
+      "projects": "Proyectos",
+      "planUsage": "Uso del plan",
+      "generalSettings": "Configuración general",
+      "favorites": "Favoritos",
+      "back": "Atrás",
+      "published": "Publicado",
+      "publish": "Publicar",
+      "sortSections": "Ordenar secciones",
+      "addSection": "Añadir sección",
+      "openPublication": "Abrir publicación",
+      "addWithAi": "Añadir con IA"
+    },
     "titleLine1": "Presenta, entrega y vende.",
     "titleLine2": "Todo en un proyecto.",
     "description": "Worvia reúne tu presentación, la entrega de archivos y la venta de trabajo digital en un solo proyecto. Empieza gratis y monetiza sin pagar primero.",
@@ -1047,6 +1061,7 @@
       },
       "picker": "Selector",
       "choose": "Elegir color",
+      "transparentBackground": "Fondo transparente",
       "pickFromScreen": "Tomar color de la pantalla",
       "hexCode": "Código hexadecimal",
       "code": "Código",

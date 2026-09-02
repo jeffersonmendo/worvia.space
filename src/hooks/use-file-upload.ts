@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createRandomId } from "@/lib/random-id";
 
 export type UploadedFile = {
   file: File;
@@ -77,7 +78,7 @@ export function useFileUpload({
           })
           .map((file) => ({
             file,
-            id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+            id: `${file.name}-${file.size}-${file.lastModified}-${createRandomId()}`,
             preview: file.type.startsWith("image/")
               ? URL.createObjectURL(file)
               : undefined,

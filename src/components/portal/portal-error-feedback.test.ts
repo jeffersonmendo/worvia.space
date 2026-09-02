@@ -7,7 +7,10 @@ const planProvider = await Bun.file(
   new URL("./portal-plan-provider.tsx", import.meta.url),
 ).text();
 const publishButton = await Bun.file(
-  new URL("./publish-portal-button.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/(workspace)/create/[portalId]/_components/publish-portal-button.tsx",
+    import.meta.url,
+  ),
 ).text();
 
 describe("portal operation error feedback", () => {

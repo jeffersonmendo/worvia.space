@@ -102,5 +102,4 @@ describe("Free portal upload limit migration", () => {
       "a.state='reserved' and a.reservation_expires_at>now()",
     );
   });
-
 });

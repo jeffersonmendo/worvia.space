@@ -1,3 +1,11 @@
+import {
+  createDefaultPortalDocument,
+  createImageItem,
+  createPortalSection,
+  type PortalDocument,
+  type PortalFileType,
+  type PortalSection,
+} from "@/domain/portal/document";
 import { AI_OPERATION_COSTS } from "@/lib/billing/ai-credits";
 import {
   type PortalPlan as BillingPortalPlan,
@@ -18,14 +26,6 @@ import {
   normalizeAssetDownloadName,
 } from "@/lib/portal/asset-names";
 import { isRenderableImageMimeType } from "@/lib/portal/asset-validation";
-import {
-  createDefaultPortalDocument,
-  createImageItem,
-  createPortalSection,
-  type PortalDocument,
-  type PortalFileType,
-  type PortalSection,
-} from "@/lib/portal/document";
 
 export type AiAssetInput = AssetAnalysisInput & {
   fileUrl?: string;

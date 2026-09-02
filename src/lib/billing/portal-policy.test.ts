@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { PortalDocument } from "@/lib/portal/document";
+import type { PortalDocument } from "@/domain/portal/document";
 import {
   PORTAL_PLANS,
   upgradeDescriptionKey,

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { PortalDocument } from "./document";
+import type { PortalDocument } from "@/domain/portal/document";
 import {
   buildColorsText,
   buildExportManifest,

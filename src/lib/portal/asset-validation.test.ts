@@ -203,10 +203,17 @@ describe("portal asset validation", () => {
     );
   });
 
-  test("checks signatures and unsafe SVG content", () => {
+  test("allows SVG declarations only for galleries and scans their content", () => {
     expect(
       validateAssetDeclaration({
         category: "file",
+        mimeType: "image/svg+xml",
+        name: "logo.svg",
+      }),
+    ).toBe(true);
+    expect(
+      validateAssetDeclaration({
+        category: "gallery",
         mimeType: "image/svg+xml",
         name: "logo.svg",
       }),
@@ -218,6 +225,22 @@ describe("portal asset validation", () => {
         name: "logo.svg",
       }),
     ).toBe(false);
+    for (const category of ["cover", "icon"] as const) {
+      expect(
+        validateAssetDeclaration({
+          category,
+          mimeType: "image/svg+xml",
+          name: "logo.svg",
+        }),
+      ).toBe(false);
+    }
+    expect(
+      validateAssetBytes(
+        new TextEncoder().encode('<svg><path d="M0 0" /></svg>'),
+        "image/svg+xml",
+        "logo.svg",
+      ),
+    ).toBe(true);
     expect(
       validateAssetBytes(
         new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),

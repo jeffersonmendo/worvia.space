@@ -1,14 +1,35 @@
 import { expect, test } from "bun:test";
 
 const publish = await Bun.file(
-  new URL("./publish-portal-button.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/(workspace)/create/[portalId]/_components/publish-portal-button.tsx",
+    import.meta.url,
+  ),
 ).text();
-const controls = await Bun.file(
-  new URL("./portal-workspace-controls.tsx", import.meta.url),
-).text();
-const renderer = await Bun.file(
-  new URL("./render-portal/render-portal.tsx", import.meta.url),
-).text();
+const renderer = (
+  await Promise.all([
+    Bun.file(new URL("../render/render-project.tsx", import.meta.url)).text(),
+    Bun.file(
+      new URL("./portal-project-controller.tsx", import.meta.url),
+    ).text(),
+    Bun.file(
+      new URL(
+        "../../app/[locale]/(workspace)/_components/portal-workspace-toolbar.tsx",
+        import.meta.url,
+      ),
+    ).text(),
+    Bun.file(
+      new URL("./portal-workspace-controls.tsx", import.meta.url),
+    ).text(),
+    Bun.file(new URL("../render/render-section.tsx", import.meta.url)).text(),
+    Bun.file(
+      new URL(
+        "../../app/[locale]/(workspace)/create/[portalId]/_components/portal-section-order-popover.tsx",
+        import.meta.url,
+      ),
+    ).text(),
+  ])
+).join("\n");
 
 test("publish validates readiness before flushing and invoking the server action", () => {
   const validationIndex = publish.indexOf("validatePortalPublicationReadiness");
@@ -29,15 +50,17 @@ test("publish validates readiness before flushing and invoking the server action
 });
 
 test("the adjacent floating popover renders actionable publication issues", () => {
-  expect(controls).toContain("publicationIssuesByPortalId[portalId]");
+  expect(renderer).toContain('publicationIssuesByPortalId[portalId ?? ""]');
   // Zustand selectors must not return a fresh [] each snapshot (infinite loop).
-  expect(controls).not.toContain("publicationIssuesByPortalId[portalId] ?? []");
-  expect(controls).toContain("EMPTY_PUBLICATION_ISSUES");
-  expect(controls).toContain("focusPortalPublicationTarget(target)");
-  expect(controls).toContain("publication.issues.");
-  expect(controls).toContain("issue.code");
-  expect(controls).toContain('t("publication.fix")');
-  expect(controls).toContain("publicationPopoverOpenByPortalId[portalId]");
+  expect(renderer).not.toContain("publicationIssuesByPortalId[portalId] ?? []");
+  expect(renderer).toContain("EMPTY_PUBLICATION_ISSUES");
+  expect(renderer).toContain("focusPortalPublicationTarget(target)");
+  expect(renderer).toContain("workspace.publication.issues.");
+  expect(renderer).toContain("issue.code");
+  expect(renderer).toContain('t("workspace.publication.fix")');
+  expect(renderer).toContain(
+    'publicationPopoverOpenByPortalId[portalId ?? ""]',
+  );
 });
 
 test("the editable portal fields expose stable focus targets", () => {

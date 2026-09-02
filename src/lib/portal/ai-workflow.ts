@@ -2,6 +2,7 @@ import {
   createClient as createSupabaseClient,
   type SupabaseClient,
 } from "@supabase/supabase-js";
+import { normalizePortalDocument } from "@/domain/portal/document";
 import type { PortalPlan } from "@/lib/billing/portal-policy";
 import type { AiPortalOperation } from "@/lib/portal/ai";
 import {
@@ -10,7 +11,6 @@ import {
   preserveManualPortalFields,
 } from "@/lib/portal/ai-proposal";
 import { generateAiStructuredEnhancement } from "@/lib/portal/ai-sdk";
-import { normalizePortalDocument } from "@/lib/portal/document";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 

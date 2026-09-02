@@ -1,10 +1,16 @@
 import { describe, expect, test } from "bun:test";
 
 const creation = await Bun.file(
-  new URL("./portal-creation-questionnaire.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/(workspace)/create/_components/portal-creation-questionnaire.tsx",
+    import.meta.url,
+  ),
 ).text();
 const dialog = await Bun.file(
-  new URL("./portal-ai-dialog.tsx", import.meta.url),
+  new URL(
+    "../../app/[locale]/(workspace)/create/[portalId]/_components/portal-ai-dialog.tsx",
+    import.meta.url,
+  ),
 ).text();
 const controls = await Bun.file(
   new URL("./portal-workspace-controls.tsx", import.meta.url),

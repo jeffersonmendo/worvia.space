@@ -2,21 +2,21 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
-  ConnectAccountDialog,
-  type PortalHomeCopy,
-} from "@/components/portal/portal-home";
-import { PortalWorkspaceToolbar } from "@/components/portal/portal-workspace-toolbar";
-import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getConnectStatusSummary } from "@/infrastructure/portal/workspace-read-models";
 import { isStripeConnectCountry } from "@/lib/billing/connect-countries";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
-import { getConnectStatusSummary } from "@/lib/portal/workspace-read-models";
+import {
+  ConnectAccountDialog,
+  type PortalHomeCopy,
+} from "../_components/portal-home";
+import { PortalWorkspaceToolbar } from "../_components/portal-workspace-toolbar";
 
 export default async function StripeConnectPage({
   params,

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { AutosaveQueue } from "./autosave-queue";
+import { AutosaveQueue } from "@/application/portal/autosave-queue";
 import {
   PortalDocumentConflictError,
   persistPortalDocumentAtLatestRevision,

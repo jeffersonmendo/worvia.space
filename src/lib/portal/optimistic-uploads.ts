@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import type { PortalFontItem } from "./document";
+import type { PortalFontItem } from "@/domain/portal/document";
+import { createRandomId } from "@/lib/random-id";
 
 export type OptimisticUpload<T> = {
   id: string;
@@ -24,8 +25,7 @@ export class OptimisticUploadRegistry<T> {
   private snapshot: OptimisticUpload<T>[] = [];
 
   constructor(dependencies: RegistryDependencies = {}) {
-    this.createId =
-      dependencies.createId ?? (() => `pending_${crypto.randomUUID()}`);
+    this.createId = dependencies.createId ?? (() => createRandomId("pending"));
     this.createObjectURL =
       dependencies.createObjectURL ?? ((file) => URL.createObjectURL(file));
     this.revokeObjectURL =

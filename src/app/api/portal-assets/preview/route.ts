@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
+import { resolvePortalAccess } from "@/infrastructure/portal/server-access";
 import { containsPortalAssetReference } from "@/lib/portal/asset-preview-reference";
-import { resolvePortalAccess } from "@/lib/portal/server-access";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";

@@ -148,7 +148,7 @@ describe("translation catalogs", () => {
       "utf8",
     );
     const renderer = readFileSync(
-      "src/components/portal/render-portal/render-portal.tsx",
+      "src/components/portal/portal-project-controller.tsx",
       "utf8",
     );
 
@@ -160,23 +160,31 @@ describe("translation catalogs", () => {
 
   test("shows localized portal summary placeholders only while editing", () => {
     const renderer = readFileSync(
-      "src/components/portal/render-portal/render-portal.tsx",
+      "src/components/render/render-project.tsx",
+      "utf8",
+    );
+    const controller = readFileSync(
+      "src/components/portal/portal-project-controller.tsx",
       "utf8",
     );
 
-    expect(renderer).toContain(
-      'placeholder={editable ? t("namePlaceholder") : undefined}',
-    );
-    expect(renderer).toContain(
-      'placeholder={editable ? t("descriptionPlaceholder") : undefined}',
-    );
+    expect(renderer).toContain("placeholder={labels?.namePlaceholder}");
+    expect(renderer).toContain("placeholder={labels?.descriptionPlaceholder}");
+    expect(controller).toContain('summaryT("namePlaceholder")');
+    expect(controller).toContain('summaryT("descriptionPlaceholder")');
   });
 
   test("provides localized item models to Base UI selects", () => {
-    const workspace = readFileSync(
-      "src/components/portal/portal-workspace-controls.tsx",
-      "utf8",
-    );
+    const workspace = [
+      readFileSync(
+        "src/components/portal/portal-workspace-controls.tsx",
+        "utf8",
+      ),
+      readFileSync(
+        "src/app/[locale]/(workspace)/create/[portalId]/_components/portal-settings-dialog.tsx",
+        "utf8",
+      ),
+    ].join("\n");
 
     expect(workspace).toContain("items={imageFitItems}");
     expect(workspace).toContain("items={aspectRatioItems}");

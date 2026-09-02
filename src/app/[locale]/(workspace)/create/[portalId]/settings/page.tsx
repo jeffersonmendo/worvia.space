@@ -1,11 +1,11 @@
 import { setRequestLocale } from "next-intl/server";
 import { PortalPlanProvider } from "@/components/portal/portal-plan-provider";
-import { PortalSettingsPage } from "@/components/portal/portal-settings-page";
-import { PortalWorkspaceToolbar } from "@/components/portal/portal-workspace-toolbar";
-import { WorkspaceProjectRegistration } from "@/components/portal/workspace-sidebar";
-import { getWorkspacePortal } from "@/lib/portal/workspace-portal";
-import { PORTAL_PLANS } from "@/lib/billing/portal-policy";
 import type { PortalPlan } from "@/lib/billing/portal-policy";
+import { PORTAL_PLANS } from "@/lib/billing/portal-policy";
+import { getWorkspacePortal } from "@/lib/portal/workspace-portal";
+import { PortalWorkspaceToolbar } from "../../../_components/portal-workspace-toolbar";
+import { WorkspaceProjectRegistration } from "../../../_components/workspace-sidebar";
+import { SettingsView } from "./_components/settings-view";
 
 export default async function PortalSettingsRoute({
   params,
@@ -21,9 +21,9 @@ export default async function PortalSettingsRoute({
     paidPriceCents,
     plan,
     portal,
-  } =
-    await getWorkspacePortal(locale, portalId);
-  const normalizedPlan: PortalPlan = plan === "starter" || plan === "pro" || plan === "premium" ? plan : "free";
+  } = await getWorkspacePortal(locale, portalId);
+  const normalizedPlan: PortalPlan =
+    plan === "starter" || plan === "pro" || plan === "premium" ? plan : "free";
   const initialSnapshot = {
     available: true,
     canPurchase,
@@ -33,7 +33,11 @@ export default async function PortalSettingsRoute({
     storageUsedBytes: 0,
   };
   return (
-    <PortalPlanProvider initialSnapshot={initialSnapshot} locale={locale} portalId={portal.id}>
+    <PortalPlanProvider
+      initialSnapshot={initialSnapshot}
+      locale={locale}
+      portalId={portal.id}
+    >
       <WorkspaceProjectRegistration
         project={{ id: portal.id, name: portal.name }}
       />
@@ -43,7 +47,7 @@ export default async function PortalSettingsRoute({
         portalSlug={portal.slug}
       />
       <main className="mx-auto flex min-w-0 w-full max-w-[calc(900px-240px-2rem)] px-4 pb-24 md:px-6">
-        <PortalSettingsPage
+        <SettingsView
           initialConnectReady={connectStatus.connected}
           initialPaidPriceCents={paidPriceCents}
           hasPortalPurchase={hasPortalPurchase}

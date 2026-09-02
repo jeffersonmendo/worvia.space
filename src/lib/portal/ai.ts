@@ -2,10 +2,10 @@ import type {
   ImageAspectRatio,
   ImageFit,
   PortalImageItem,
-} from "@/lib/portal/document";
+} from "@/domain/portal/document";
 
 export type AiPortalOperation = "generate" | "improve-project" | "refine-copy";
-export type FieldOrigin = "ai" | "manual";
+export type { FieldOrigin } from "@/domain/portal/field-origin";
 
 export type AssetAnalysisInput = {
   id: string;

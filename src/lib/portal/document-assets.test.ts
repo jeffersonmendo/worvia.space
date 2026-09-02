@@ -4,7 +4,7 @@ import {
   createImageItem,
   createPortalSection,
   portalDocumentToJson,
-} from "./document";
+} from "@/domain/portal/document";
 
 test("serializes managed assets as stable references instead of signed previews", () => {
   const document = createDefaultPortalDocument({

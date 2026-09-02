@@ -1,9 +1,9 @@
 import { startAiPortalProposal } from "@workflows/ai-portal-proposal";
 import { NextResponse } from "next/server";
+import { normalizePortalDocument } from "@/domain/portal/document";
 import type { AiPortalOperation } from "@/lib/portal/ai";
 import type { AiAssetInput } from "@/lib/portal/ai-proposal";
 import { createAiWorkflowJob } from "@/lib/portal/ai-workflow";
-import { normalizePortalDocument } from "@/lib/portal/document";
 import { createClient } from "@/lib/supabase/server";
 
 const operations = new Set<AiPortalOperation>([

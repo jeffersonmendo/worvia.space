@@ -1,10 +1,10 @@
-import type { Json } from "@/lib/supabase/database.types";
 import type {
   PortalDocument,
   PortalFileItem,
   PortalFontItem,
   PortalImageItem,
-} from "./document";
+} from "@/domain/portal/document";
+import type { Json } from "@/lib/supabase/database.types";
 
 export function containsPortalAssetReference(
   value: Json | null | undefined,

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
-import { recordPaidPortalDownload } from "@/lib/billing/paid-portal-downloads";
 import {
   normalizePortalDocument,
   portalBlocksToDocument,
-} from "@/lib/portal/document";
+} from "@/domain/portal/document";
+import {
+  getAuthorizedDocument,
+  resolvePortalAccess,
+} from "@/infrastructure/portal/server-access";
+import { fetchStorageEntry } from "@/infrastructure/portal/server-assets";
+import { recordPaidPortalDownload } from "@/lib/billing/paid-portal-downloads";
 import {
   buildExportManifest,
   buildManifestText,
@@ -13,11 +18,6 @@ import {
   selectManifestScope,
   selectPortalExportDocument,
 } from "@/lib/portal/export-manifest";
-import {
-  getAuthorizedDocument,
-  resolvePortalAccess,
-} from "@/lib/portal/server-access";
-import { fetchStorageEntry } from "@/lib/portal/server-assets";
 import { createZip } from "@/lib/portal/zip";
 import type { Portal } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";

@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  getSignUpErrorKey,
-  isAuthenticationRequiredError,
-} from "./auth-error";
+import { getSignUpErrorKey, isAuthenticationRequiredError } from "./auth-error";
 
 describe("auth error classification", () => {
   test("maps Supabase email rate limits to a safe client error key", () => {
@@ -19,9 +16,9 @@ describe("auth error classification", () => {
   });
 
   test("recognizes the portal authentication error", () => {
-    expect(isAuthenticationRequiredError(new Error("Authentication required"))).toBe(
-      true,
-    );
+    expect(
+      isAuthenticationRequiredError(new Error("Authentication required")),
+    ).toBe(true);
     expect(isAuthenticationRequiredError(new Error("Portal not found"))).toBe(
       false,
     );

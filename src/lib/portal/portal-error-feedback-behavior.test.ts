@@ -16,9 +16,9 @@ const {
   showPortalPublishError,
 } = await import("./portal-error-feedback");
 const { PortalPublishFailure, publishPortalAfterAutosave } = await import(
-  "./publish-flow"
+  "@/application/portal/publish-flow"
 );
-const { AutosaveQueue } = await import("./autosave-queue");
+const { AutosaveQueue } = await import("@/application/portal/autosave-queue");
 const { PortalDocumentConflictError, persistPortalDocumentAtLatestRevision } =
   await import("./revisioned-autosave");
 
