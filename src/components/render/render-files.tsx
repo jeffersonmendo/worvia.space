@@ -130,7 +130,6 @@ export function RenderFiles({
   policy,
   visibility,
   editable,
-  editorGridGaps: _editorGridGaps,
   addAction,
   sectionId,
 }: {
@@ -141,7 +140,6 @@ export function RenderFiles({
   policy?: import("./visual-model").RenderActionStyle;
   visibility?: "always" | "hover";
   editable?: boolean;
-  editorGridGaps?: boolean;
   addAction?: RenderActionsData[number];
   sectionId?: string;
 }) {

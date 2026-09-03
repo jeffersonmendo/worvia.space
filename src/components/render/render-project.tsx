@@ -448,7 +448,6 @@ export const RenderProject = forwardRef<
         <RenderFiles
           items={section.content.files ?? []}
           editable={editor}
-          editorGridGaps={editor}
           addAction={collectionAction("file")}
           actions={(item) =>
             withContext(
