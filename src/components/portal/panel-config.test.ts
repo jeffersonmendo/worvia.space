@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   createPanelDeleteConfirmation,
+  shouldShowItemVisibilityControl,
   supportsFilePreviewPresentation,
 } from "./panel-config";
 import { visualColorPickerValue } from "./visual-color-picker";
@@ -40,6 +41,16 @@ test("orders PanelConfig fields with inputs before final switches", () => {
   expect(indexOfOrThrow(galleryFields, "<ColorPickerField")).toBeLessThan(
     indexOfOrThrow(panelSource, 'label="Mostrar sección"'),
   );
+});
+
+test("uses the image section switch and shows font section visibility without width", () => {
+  expect(shouldShowItemVisibilityControl("image", "image")).toBe(false);
+  expect(shouldShowItemVisibilityControl("image", "gallery")).toBe(true);
+  expect(panelSource).toContain(
+    "showVisibility={shouldShowItemVisibilityControl(",
+  );
+  expect(panelSource).not.toContain("WidthField");
+  expect(panelSource).not.toContain("Ancho de la sección");
 });
 
 test("keeps deletion pending when confirmation is canceled", () => {
@@ -93,7 +104,6 @@ test("renders icons in select options and selected values", () => {
   expect(selectField.match(/<Icon aria-hidden \/>/g)?.length).toBe(2);
   expect(panelSource).toContain("const THREE_TO_FOUR_COLUMN_OPTIONS");
   expect(panelSource).toContain("const COLOR_COLUMN_OPTIONS");
-  expect(panelSource).toContain("const WIDTH_OPTIONS");
   expect(panelSource).toContain("const GALLERY_LAYOUT_OPTIONS");
   expect(panelSource).toContain("const COLOR_LAYOUT_OPTIONS");
   expect(panelSource).toContain("const FIT_OPTIONS");
@@ -101,7 +111,7 @@ test("renders icons in select options and selected values", () => {
 
   const columnOptions = panelSource.slice(
     indexOfOrThrow(panelSource, "const THREE_TO_FOUR_COLUMN_OPTIONS"),
-    indexOfOrThrow(panelSource, "const WIDTH_OPTIONS"),
+    indexOfOrThrow(panelSource, "const GALLERY_LAYOUT_OPTIONS"),
   );
   expect(columnOptions.match(/IconColumns\]/g)?.length).toBe(5);
   expect(columnOptions).not.toContain("IconNumber");

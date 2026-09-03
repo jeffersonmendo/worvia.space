@@ -4,6 +4,10 @@ import {
   inferAssetMimeType,
   isRenderableImageMimeType,
   normalizeAssetMimeType,
+  portalAssetInputAccept,
+  preflightAiPortalAssetBatch,
+  preflightPortalAssetBatch,
+  preflightPortalAssetSelection,
   validateAssetBytes,
   validateAssetDeclaration,
 } from "./asset-validation";
@@ -276,6 +280,128 @@ describe("portal asset validation", () => {
         "image/svg+xml",
       ),
     ).toBe(false);
+  });
+
+  test("preflights plain gallery SVGs but rejects external-DOCTYPE SVGs before upload", async () => {
+    const plainSvg = new File(['<svg><path d="M0 0" /></svg>'], "logo.svg", {
+      type: "image/svg+xml",
+    });
+    const externalDoctypeSvg = new File(
+      [
+        '<?xml version="1.0"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg />',
+      ],
+      "external.svg",
+      { type: "image/svg+xml" },
+    );
+
+    await expect(
+      preflightPortalAssetSelection("gallery", plainSvg),
+    ).resolves.toBe(true);
+    await expect(
+      preflightPortalAssetSelection("gallery", externalDoctypeSvg),
+    ).resolves.toBe(false);
+  });
+
+  test("preflights File selections from the server declaration allowlist", async () => {
+    const supportedFile = new File(["%PDF-1.7"], "guide.pdf", {
+      type: "application/pdf",
+    });
+    const unsupportedFile = new File(["binary"], "payload.zip", {
+      type: "application/zip",
+    });
+
+    expect(portalAssetInputAccept("file")).toContain(".pdf");
+    expect(portalAssetInputAccept("file")).toContain(".woff2");
+    expect(portalAssetInputAccept("file")).toContain(".png");
+    await expect(
+      preflightPortalAssetSelection("file", supportedFile),
+    ).resolves.toBe(true);
+    await expect(
+      preflightPortalAssetSelection("file", unsupportedFile),
+    ).resolves.toBe(false);
+  });
+
+  test("keeps valid Gallery batch files in order while skipping an external-DOCTYPE SVG", async () => {
+    const first = new File(["<svg><path /></svg>"], "first.svg", {
+      type: "image/svg+xml",
+    });
+    const rejected = new File(
+      ['<!DOCTYPE svg SYSTEM "https://example.com/svg.dtd"><svg />'],
+      "external.svg",
+      { type: "image/svg+xml" },
+    );
+    const last = new File(["<svg><circle /></svg>"], "last.svg", {
+      type: "image/svg+xml",
+    });
+
+    await expect(
+      preflightPortalAssetBatch("gallery", [first, rejected, last]),
+    ).resolves.toEqual({ acceptedFiles: [first, last], rejectedFileCount: 1 });
+  });
+
+  test("keeps valid Files batch files in order while skipping invalid SVGs and unsupported files", async () => {
+    const first = new File(["%PDF-1.7"], "first.pdf", {
+      type: "application/pdf",
+    });
+    const rejectedSvg = new File(
+      ['<!DOCTYPE svg SYSTEM "https://example.com/svg.dtd"><svg />'],
+      "external.svg",
+      { type: "image/svg+xml" },
+    );
+    const rejectedFile = new File(["binary"], "payload.zip", {
+      type: "application/zip",
+    });
+    const last = new File(["Notes"], "last.txt", { type: "text/plain" });
+
+    await expect(
+      preflightPortalAssetBatch("file", [
+        first,
+        rejectedSvg,
+        rejectedFile,
+        last,
+      ]),
+    ).resolves.toEqual({ acceptedFiles: [first, last], rejectedFileCount: 2 });
+  });
+
+  test("returns no accepted Files when every selected file is unsupported", async () => {
+    const unsupportedFile = new File(["binary"], "payload.zip", {
+      type: "application/zip",
+    });
+
+    await expect(
+      preflightPortalAssetBatch("file", [unsupportedFile]),
+    ).resolves.toEqual({ acceptedFiles: [], rejectedFileCount: 1 });
+  });
+
+  test("keeps accepted AI creation attachments in order and rejects external SVGs", async () => {
+    const first = new File(["%PDF-1.7"], "brief.pdf", {
+      type: "application/pdf",
+    });
+    const rejected = new File(
+      ['<!DOCTYPE svg SYSTEM "https://example.com/svg.dtd"><svg />'],
+      "external.svg",
+      { type: "image/svg+xml" },
+    );
+    const last = new File(["Notes"], "notes.txt", { type: "text/plain" });
+
+    await expect(
+      preflightAiPortalAssetBatch([first, rejected, last]),
+    ).resolves.toEqual({ acceptedFiles: [first, last], rejectedFileCount: 1 });
+  });
+
+  test("returns no AI creation attachments when every file is rejected", async () => {
+    const rejectedSvg = new File(
+      ['<!DOCTYPE svg SYSTEM "https://example.com/svg.dtd"><svg />'],
+      "external.svg",
+      { type: "image/svg+xml" },
+    );
+    const unsupportedFile = new File(["binary"], "payload.zip", {
+      type: "application/zip",
+    });
+
+    await expect(
+      preflightAiPortalAssetBatch([rejectedSvg, unsupportedFile]),
+    ).resolves.toEqual({ acceptedFiles: [], rejectedFileCount: 2 });
   });
 
   test.each([

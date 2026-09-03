@@ -4,6 +4,7 @@ import {
   applyRenderProjectChange,
   applyRenderProjectDocument,
   applyRenderSectionChange,
+  portalDocumentToPublicRenderProject,
   portalDocumentToRenderProject,
 } from "./portal-document-adapter";
 
@@ -52,6 +53,131 @@ const document: PortalDocument = {
 };
 
 describe("portalDocumentToRenderProject", () => {
+  test("round-trips section visibility through the controlled project document", () => {
+    const project = portalDocumentToRenderProject(document);
+    const next = applyRenderProjectDocument(document, {
+      ...project,
+      sections: project.sections.map((section) => ({
+        ...section,
+        visible: false,
+      })),
+    });
+
+    expect(next.sections[0]?.visible).toBe(false);
+    expect(portalDocumentToRenderProject(next).sections[0]?.visible).toBe(
+      false,
+    );
+  });
+
+  test("creates a public composition without inactive sections or image, color, and file items", () => {
+    const source: PortalDocument = {
+      ...document,
+      sections: [
+        {
+          ...document.sections[0],
+          content: {
+            colors: [
+              {
+                color_code: "#111111",
+                color_name: "Hidden",
+                id: "color-hidden",
+                position: 0,
+                visible: false,
+              },
+              {
+                color_code: "#222222",
+                color_name: "Shown",
+                id: "color-shown",
+                position: 1,
+                visible: true,
+              },
+            ],
+            files: [
+              {
+                allow_download: true,
+                file_name: "hidden.pdf",
+                file_url: "https://example.com/hidden.pdf",
+                id: "file-hidden",
+                position: 0,
+                visible: false,
+              },
+              {
+                allow_download: true,
+                file_name: "shown.pdf",
+                file_url: "https://example.com/shown.pdf",
+                id: "file-shown",
+                position: 1,
+                visible: true,
+              },
+            ],
+            fonts: [
+              {
+                file_url: "https://example.com/hidden.woff2",
+                font_name: "Hidden Font",
+                id: "font-hidden",
+                position: 0,
+                visible: false,
+              },
+              {
+                file_url: "https://example.com/shown.woff2",
+                font_name: "Shown Font",
+                id: "font-shown",
+                position: 1,
+                visible: true,
+              },
+            ],
+            image: {
+              ...galleryFixture().image,
+              id: "image-hidden",
+              visible: false,
+            },
+            images: [
+              {
+                ...galleryFixture().image,
+                id: "gallery-hidden",
+                visible: false,
+              },
+            ],
+          },
+          type: "gallery",
+          visible: true,
+        },
+        {
+          ...document.sections[0],
+          content: {
+            image: {
+              ...galleryFixture().image,
+              id: "image-controlled-by-section",
+              visible: false,
+            },
+          },
+          id: "image-parent-controls",
+          type: "image",
+          visible: true,
+        },
+        { ...document.sections[0], id: "hidden-section", visible: false },
+      ],
+    };
+
+    const project = portalDocumentToPublicRenderProject(source);
+
+    expect(project.sections).toHaveLength(2);
+    expect(project.sections[0]?.content.images).toEqual([]);
+    expect(project.sections[0]?.content.colors?.map(({ id }) => id)).toEqual([
+      "color-shown",
+    ]);
+    expect(project.sections[0]?.content.files?.map(({ id }) => id)).toEqual([
+      "file-shown",
+    ]);
+    expect(project.sections[0]?.content.fonts?.map(({ id }) => id)).toEqual([
+      "font-shown",
+    ]);
+    expect(
+      project.sections.find((section) => section.id === "image-parent-controls")
+        ?.content.image?.id,
+    ).toBe("image-controlled-by-section");
+  });
+
   test("round-trips image transparency independently from its selected background color", () => {
     const { image, section } = galleryFixture();
     const source: PortalDocument = {

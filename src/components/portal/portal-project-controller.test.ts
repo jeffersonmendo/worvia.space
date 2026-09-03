@@ -66,3 +66,35 @@ test("captures the color name before scheduling its draft update", () => {
   );
   expect(dialogSource).not.toContain("name: event.currentTarget.value");
 });
+
+test("delegates post-render section-title focus to the renderer facade", () => {
+  expect(controllerSource).toContain("useRef<RenderProjectHandle>(null)");
+  expect(controllerSource).toContain(
+    "renderProjectRef.current?.focusSectionTitle(editor.focus)",
+  );
+  expect(controllerSource).toContain("ref={renderProjectRef}");
+});
+
+test("recovers invalid asset selections with localized feedback at the controller boundary", () => {
+  const rejectedSelection = controllerSource.slice(
+    controllerSource.indexOf("if (change.rejectedFileCount)"),
+    controllerSource.indexOf("const itemMove = change.itemMove"),
+  );
+  const assetSelection = controllerSource.slice(
+    controllerSource.indexOf("if (change.assets?.length && isEditorMode)"),
+    controllerSource.indexOf(
+      "if (draftProject) setDraftProject(change.project)",
+    ),
+  );
+
+  expect(assetSelection).toContain(
+    "recoverExpectedPortalAssetUploadRejection({",
+  );
+  expect(assetSelection).toContain("setDraftProject(null)");
+  expect(assetSelection).toContain('toast.error(uploadT("invalidAsset")');
+  expect(assetSelection).toContain("throw error");
+  expect(rejectedSelection).toContain(
+    'uploadT("skippedAssets", { count: change.rejectedFileCount })',
+  );
+  expect(rejectedSelection).toContain("if (!change.assets?.length) return");
+});

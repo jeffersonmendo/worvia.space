@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { RenderAction, RenderActionTools } from "./visual-model";
 
 /**
@@ -9,10 +10,12 @@ import type { RenderAction, RenderActionTools } from "./visual-model";
  */
 export function RenderCollectionAddTile({
   action,
+  className,
   kind,
   tools,
 }: {
   action?: RenderAction;
+  className?: string;
   kind: "image" | "color" | "font" | "file";
   tools: RenderActionTools;
 }) {
@@ -21,7 +24,10 @@ export function RenderCollectionAddTile({
   return (
     <Button
       aria-label={action.label}
-      className="flex min-h-32 w-full flex-col gap-2 rounded-xl border-border border-dashed text-muted-foreground hover:bg-transparent! hover:border-foreground/20"
+      className={cn(
+        "flex min-h-32 w-full flex-col gap-2 rounded-xl border-border border-dashed text-muted-foreground hover:bg-transparent! hover:border-foreground/20",
+        className,
+      )}
       data-render-add-tile={kind}
       disabled={action.disabled || action.pending}
       onClick={(event) =>

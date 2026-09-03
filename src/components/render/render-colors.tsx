@@ -48,50 +48,47 @@ export function RenderColors({
       style={{ background: layout.background, padding: layout.padding }}
       tag="div"
     >
-      {ordered(items)
-        .filter((item) => item.visible)
-        .map((color, index) => (
-          <RenderSortableItem
+      {ordered(items).map((color, index) => (
+        <RenderSortableItem
+          className={cn(
+            "relative flex flex-col gap-1",
+            stack && "flex-row items-center gap-3",
+            editable && !color.visible && "opacity-40",
+          )}
+          enabled={Boolean(editable)}
+          index={index}
+          itemId={color.id}
+          key={color.id}
+          kind="color"
+          sectionId={sectionId}
+          tag="div"
+        >
+          <div
             className={cn(
-              "relative flex flex-col gap-1",
-              stack && "flex-row items-center gap-3",
+              "aspect-square flex-col flex rounded-lg border",
+              stack ? "size-14 shrink-0" : "w-full",
             )}
-            enabled={Boolean(editable)}
-            index={index}
-            itemId={color.id}
-            key={color.id}
-            kind="color"
-            sectionId={sectionId}
-            tag="div"
-          >
-            <div
-              className={cn(
-                "aspect-square flex-col flex rounded-lg border",
-                stack ? "size-14 shrink-0" : "w-full",
-              )}
-              style={{ backgroundColor: color.code }}
-            />
-            <div className="flex flex-col gap-1">
-              {showName ? (
-                <span className="truncate text-sm font-medium">
-                  {color.name}
-                </span>
-              ) : null}
-              {showCode ? (
-                <span className="truncate text-muted-foreground text-sm">
-                  {color.code}
-                </span>
-              ) : null}
-            </div>
-            <RenderActions
-              actions={actions?.(color)}
-              policy={policy}
-              scope="item"
-              tools={tools}
-              visibility={visibility}
-            />
-          </RenderSortableItem>
-        ))}
+            style={{ backgroundColor: color.code }}
+          />
+          <div className="flex flex-col gap-1">
+            {showName ? (
+              <span className="truncate text-sm font-medium">{color.name}</span>
+            ) : null}
+            {showCode ? (
+              <span className="truncate text-muted-foreground text-sm">
+                {color.code}
+              </span>
+            ) : null}
+          </div>
+          <RenderActions
+            actions={actions?.(color)}
+            policy={policy}
+            scope="item"
+            tools={tools}
+            visibility={visibility}
+          />
+        </RenderSortableItem>
+      ))}
       {editable && addAction ? (
         <RenderCollectionAddTile
           action={addAction}

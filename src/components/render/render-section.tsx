@@ -23,8 +23,10 @@ export function RenderSection({
   editable = false,
   header,
   id,
+  inactive = false,
   layout,
   onChange,
+  sectionRef,
   title = "",
 }: {
   actions?: RenderActionsData;
@@ -40,8 +42,10 @@ export function RenderSection({
   editable?: boolean;
   header?: React.ReactNode;
   id: string;
+  inactive?: boolean;
   layout?: RenderLayout;
   onChange?: (change: RenderSectionChange) => void;
+  sectionRef?: React.Ref<HTMLElement>;
   title?: string;
 }) {
   return (
@@ -50,6 +54,7 @@ export function RenderSection({
       <section
         className={cn(
           "group/section relative flex flex-col gap-4",
+          inactive && "opacity-40",
           layout?.align === "center" && "text-center",
           layout?.align === "right" && "text-right",
         )}
@@ -60,11 +65,14 @@ export function RenderSection({
         onDragOver={onDragOver}
         onDragStart={onDragStart}
         onDrop={onDrop}
+        id={id}
+        ref={sectionRef}
       >
         <header className="relative flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">
             {editable ? (
               <Textarea
+                aria-label="Section title"
                 className="min-w-0 flex-1 bg-transparent! text-balance rounded-none! border-0 p-0! ring-0 focus-visible:ring-0! text-base! resize-none placeholder:bg-none!"
                 data-portal-editor-field
                 rows={10}

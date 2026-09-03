@@ -503,11 +503,13 @@ export function SectionTypeDialog({
   onSelectComplete,
   onSelect,
   trigger,
+  triggerNativeButton = true,
 }: {
   openRequestKey?: string;
   onSelectComplete?: () => void;
   onSelect: (type: Exclude<PortalSectionType, "empty">) => void;
   trigger: ReactElement;
+  triggerNativeButton?: boolean;
 }) {
   const t = useTranslations("PortalEditor.sections");
   const [open, setOpen] = useState(false);
@@ -540,7 +542,7 @@ export function SectionTypeDialog({
       }}
       open={open}
     >
-      <DialogTrigger render={trigger} />
+      <DialogTrigger nativeButton={triggerNativeButton} render={trigger} />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("addTitle")}</DialogTitle>
@@ -3614,7 +3616,7 @@ function FilesEditor({
       >
         <div
           className={cn(
-            "grid gap-4",
+            "grid gap-x-4 gap-y-4",
             columns === 3 &&
               "grid-cols-2 lg:grid-cols-3 group-data-[style-mode=desktop]/portal:grid-cols-3! group-data-[style-mode=mobile]/portal:grid-cols-2!",
             columns === 4 &&

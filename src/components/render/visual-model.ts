@@ -140,6 +140,11 @@ export type RenderProjectData = {
   sections: RenderSectionData[];
 };
 
+/** Imperative editor-only navigation surface; consumers retain publication rules. */
+export type RenderProjectHandle = {
+  focusSectionTitle(sectionId: string): boolean;
+};
+
 export type RenderActionTools = {
   pickAssets(options: {
     sectionId: string;
@@ -244,6 +249,7 @@ export type RenderProjectChange = {
   project: RenderProjectData;
   kind: RenderProjectChangeKind;
   assets?: SelectedAsset[];
+  rejectedFileCount?: number;
   itemMove?: RenderProjectItemMove;
 };
 export type RenderProjectLabels = {
@@ -280,6 +286,7 @@ export type RenderProjectProps = (
 export type RenderSectionChange =
   | { field: "title" | "description"; value: string }
   | { field: "position"; value: number }
+  | { field: "visible"; value: boolean }
   | { field: "layout"; value: RenderLayout }
   | { field: "content"; value: RenderSectionContent };
 export type RenderSectionSlotProps = {

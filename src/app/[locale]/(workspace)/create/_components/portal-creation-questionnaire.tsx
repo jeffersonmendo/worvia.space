@@ -80,6 +80,7 @@ import { extractAssetMetadata } from "@/lib/portal/asset-metadata";
 import {
   inferAssetMimeType,
   isRenderableImageMimeType,
+  preflightAiPortalAssetBatch,
 } from "@/lib/portal/asset-validation";
 import { createRandomId } from "@/lib/random-id";
 import { createClient } from "@/lib/supabase/client";
@@ -99,6 +100,7 @@ function fileKey(file: File) {
 
 export function PortalCreationQuestionnaire({ locale }: { locale: string }) {
   const t = useTranslations("Home.create");
+  const uploadT = useTranslations("PortalEditor.upload");
   const router = useRouter();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
@@ -124,7 +126,7 @@ export function PortalCreationQuestionnaire({ locale }: { locale: string }) {
     0,
   );
   const [
-    { files: selectedFiles, isDragging, errors: fileErrors },
+    { files: selectedFiles, isDragging, isPreflighting, errors: fileErrors },
     {
       handleDragEnter,
       handleDragLeave,
@@ -136,6 +138,9 @@ export function PortalCreationQuestionnaire({ locale }: { locale: string }) {
   ] = useFileUpload({
     accept: "image/*,.pdf,.txt,.md,.ai,.eps,.psd,.indd,.ttf,.otf,.woff,.woff2",
     maxSize: 500 * 1024 * 1024,
+    onPreflight: ({ rejectedFileCount }) =>
+      toast.warning(uploadT("skippedAssets", { count: rejectedFileCount })),
+    preflightFiles: preflightAiPortalAssetBatch,
     validateFile: (file, existingFiles) => {
       const counts = existingFiles.reduce(
         (result, existingFile) => {
@@ -692,7 +697,9 @@ export function PortalCreationQuestionnaire({ locale }: { locale: string }) {
             <QuestionnaireActions className="mt-4">
               <QuestionnairePrevious>{t("back")}</QuestionnairePrevious>
               <QuestionnaireNext>{t("next")}</QuestionnaireNext>
-              <QuestionnaireSubmit disabled={mutation.isPending}>
+              <QuestionnaireSubmit
+                disabled={mutation.isPending || isPreflighting}
+              >
                 {mutation.isPending ? (
                   <IconLoader2
                     className="animate-spin"

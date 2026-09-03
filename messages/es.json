@@ -706,6 +706,11 @@
     "specialized": "Esta sección está lista para contenido especializado. La representación detallada de {type} se ampliará en una próxima iteración."
   },
   "PortalEditor": {
+    "upload": {
+      "invalidAsset": "No se pudo subir este archivo porque su contenido no es válido.",
+      "skippedAssets": "{count, plural, one {Se omitió # archivo no compatible o no válido.} other {Se omitieron # archivos no compatibles o no válidos.}}",
+      "authRequired": "Inicia sesión para subir archivos."
+    },
     "plan": {
       "free": "Gratis",
       "starter": "Starter",
@@ -802,9 +807,6 @@
       "conflictDescription": "Tu última edición local está preservada. Carga la versión guardada y reintenta solo si deseas aplicar tu edición sobre ella.",
       "conflictRetry": "Reintentar última edición",
       "retry": "Reintentar guardado"
-    },
-    "upload": {
-      "authRequired": "Inicia sesión para subir archivos."
     },
     "workspace": {
       "back": "Atrás",

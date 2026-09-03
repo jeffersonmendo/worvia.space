@@ -703,6 +703,11 @@
     "specialized": "This section is ready for specialized content. Detailed rendering for {type} will be expanded in a future iteration."
   },
   "PortalEditor": {
+    "upload": {
+      "invalidAsset": "This file could not be uploaded because its contents are not valid.",
+      "skippedAssets": "{count, plural, one {Skipped # unsupported or invalid file.} other {Skipped # unsupported or invalid files.}}",
+      "authRequired": "Log in to upload files."
+    },
     "plan": {
       "free": "Free",
       "starter": "Starter",
@@ -799,9 +804,6 @@
       "conflictDescription": "Your latest local edit is preserved. Load the saved version, then retry only if you want to apply your edit over it.",
       "conflictRetry": "Retry latest edit",
       "retry": "Retry saving"
-    },
-    "upload": {
-      "authRequired": "Log in to upload files."
     },
     "workspace": {
       "back": "Back",

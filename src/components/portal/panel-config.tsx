@@ -6,13 +6,10 @@ import {
   IconAspectRatio,
   IconColumns,
   IconColumns2,
-  IconContainer,
   IconCrop,
   IconCrop11,
   IconCrop169,
-  IconLayoutDistributeHorizontal,
   IconLayoutGrid,
-  IconMaximize,
   IconPalette,
   IconPanoramaHorizontal,
   IconPhoto,
@@ -79,6 +76,13 @@ export type PanelConfigKind =
   | "file"
   | "font";
 
+export function shouldShowItemVisibilityControl(
+  panel: PanelConfigKind,
+  sectionType: RenderSectionData["type"],
+) {
+  return !(panel === "image" && sectionType === "image");
+}
+
 export function getPanelConfigCopy(panel: PanelConfigKind) {
   const title = {
     "section-gallery": "Configurar galería",
@@ -130,12 +134,6 @@ const COLOR_COLUMN_OPTIONS = [
   ["3", "3 columnas (2 en móvil)", IconColumns],
   ["4", "4 columnas (3 en móvil)", IconColumns],
   ["5", "5 columnas (4 en móvil)", IconColumns],
-] satisfies readonly SelectOption[];
-
-const WIDTH_OPTIONS = [
-  ["container", "Contenido centrado", IconContainer],
-  ["wide", "Ancho ampliado", IconLayoutDistributeHorizontal],
-  ["full", "Ancho completo", IconMaximize],
 ] satisfies readonly SelectOption[];
 
 const GALLERY_LAYOUT_OPTIONS = [
@@ -256,14 +254,15 @@ export function PanelConfig({
               options={THREE_TO_FOUR_COLUMN_OPTIONS}
             />
           ) : null}
-          {panel === "section-image" || panel === "section-fonts" ? (
-            <WidthField
-              value={currentLayout.width}
-              onChange={(width) => updateLayout({ width })}
-            />
-          ) : null}
           {panel === "image" && item ? (
-            <ImageFields item={item as RenderImageData} onChange={updateItem} />
+            <ImageFields
+              item={item as RenderImageData}
+              onChange={updateItem}
+              showVisibility={shouldShowItemVisibilityControl(
+                panel,
+                section.type,
+              )}
+            />
           ) : null}
           {panel === "color" && item ? (
             <ColorFields item={item as RenderColorData} onChange={updateItem} />
@@ -544,22 +543,6 @@ function ColumnsField({
     />
   );
 }
-function WidthField({
-  onChange,
-  value,
-}: {
-  onChange: (width: "container" | "wide" | "full") => void;
-  value?: string;
-}) {
-  return (
-    <SelectField
-      label="Ancho de la sección"
-      onChange={(value) => onChange(value as "container" | "wide" | "full")}
-      options={WIDTH_OPTIONS}
-      value={value}
-    />
-  );
-}
 function GallerySectionFields({
   layout,
   onChange,
@@ -659,9 +642,11 @@ function ColorSectionFields({
 function ImageFields({
   item,
   onChange,
+  showVisibility,
 }: {
   item: RenderImageData;
   onChange: (change: Partial<PanelItem>) => void;
+  showVisibility: boolean;
 }) {
   return (
     <>
@@ -713,11 +698,13 @@ function ImageFields({
         transparent={item.backgroundTransparent ?? false}
         value={item.background ?? "secondary"}
       />
-      <SwitchField
-        checked={item.visible}
-        label="Mostrar imagen"
-        onCheckedChange={(visible) => onChange({ visible })}
-      />
+      {showVisibility ? (
+        <SwitchField
+          checked={item.visible}
+          label="Mostrar imagen"
+          onCheckedChange={(visible) => onChange({ visible })}
+        />
+      ) : null}
       <SwitchField
         checked={item.allowDownload ?? true}
         label="Permitir descarga"

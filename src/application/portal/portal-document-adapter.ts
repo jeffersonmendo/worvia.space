@@ -265,6 +265,49 @@ export function portalDocumentToRenderProject(
   };
 }
 
+/** Compose the public projection before it reaches the domain-neutral renderer. */
+export function portalDocumentToPublicRenderProject(
+  document: PortalDocument,
+  options: {
+    requireContent?: boolean;
+    showEmptySections?: boolean;
+  } = {},
+): RenderProjectData {
+  const project = portalDocumentToRenderProject(document);
+  const hasContent = (section: RenderSectionData) => {
+    const content = section.content;
+    return Boolean(
+      section.title.trim() ||
+        section.description.trim() ||
+        content.body?.trim() ||
+        content.image?.src.trim() ||
+        content.images?.some((image) => image.src.trim()) ||
+        content.colors?.length ||
+        content.fonts?.some((font) => font.visible) ||
+        content.files?.length,
+    );
+  };
+  const sections = project.sections
+    .filter((section) => section.visible)
+    .filter((section) => options.showEmptySections || section.type !== "empty")
+    .map((section) => ({
+      ...section,
+      content: {
+        ...section.content,
+        colors: section.content.colors?.filter((color) => color.visible),
+        files: section.content.files?.filter((file) => file.visible),
+        fonts: section.content.fonts?.filter((font) => font.visible),
+        image:
+          section.type !== "image" && section.content.image?.visible === false
+            ? null
+            : section.content.image,
+        images: section.content.images?.filter((image) => image.visible),
+      },
+    }))
+    .filter((section) => !options.requireContent || hasContent(section));
+  return { ...project, sections };
+}
+
 export function portalSectionToRenderSection(
   section: PortalDocument["sections"][number],
 ): RenderSectionData {
@@ -301,6 +344,9 @@ export function applyRenderSectionChange(
       }
       if (change.field === "position") {
         return { ...section, position: change.value };
+      }
+      if (change.field === "visible") {
+        return { ...section, visible: change.value };
       }
       if (change.field === "layout") {
         return {
@@ -367,6 +413,10 @@ export function applyRenderProjectDocument(
     next = applyRenderSectionChange(next, section.id, {
       field: "position",
       value: section.position,
+    });
+    next = applyRenderSectionChange(next, section.id, {
+      field: "visible",
+      value: section.visible,
     });
     next = applyRenderSectionChange(next, section.id, {
       field: "title",

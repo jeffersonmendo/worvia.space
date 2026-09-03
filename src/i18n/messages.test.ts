@@ -63,6 +63,19 @@ describe("translation catalogs", () => {
     expect(es).toHaveProperty("PortalEditor.image.ratioAuto", "Automática");
   });
 
+  test("localize recoverable invalid asset upload feedback", () => {
+    expect(en).toHaveProperty(
+      "PortalEditor.upload.invalidAsset",
+      "This file could not be uploaded because its contents are not valid.",
+    );
+    expect(es).toHaveProperty(
+      "PortalEditor.upload.invalidAsset",
+      "No se pudo subir este archivo porque su contenido no es válido.",
+    );
+    expect(en).toHaveProperty("PortalEditor.upload.skippedAssets");
+    expect(es).toHaveProperty("PortalEditor.upload.skippedAssets");
+  });
+
   test("give every not-found surface a localized way forward", () => {
     for (const messages of [en, es]) {
       expect(messages).toHaveProperty("PublicPortal.notFound.viewProjects");

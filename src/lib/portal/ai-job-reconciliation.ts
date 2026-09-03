@@ -1,5 +1,24 @@
 import type { PortalAutosaveState } from "@/application/portal/editor-store";
 
+type PersistedAiWorkflowJob = {
+  status: "loading" | "completed" | "error" | "cancelled";
+  updatedAt: string;
+};
+
+export function getTerminalRecoveryJobIds(
+  jobsById: Record<string, PersistedAiWorkflowJob>,
+  activeJobIds: Set<string>,
+  limit: number,
+) {
+  return Object.entries(jobsById)
+    .filter(([id, job]) => job.status === "loading" && !activeJobIds.has(id))
+    .sort(([, left], [, right]) =>
+      right.updatedAt.localeCompare(left.updatedAt),
+    )
+    .slice(0, limit)
+    .map(([id]) => id);
+}
+
 export function canRefreshCompletedDocumentJob(
   autosave: PortalAutosaveState | undefined,
 ) {

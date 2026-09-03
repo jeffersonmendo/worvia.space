@@ -5,5 +5,7 @@ const source = await Bun.file(
 ).text();
 
 test("maps public global actions to RenderProject project actions", () => {
-  expect(source).toContain("project: () => adaptActions(source.global?.() ?? [])");
+  expect(source).toContain(
+    "project: () => adaptActions(source.global?.() ?? [])",
+  );
 });

@@ -1,8 +1,4 @@
-import {
-  IconFileText,
-  IconFileTextFilled,
-  IconPhotoFilled,
-} from "@tabler/icons-react";
+import { IconFileTextFilled, IconPhotoFilled } from "@tabler/icons-react";
 import type { SVGProps } from "react";
 import { cn } from "@/lib/utils";
 

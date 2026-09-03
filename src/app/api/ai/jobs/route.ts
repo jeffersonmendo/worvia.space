@@ -10,16 +10,15 @@ export async function GET(request: Request) {
       { status: 401 },
     );
   const portalId = new URL(request.url).searchParams.get("portalId");
-  const jobId = new URL(request.url).searchParams.get("jobId");
   let query = supabase
     .from("ai_workflow_jobs")
     .select(
-      "id,portal_id,kind,status,request_id,payload,result,error_code,created_at,updated_at",
+      "id,portal_id,kind,status,request_id,error_code,updated_at,operation:payload->>operation,auto_apply:payload->autoApply,target:payload->target,progress:result->>progress,progress_detail:result->progressDetail",
     )
+    .in("status", ["queued", "processing"])
     .order("updated_at", { ascending: false })
     .limit(50);
   if (portalId) query = query.eq("portal_id", portalId);
-  if (jobId) query = query.eq("id", jobId);
   const { data, error } = await query;
   if (error)
     return NextResponse.json({ error: "jobs_unavailable" }, { status: 503 });
@@ -34,18 +33,8 @@ export async function GET(request: Request) {
     jobs: (data ?? []).map((job) => ({
       ...job,
       portal_name: portalNames.get(job.portal_id) ?? null,
-      operation:
-        typeof job.payload === "object" &&
-        job.payload !== null &&
-        "operation" in job.payload
-          ? job.payload.operation
-          : null,
-      autoApply:
-        typeof job.payload === "object" &&
-        job.payload !== null &&
-        "autoApply" in job.payload
-          ? job.payload.autoApply === true
-          : false,
+      autoApply: job.auto_apply === true,
+      progressDetail: job.progress_detail,
     })),
   });
 }

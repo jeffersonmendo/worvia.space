@@ -52,4 +52,13 @@ describe("portal creation files step", () => {
       "100 MB de almacenamiento",
     );
   });
+
+  test("preflights attachments before previews and sends AI only accepted files", () => {
+    expect(source).toContain("preflightFiles: preflightAiPortalAssetBatch");
+    expect(source).toContain('toast.warning(uploadT("skippedAssets"');
+    expect(source).toContain("for (const file of files)");
+    expect(source).toContain("assets: uploadedAssets");
+    expect(source).toContain("if (files.length === 0)");
+    expect(source).toContain("mutation.isPending || isPreflighting");
+  });
 });

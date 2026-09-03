@@ -110,6 +110,27 @@ export async function markAiWorkflowJob(
   if (error) throw error;
 }
 
+type AiOperationJob = Pick<AiWorkflowJob, "id"> & {
+  portal_id: string;
+  request_id: string;
+  payload: Json;
+};
+
+export async function claimAiOperationJob(
+  supabase: WorkflowClient,
+  id: string,
+) {
+  const { data, error } = await supabase
+    .from("ai_workflow_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("status", "queued")
+    .select("id,portal_id,request_id,payload")
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function completeAiWorkflowCredits(
   supabase: WorkflowClient,
   requestId: string,
@@ -124,20 +145,21 @@ export async function completeAiWorkflowCredits(
 
 export async function processAiOperationJob(
   supabase: WorkflowClient,
-  job: Pick<AiWorkflowJob, "id"> & {
-    portal_id: string;
-    request_id: string;
-    payload: Json;
-  },
+  job: Pick<AiWorkflowJob, "id">,
+) {
+  const claimedJob = await claimAiOperationJob(supabase, job.id);
+  if (!claimedJob) return null;
+  return processClaimedAiOperationJob(supabase, claimedJob);
+}
+
+export async function processClaimedAiOperationJob(
+  supabase: WorkflowClient,
+  job: AiOperationJob,
 ) {
   const payload = job.payload as Record<string, Json | undefined>;
   const operation = payload.operation as AiPortalOperation;
   const proposedDocument = payload.proposedDocument;
   if (!proposedDocument || !operation) throw new Error("invalid_job_payload");
-  await markAiWorkflowJob(supabase, job.id, {
-    status: "processing",
-    started_at: new Date().toISOString(),
-  });
   try {
     const { data: portal } = await supabase
       .from("portals")
@@ -294,13 +316,8 @@ export async function processAiProposalJob(
       });
       const document = await processAiOperationJob(supabase, {
         id: operationJob.id,
-        payload: {
-          operation,
-          proposedDocument: proposal.proposedDocument,
-        } as Json,
-        portal_id: job.portal_id,
-        request_id: `${job.request_id}:apply`,
       });
+      if (!document) throw new Error("ai_operation_not_queued");
       await markAiWorkflowJob(supabase, job.id, {
         status: "completed",
         result: { document, proposal } as Json,

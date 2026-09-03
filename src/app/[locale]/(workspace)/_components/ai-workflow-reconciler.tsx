@@ -17,6 +17,7 @@ import type { PortalDocument } from "@/domain/portal/document";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import {
   canRefreshCompletedDocumentJob,
+  getTerminalRecoveryJobIds,
   hasAuthoritativeDocumentAck,
   type PendingDocumentJobRefresh,
   shouldRequestDocumentRefresh,
@@ -36,24 +37,22 @@ type Job = {
   kind: "portal-operation" | "portal-content" | "portal-proposal";
   status: "queued" | "processing" | "completed" | "error" | "cancelled";
   request_id: string;
-  result: {
+  result?: {
     document?: PortalDocument;
     proposal?: unknown;
-    progress?: AiWorkflowProgress;
-    progressDetail?: AiWorkflowProgressDetail;
   } | null;
-  payload?: {
-    operation?: "generate" | "improve-project" | "refine-copy";
-    autoApply?: boolean;
-    target?: { id?: string; kind?: string };
-  };
   operation?: "generate" | "improve-project" | "refine-copy";
   autoApply?: boolean;
+  target?: { id?: string; kind?: string };
+  progress?: AiWorkflowProgress;
+  progressDetail?: AiWorkflowProgressDetail;
   error_code: string | null;
   updated_at: string;
 };
 
 type JobsResponse = { jobs?: Job[] } | null;
+type JobResponse = { job?: Job } | null;
+const MAX_TERMINAL_RECOVERY_JOBS = 50;
 let aiJobsRequestInFlight: Promise<JobsResponse> | null = null;
 
 function fetchAiJobs() {
@@ -69,6 +68,12 @@ function fetchAiJobs() {
     aiJobsRequestInFlight = null;
   });
   return aiJobsRequestInFlight;
+}
+
+async function fetchAiJob(jobId: string) {
+  const response = await fetch(`/api/ai/jobs/${jobId}`, { cache: "no-store" });
+  if (!response.ok) return null;
+  return (await response.json().catch(() => null)) as JobResponse;
 }
 
 export function AiWorkflowReconciler() {
@@ -101,18 +106,15 @@ export function AiWorkflowReconciler() {
       pathnameRef.current.match(/\/create\/([^/]+)/)?.[1] ?? null;
     const translate = (...args: Parameters<typeof t>) => tRef.current(...args);
     const progressDescription = (job: Job) => {
-      if (
-        job.result?.progress === "analyzing-assets" &&
-        job.result.progressDetail?.batch
-      )
+      if (job.progress === "analyzing-assets" && job.progressDetail?.batch)
         return translate("aiAnalyzingAssets");
-      if (job.result?.progress === "analyzing-assets")
+      if (job.progress === "analyzing-assets")
         return translate("aiAnalyzingAssets");
-      if (job.result?.progress === "generating-copy")
+      if (job.progress === "generating-copy")
         return translate("aiGeneratingCopy");
-      if (job.result?.progress === "generating-structure")
+      if (job.progress === "generating-structure")
         return translate("aiGeneratingStructure");
-      if (job.result?.progress === "applying") return translate("aiApplying");
+      if (job.progress === "applying") return translate("aiApplying");
       if (job.kind === "portal-content")
         return translate("aiProcessingContent");
       if (job.kind === "portal-operation") return translate("aiApplying");
@@ -125,10 +127,10 @@ export function AiWorkflowReconciler() {
           : job.operation === "refine-copy"
             ? translate("aiImproveWithAiTitle")
             : translate("aiAddWithAiTitle");
-      if (job.result?.progressDetail?.batch) {
+      if (job.progressDetail?.batch) {
         return `${title} · ${translate("aiBatchLabel", {
-          batch: job.result.progressDetail.batch,
-          total: job.result.progressDetail.total,
+          batch: job.progressDetail.batch,
+          total: job.progressDetail.total,
         })}`;
       }
       return title;
@@ -141,11 +143,9 @@ export function AiWorkflowReconciler() {
         code: job.error_code ?? "unknown",
       });
     };
-    const runReconciliation = async () => {
-      const body = await fetchAiJobs();
-      if (!body || disposed) return;
+    const reconcileJobs = (jobs: Job[]) => {
       const latestDocumentJobByPortal = new Map<string, Job>();
-      for (const job of body?.jobs ?? []) {
+      for (const job of jobs) {
         if (
           job.status === "completed" &&
           (job.kind !== "portal-proposal" || job.autoApply === true) &&
@@ -156,7 +156,7 @@ export function AiWorkflowReconciler() {
             latestDocumentJobByPortal.set(job.portal_id, job);
         }
       }
-      for (const job of body?.jobs ?? []) {
+      for (const job of jobs) {
         upsertJob({
           id: job.id,
           portalId: job.portal_id,
@@ -178,11 +178,11 @@ export function AiWorkflowReconciler() {
             (job.kind === "portal-content" ? "refine-copy" : undefined),
           autoApply: job.autoApply,
           targetKey:
-            job.payload?.target?.kind && job.payload.target.id
-              ? `${job.payload.target.kind}:${job.payload.target.id}`
+            job.target?.kind && job.target.id
+              ? `${job.target.kind}:${job.target.id}`
               : undefined,
-          progress: job.result?.progress,
-          progressDetail: job.result?.progressDetail,
+          progress: job.progress,
+          progressDetail: job.progressDetail,
           proposal: (job.result as { proposal?: never } | null)?.proposal,
         });
         const wasActive =
@@ -191,8 +191,8 @@ export function AiWorkflowReconciler() {
         const isInternalApplyJob =
           job.kind === "portal-operation" && job.request_id.endsWith(":apply");
         const canCancel =
-          job.result?.progress !== "generating-structure" &&
-          job.result?.progress !== "generating-copy";
+          job.progress !== "generating-structure" &&
+          job.progress !== "generating-copy";
         const activePortalId = currentPortalId();
         const belongsToCurrentProject = Boolean(
           activePortalId && job.portal_id === activePortalId,
@@ -252,8 +252,9 @@ export function AiWorkflowReconciler() {
         }
         previousStatuses.set(job.id, job.status);
         if (
-          (job.status === "queued" || job.status === "processing") &&
-          job.kind === "portal-operation"
+          job.status === "queued" &&
+          job.kind === "portal-operation" &&
+          !isInternalApplyJob
         ) {
           void fetch(`/api/ai/jobs/${job.id}/process`, { method: "POST" });
         }
@@ -316,6 +317,30 @@ export function AiWorkflowReconciler() {
         }
       }
     };
+    const runReconciliation = async () => {
+      const body = await fetchAiJobs();
+      if (!body || disposed) return;
+      const activeJobs = body.jobs ?? [];
+      reconcileJobs(activeJobs);
+      const terminalRecoveryJobIds = getTerminalRecoveryJobIds(
+        useAiWorkflowStore.getState().jobsById,
+        new Set(activeJobs.map((job) => job.id)),
+        MAX_TERMINAL_RECOVERY_JOBS,
+      );
+      const terminalJobs = await Promise.all(
+        terminalRecoveryJobIds.map(async (jobId) => {
+          const terminalJob = await fetchAiJob(jobId);
+          return terminalJob?.job ?? null;
+        }),
+      );
+      if (disposed) return;
+      reconcileJobs(terminalJobs.filter((job): job is Job => job !== null));
+    };
+    const reconcileTerminalJob = async (jobId: string) => {
+      const body = await fetchAiJob(jobId);
+      if (!body?.job || disposed) return;
+      reconcileJobs([body.job]);
+    };
     const reconcile = createTrailingReconciler(runReconciliation);
     void reconcile();
     const reconcileOnNavigation = () => void reconcile();
@@ -360,7 +385,24 @@ export function AiWorkflowReconciler() {
             schema: "public",
             table: "ai_workflow_jobs",
           },
-          () => void reconcile(),
+          (payload) => {
+            const job = payload.new as { id?: unknown; status?: unknown };
+            if (typeof job.id !== "string" || typeof job.status !== "string")
+              return;
+            const { id, status } = job;
+            if (status === "queued" || status === "processing") {
+              void reconcile();
+              return;
+            }
+            if (
+              (status === "completed" ||
+                status === "error" ||
+                status === "cancelled") &&
+              useAiWorkflowStore.getState().jobsById[id]
+            ) {
+              void reconcileTerminalJob(id);
+            }
+          },
         )
         .subscribe((status) => {
           if (status === "SUBSCRIBED") void reconcile();

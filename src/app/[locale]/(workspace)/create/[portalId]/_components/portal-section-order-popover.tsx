@@ -40,6 +40,7 @@ import {
 } from "@/domain/portal/document";
 import {
   focusPortalSectionTitle,
+  requestPortalAddSectionDialog,
   scrollToPortalSection,
 } from "@/lib/portal/scroll-to-section";
 import { cn } from "@/lib/utils";
@@ -161,6 +162,20 @@ export function PortalSectionOrderPopover({
     );
   }
 
+  function revealPendingSection() {
+    const sectionId = pendingSectionIdRef.current;
+    if (!sectionId) return;
+
+    pendingSectionIdRef.current = null;
+    scrollToPortalSection(sectionId);
+    focusPortalSectionTitle(sectionId);
+  }
+
+  function completeSectionSelection() {
+    if (open) return setOpen(false);
+    revealPendingSection();
+  }
+
   useEffect(() => {
     const retry = (event: Event) => {
       const action = (
@@ -179,12 +194,7 @@ export function PortalSectionOrderPopover({
     <Popover
       onOpenChange={setOpen}
       onOpenChangeComplete={(isOpen) => {
-        const sectionId = pendingSectionIdRef.current;
-        if (isOpen || !sectionId) return;
-
-        pendingSectionIdRef.current = null;
-        scrollToPortalSection(sectionId);
-        focusPortalSectionTitle(sectionId);
+        if (!isOpen) revealPendingSection();
       }}
       open={open}
       triggerId={triggerless ? triggerId : undefined}
@@ -226,22 +236,17 @@ export function PortalSectionOrderPopover({
           <PopoverTitle>{t("orderTitle")}</PopoverTitle>
           <PopoverDescription>{t("orderDescription")}</PopoverDescription>
         </PopoverHeader>
-        <SectionTypeDialog
-          onSelect={addSection}
-          onSelectComplete={() => setOpen(false)}
-          trigger={
-            <Button
-              aria-label={t("add")}
-              data-portal-add-section
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              <IconPlus data-icon="inline-start" />
-              {t("add")}
-            </Button>
-          }
-        />
+        <Button
+          aria-label={t("add")}
+          data-portal-add-section
+          onClick={() => requestPortalAddSectionDialog()}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <IconPlus data-icon="inline-start" />
+          {t("add")}
+        </Button>
         <DragDropProvider
           onDragEnd={(event) => {
             if (!event.canceled) {
@@ -288,6 +293,13 @@ export function PortalSectionOrderPopover({
           </div>
         </DragDropProvider>
       </PopoverContent>
+      <SectionTypeDialog
+        onSelect={addSection}
+        onSelectComplete={completeSectionSelection}
+        openRequestKey="portal-add-section"
+        trigger={<span aria-hidden="true" />}
+        triggerNativeButton={false}
+      />
     </Popover>
   );
 }

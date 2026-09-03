@@ -59,6 +59,7 @@ import { extractAssetMetadata } from "@/lib/portal/asset-metadata";
 import {
   inferAssetMimeType,
   isRenderableImageMimeType,
+  preflightAiPortalAssetBatch,
 } from "@/lib/portal/asset-validation";
 import { createRandomId } from "@/lib/random-id";
 import { createClient } from "@/lib/supabase/client";
@@ -71,11 +72,12 @@ export function PortalAiDialog({
   triggerless?: boolean;
 }) {
   const t = useTranslations("PortalEditor.ai");
+  const uploadT = useTranslations("PortalEditor.upload");
   const workspaceT = useTranslations("PortalEditor.workspace");
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [
-    { files: selectedFiles, isDragging, errors: fileErrors },
+    { files: selectedFiles, isDragging, isPreflighting, errors: fileErrors },
     {
       clearFiles,
       handleDragEnter,
@@ -88,6 +90,9 @@ export function PortalAiDialog({
   ] = useFileUpload({
     accept: "image/*,.pdf,.txt,.md,.ai,.eps,.psd,.indd,.ttf,.otf,.woff,.woff2",
     maxSize: 500 * 1024 * 1024,
+    onPreflight: ({ rejectedFileCount }) =>
+      toast.warning(uploadT("skippedAssets", { count: rejectedFileCount })),
+    preflightFiles: preflightAiPortalAssetBatch,
   });
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzed, setAnalyzed] = useState(false);
@@ -168,6 +173,8 @@ export function PortalAiDialog({
       toast.warning(t("insufficientCredits"));
       return;
     }
+    if (isPreflighting) return;
+    if (operation !== "refine-copy" && files.length === 0) return;
     setAnalyzing(true);
     setProposalError(false);
     setApplyError(false);
@@ -682,6 +689,7 @@ export function PortalAiDialog({
                 analyzing ||
                 applying ||
                 analyzed ||
+                isPreflighting ||
                 !canAffordOperation
               }
               onClick={() => void analyze()}

@@ -79,6 +79,15 @@ export function isRenderableImageMimeType(mimeType: string) {
   );
 }
 
+export function portalAssetCategoryForFile(file: Pick<File, "name" | "type">) {
+  const mimeType = inferAssetMimeType(file.name, file.type);
+  return isRenderableImageMimeType(mimeType)
+    ? "image"
+    : mimeType.startsWith("font/")
+      ? "font"
+      : "file";
+}
+
 function extension(name: string) {
   return name.split(".").pop()?.toLowerCase() ?? "";
 }
@@ -120,6 +129,84 @@ export function validateAssetDeclaration(input: {
   }
   if (input.category === "font") return input.mimeType.startsWith("font/");
   return true;
+}
+
+/** A picker hint only. Server declaration and byte validation remain authoritative. */
+export function portalAssetInputAccept(category: PortalAssetCategory) {
+  return Object.entries(mimeByExtension)
+    .filter(([name, mimeTypes]) =>
+      mimeTypes.some((mimeType) =>
+        validateAssetDeclaration({ category, mimeType, name: `asset.${name}` }),
+      ),
+    )
+    .flatMap(([name, mimeTypes]) => [`.${name}`, ...mimeTypes])
+    .join(",");
+}
+
+export async function preflightPortalAssetSelection(
+  category: PortalAssetCategory,
+  file: Pick<File, "arrayBuffer" | "name" | "type">,
+) {
+  const mimeType = inferAssetMimeType(file.name, file.type);
+  if (!validateAssetDeclaration({ category, mimeType, name: file.name }))
+    return false;
+
+  // SVG previews are rendered in the editor, so inspect them before a draft,
+  // reservation, or upload is created. The server repeats this validation.
+  if (mimeType === "image/svg+xml") {
+    try {
+      return validateAssetBytes(
+        new Uint8Array(await file.arrayBuffer()),
+        mimeType,
+        file.name,
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export async function preflightPortalAssetBatch(
+  category: PortalAssetCategory,
+  files: readonly File[],
+) {
+  const results = await Promise.all(
+    files.map(async (file) => ({
+      file,
+      valid: await preflightPortalAssetSelection(category, file),
+    })),
+  );
+  const acceptedFiles = results
+    .filter(({ valid }) => valid)
+    .map(({ file }) => file);
+
+  return {
+    acceptedFiles,
+    rejectedFileCount: results.length - acceptedFiles.length,
+  };
+}
+
+/** Preflight the mixed attachment batch used by AI project creation. */
+export async function preflightAiPortalAssetBatch(files: readonly File[]) {
+  const results = await Promise.all(
+    files.map(async (file) => ({
+      file,
+      valid: await preflightPortalAssetSelection(
+        portalAssetCategoryForFile(file),
+        file,
+      ),
+    })),
+  );
+  const acceptedFiles = results
+    .filter(({ valid }) => valid)
+    .map(({ file }) => file);
+
+  return {
+    acceptedFiles,
+    rejectedFileCount: results.length - acceptedFiles.length,
+  };
 }
 
 function starts(bytes: Uint8Array, signature: number[]) {

@@ -14,7 +14,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
-import { portalDocumentToRenderProject } from "@/application/portal/portal-document-adapter";
+import { portalDocumentToPublicRenderProject } from "@/application/portal/portal-document-adapter";
 import type {
   PortalAction,
   PortalActionConfig,
@@ -182,11 +182,10 @@ export function PortalProjectView({
       <RenderProject
         mode="view"
         actions={actions}
-        project={portalDocumentToRenderProject(document)}
+        project={portalDocumentToPublicRenderProject(document, visibility)}
         ui={{
           contentClassName,
           styleMode,
-          visibility,
           actions: {
             item: {
               visibility: "always",

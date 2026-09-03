@@ -135,4 +135,31 @@ describe("publication target focus", () => {
     );
     assert.equal(focused, true);
   });
+
+  test("scrolls the exact section before focusing its title input", () => {
+    const calls: string[] = [];
+    const title = {
+      focus: () => calls.push("focus-title"),
+    };
+    const document = {
+      getElementById: (id: string) =>
+        id === "section-invalid"
+          ? {
+              querySelector: (selector: string) =>
+                selector === "[data-portal-section-title]" ? title : null,
+              scrollIntoView: () => calls.push("scroll-section"),
+            }
+          : null,
+      querySelector: () => null,
+    };
+
+    assert.equal(
+      focusPortalPublicationTarget(
+        { kind: "section-title", sectionId: "section-invalid" },
+        document,
+      ),
+      true,
+    );
+    assert.deepEqual(calls, ["scroll-section", "focus-title"]);
+  });
 });

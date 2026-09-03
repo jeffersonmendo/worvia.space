@@ -12,6 +12,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 import { useOptionalWorkspaceConfigSidebar } from "@/app/[locale]/(workspace)/_components/workspace-sidebar";
 import {
   flushPortalAutosave,
@@ -36,6 +37,7 @@ import { VisualColorPicker } from "@/components/portal/visual-color-picker";
 import { RenderProject } from "@/components/render/render-project";
 import type {
   RenderProjectData,
+  RenderProjectHandle,
   RenderProjectUi,
   SelectedAsset,
 } from "@/components/render/visual-model";
@@ -58,6 +60,7 @@ import {
   uploadManagedPortalAssetServerOwned,
 } from "@/infrastructure/portal/portal-assets-client";
 import type { SafePendingPortalAction } from "@/lib/billing/portal-plan-client";
+import { recoverExpectedPortalAssetUploadRejection } from "@/lib/portal/portal-asset-upload-rejection";
 import {
   configPanelTargetKey,
   resetConfigPanelScroll,
@@ -112,6 +115,7 @@ export function PortalProjectController({
   const isEditorMode = mode === "editor";
   const isDemoMode = mode === "demo";
   const isInteractiveMode = isEditorMode || isDemoMode;
+  const uploadT = useTranslations("PortalEditor.upload");
   const summaryT = useTranslations("PortalViewer.summary");
   const storeDocument = usePortalEditorStore((state) =>
     isEditorMode && editor
@@ -136,6 +140,7 @@ export function PortalProjectController({
   const [draftProject, setDraftProject] = useState<RenderProjectData | null>(
     null,
   );
+  const renderProjectRef = useRef<RenderProjectHandle>(null);
   const [configTarget, setConfigTarget] = useState<EditorConfigTarget | null>(
     null,
   );
@@ -409,6 +414,7 @@ export function PortalProjectController({
 
   useEffect(() => {
     if (!editor?.focus) return;
+    if (renderProjectRef.current?.focusSectionTitle(editor.focus)) return;
     scrollToPortalSection(editor.focus);
     focusPortalSectionTitle(editor.focus);
   }, [editor?.focus]);
@@ -765,6 +771,7 @@ export function PortalProjectController({
         <RenderProject
           collectionAvailability={collectionAvailability}
           mode={isInteractiveMode ? "editor" : "view"}
+          ref={renderProjectRef}
           actions={
             isEditorMode
               ? {
@@ -881,6 +888,15 @@ export function PortalProjectController({
           project={project}
           ui={ui}
           onChange={(change) => {
+            if (change.rejectedFileCount) {
+              toast.error(
+                uploadT("skippedAssets", { count: change.rejectedFileCount }),
+                {
+                  id: `portal-asset-upload-error:${editor?.portalId ?? "unknown"}`,
+                },
+              );
+              if (!change.assets?.length) return;
+            }
             const itemMove = change.itemMove;
             if (change.kind === "item-order" && itemMove) {
               changeEditableDocument((current) =>
@@ -894,20 +910,37 @@ export function PortalProjectController({
               changeEditableDocument((current) =>
                 applyRenderProjectDocument(current, persistableProject),
               );
-              void uploadSelectedAssets(change.assets).then((replacements) => {
-                changeEditableDocument((current) => {
-                  let latest = portalDocumentToRenderProject(current);
-                  for (const replacement of replacements)
-                    latest = mergeCanonicalDraft(
-                      latest,
-                      change.project,
-                      replacement.selected,
-                      replacement.uploaded,
-                    );
-                  return applyRenderProjectDocument(current, latest);
+              void uploadSelectedAssets(change.assets)
+                .then((replacements) => {
+                  changeEditableDocument((current) => {
+                    let latest = portalDocumentToRenderProject(current);
+                    for (const replacement of replacements)
+                      latest = mergeCanonicalDraft(
+                        latest,
+                        change.project,
+                        replacement.selected,
+                        replacement.uploaded,
+                      );
+                    return applyRenderProjectDocument(current, latest);
+                  });
+                  setDraftProject(null);
+                })
+                .catch((error) => {
+                  if (
+                    recoverExpectedPortalAssetUploadRejection({
+                      error,
+                      onInvalidAsset: () => {
+                        setDraftProject(null);
+                        toast.error(uploadT("invalidAsset"), {
+                          id: `portal-asset-upload-error:${editor?.portalId}`,
+                        });
+                      },
+                    })
+                  ) {
+                    return;
+                  }
+                  throw error;
                 });
-                setDraftProject(null);
-              });
               return;
             }
             if (draftProject) setDraftProject(change.project);

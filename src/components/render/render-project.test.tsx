@@ -115,6 +115,20 @@ describe("RenderProject visual contract", () => {
     expect(html).toContain("grid-cols-2");
   });
 
+  test("keeps text section editing limited to its title and description", () => {
+    const html = renderToStaticMarkup(
+      <RenderProject
+        mode="editor"
+        onChange={() => undefined}
+        project={project}
+      />,
+    );
+
+    expect(html).toContain('data-portal-section-title="true"');
+    expect(html).toContain('data-portal-section-description="true"');
+    expect(html).not.toContain('data-portal-section-body="true"');
+  });
+
   test("preserves collection and image presentation configuration", () => {
     const html = renderToStaticMarkup(
       <RenderGallery
@@ -256,10 +270,187 @@ describe("RenderProject visual contract", () => {
     expect(fileMarkup).toContain('draggable="false"');
   });
 
-  test("top-aligns gallery cells for mixed image ratios", () => {
+  test("keeps mixed-ratio gallery cells top-aligned in view mode", () => {
     expect(renderGallerySource).toContain('"items-start"');
     expect(renderGallerySource).toContain('className="h-fit self-start"');
   });
+
+  test("preserves every configured gallery and file image aspect ratio in the editor", () => {
+    const editor = renderToStaticMarkup(
+      <RenderProject
+        mode="editor"
+        onChange={() => undefined}
+        project={{
+          ...project,
+          sections: [
+            {
+              content: {
+                images: [
+                  { ...image, aspectRatio: "21/9", id: "wide-image" },
+                  { ...image, aspectRatio: "1/1", id: "square-image" },
+                ],
+              },
+              description: "",
+              id: "gallery-uniform-cells",
+              position: 0,
+              title: "Gallery",
+              type: "gallery",
+              visible: true,
+            },
+            {
+              content: {
+                files: [
+                  {
+                    aspectRatio: "16/9",
+                    fileName: "wide.png",
+                    id: "wide-file",
+                    position: 0,
+                    src: "https://example.com/wide.png",
+                    visible: true,
+                  },
+                  {
+                    aspectRatio: "1/1",
+                    fileName: "square.png",
+                    id: "square-file",
+                    position: 1,
+                    src: "https://example.com/square.png",
+                    visible: true,
+                  },
+                ],
+              },
+              description: "",
+              id: "files-uniform-cells",
+              position: 1,
+              title: "Files",
+              type: "files",
+              visible: true,
+            },
+          ],
+        }}
+      />,
+    );
+    const view = renderToStaticMarkup(
+      <RenderProject
+        mode="view"
+        project={{
+          ...project,
+          sections: [
+            {
+              content: { images: [{ ...image, aspectRatio: "21/9" }] },
+              description: "",
+              id: "gallery-uniform-cells",
+              position: 0,
+              title: "Gallery",
+              type: "gallery",
+              visible: true,
+            },
+            {
+              content: {
+                files: [
+                  {
+                    aspectRatio: "16/9",
+                    fileName: "wide.png",
+                    id: "wide-file",
+                    position: 0,
+                    src: "https://example.com/wide.png",
+                    visible: true,
+                  },
+                ],
+              },
+              description: "",
+              id: "files-uniform-cells",
+              position: 1,
+              title: "Files",
+              type: "files",
+              visible: true,
+            },
+          ],
+        }}
+      />,
+    );
+    expect(editor.match(/aspect-\[21\/9\]/g)).toHaveLength(1);
+    expect(editor.match(/aspect-video/g)).toHaveLength(1);
+    expect(editor.match(/aspect-square/g)).toHaveLength(2);
+    expect(editor).toContain("padding:12px");
+    expect(editor).not.toContain("aspect-auto");
+    expect(view).not.toContain("data-render-sortable-item");
+    expect(view).toContain("aspect-[21/9]");
+    expect(view).toContain("aspect-video");
+  });
+
+  test.each([
+    ["sm", "gap-x-2 gap-y-2"],
+    ["md", "gap-x-4 gap-y-4"],
+    ["lg", "gap-x-6 gap-y-6"],
+  ] as const)(
+    "uses matching %s gaps for editor gallery and file grids",
+    (gap, expectedGap) => {
+      const editor = renderToStaticMarkup(
+        <RenderProject
+          mode="editor"
+          onChange={() => undefined}
+          project={{
+            ...project,
+            sections: [
+              {
+                content: { images: [image] },
+                description: "",
+                id: `gallery-${gap}`,
+                layout: { columns: 3, gap },
+                position: 0,
+                title: "Gallery",
+                type: "gallery",
+                visible: true,
+              },
+              {
+                content: {
+                  files: [
+                    {
+                      fileName: "file.png",
+                      id: `file-${gap}`,
+                      position: 0,
+                      src: "https://example.com/file.png",
+                      visible: true,
+                    },
+                  ],
+                },
+                description: "",
+                id: `files-${gap}`,
+                layout: { columns: 3, gap },
+                position: 1,
+                title: "Files",
+                type: "files",
+                visible: true,
+              },
+            ],
+          }}
+        />,
+      );
+      const view = renderToStaticMarkup(
+        <RenderProject
+          mode="view"
+          project={{
+            ...project,
+            sections: [
+              {
+                content: { images: [image] },
+                description: "",
+                id: `gallery-view-${gap}`,
+                layout: { columns: 3, gap },
+                position: 0,
+                title: "Gallery",
+                type: "gallery",
+                visible: true,
+              },
+            ],
+          }}
+        />,
+      );
+
+      expect(editor.match(new RegExp(expectedGap, "g"))).toHaveLength(2);
+      expect(view).not.toContain(expectedGap);
+    },
+  );
 
   test("editable changes presentation and emits controlled callbacks", () => {
     const onChange = mock(() => undefined);
@@ -398,7 +589,7 @@ describe("RenderProject visual contract", () => {
     expect(standalone).toContain('data-render-file-preview="pdf"');
     expect(standalone).toContain("guide.pdf");
     expect(standalone).toContain("aspect-square");
-    expect(collection).not.toContain("guide.pdf");
+    expect(collection).toContain("guide.pdf");
   });
 
   test.each([
@@ -609,6 +800,152 @@ test("uses one facade for editor fields and view-only presentation", () => {
   expect(editor).toContain("data-portal-name");
   expect(view).toContain('data-render-mode="view"');
   expect(view).not.toContain("data-portal-name");
+});
+
+test("derives picker accept filters and preflights selections before creating drafts", () => {
+  expect(renderProjectSource).toContain('portalAssetInputAccept("gallery")');
+  expect(renderProjectSource).toContain('portalAssetInputAccept("file")');
+  expect(renderProjectSource).toContain(
+    "await preflightPortalAssetBatch(category, files)",
+  );
+  expect(
+    renderProjectSource.indexOf("await preflightPortalAssetBatch"),
+  ).toBeLessThan(renderProjectSource.indexOf("URL.createObjectURL(file)"));
+  expect(renderProjectSource).toContain("if (!acceptedFiles.length)");
+});
+
+test("exposes each editor section as a stable title-focus target", () => {
+  const editor = renderToStaticMarkup(
+    <RenderProject
+      mode="editor"
+      onChange={() => undefined}
+      project={project}
+    />,
+  );
+
+  expect(editor).toContain(
+    '<section class="group/section relative flex flex-col gap-4" data-section-id="gallery" id="gallery">',
+  );
+  expect(editor).toContain('aria-label="Section title"');
+  expect(editor).toContain("data-portal-section-title");
+});
+
+test("renders caller-supplied inactive sections and items with reduced editor opacity", () => {
+  const inactiveProject: RenderProjectData = {
+    ...project,
+    sections: [
+      {
+        content: {
+          colors: [
+            {
+              code: "#111111",
+              id: "hidden-color",
+              name: "Hidden color",
+              position: 0,
+              visible: false,
+            },
+          ],
+          files: [
+            {
+              fileName: "hidden.pdf",
+              id: "hidden-file",
+              position: 0,
+              src: "https://example.com/hidden.pdf",
+              visible: false,
+            },
+          ],
+          image: {
+            ...image,
+            alt: "Hidden image",
+            id: "hidden-image",
+            visible: false,
+          },
+        },
+        description: "",
+        id: "inactive-image",
+        position: 0,
+        title: "Inactive section",
+        type: "image",
+        visible: false,
+      },
+    ],
+  };
+
+  const editor = renderToStaticMarkup(
+    <RenderProject
+      mode="editor"
+      onChange={() => undefined}
+      project={inactiveProject}
+    />,
+  );
+  const view = renderToStaticMarkup(
+    <RenderProject mode="view" project={inactiveProject} />,
+  );
+
+  expect(editor).toContain("Inactive section");
+  expect(editor).toContain("Hidden image");
+  expect(editor).toContain("opacity-40");
+  expect(view).toContain("Inactive section");
+  expect(view).toContain("Hidden image");
+});
+
+test("renders inactive image, color, and file leaf records supplied by a caller", () => {
+  const inactiveImage = renderToStaticMarkup(
+    <RenderImage
+      image={{ ...image, alt: "Inactive image", visible: false }}
+      previewable={false}
+    />,
+  );
+  const inactiveColors = renderToStaticMarkup(
+    <RenderColors
+      items={[
+        {
+          code: "#111111",
+          id: "hidden-color",
+          name: "Inactive color",
+          position: 0,
+          visible: false,
+        },
+      ]}
+    />,
+  );
+  const inactiveFiles = renderToStaticMarkup(
+    <RenderFiles
+      items={[
+        {
+          fileName: "inactive.pdf",
+          id: "hidden-file",
+          position: 0,
+          src: "https://example.com/inactive.pdf",
+          visible: false,
+        },
+      ]}
+    />,
+  );
+
+  expect(inactiveImage).toContain("Inactive image");
+  expect(inactiveColors).toContain("Inactive color");
+  expect(inactiveFiles).toContain("inactive.pdf");
+});
+
+test("renders caller-supplied inactive fonts with reduced editor opacity", () => {
+  const html = renderToStaticMarkup(
+    <RenderFonts
+      editable
+      items={[
+        {
+          family: "Inactive Font",
+          id: "inactive-font",
+          position: 0,
+          sample: "Inactive sample",
+          visible: false,
+        },
+      ]}
+    />,
+  );
+
+  expect(html).toContain("Inactive sample");
+  expect(html).toContain("opacity-40");
 });
 
 test("reserves inline space for project and section actions in both modes", () => {
@@ -827,6 +1164,23 @@ test("uses dnd-kit only for collection items and never makes sections sortable",
   expect(renderFilesSource).toContain("RenderSortableItem");
   expect(editor).toContain("data-render-sortable-item");
   expect(view).not.toContain("data-render-sortable-item");
+});
+
+test("uses a card-sized sibling button as the sortable drag activator", () => {
+  const editor = renderToStaticMarkup(
+    <RenderProject
+      mode="editor"
+      onChange={() => undefined}
+      project={project}
+    />,
+  );
+
+  expect(editor).toContain(
+    'data-render-sortable-item="image"><button aria-label="Drag item"',
+  );
+  expect(editor).toContain("data-render-sortable-drag-handle");
+  expect(editor).toContain('aria-label="Drag item"');
+  expect(renderProjectSource).not.toContain("handleRef");
 });
 
 test("renders collection add affordances as trailing tiles only in editor mode", () => {

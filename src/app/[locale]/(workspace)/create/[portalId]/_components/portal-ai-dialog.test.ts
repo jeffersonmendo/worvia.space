@@ -18,4 +18,17 @@ describe("portal AI upload sheet", () => {
     expect(source).toContain("getInputProps");
     expect(source).toContain("removeFile");
   });
+
+  test("preflights attachments before previews and prevents an empty AI request", () => {
+    expect(source).toContain("preflightFiles: preflightAiPortalAssetBatch");
+    expect(source).toContain('toast.warning(uploadT("skippedAssets"');
+    expect(source).toContain(
+      'for (const file of operation === "refine-copy" ? [] : files)',
+    );
+    expect(source).toContain("assets,");
+    expect(source).toContain(
+      'if (operation !== "refine-copy" && files.length === 0) return',
+    );
+    expect(source).toContain("if (isPreflighting) return");
+  });
 });

@@ -15,11 +15,19 @@ export type RenderCreatableSectionType = Exclude<RenderSectionType, "empty">;
 export type RenderSectionCreationOptions = Partial<
   Pick<
     RenderSectionData,
-    "content" | "description" | "id" | "layout" | "position" | "title" | "visible"
+    | "content"
+    | "description"
+    | "id"
+    | "layout"
+    | "position"
+    | "title"
+    | "visible"
   >
 >;
 
-function defaultContent(type: RenderCreatableSectionType): RenderSectionContent {
+function defaultContent(
+  type: RenderCreatableSectionType,
+): RenderSectionContent {
   switch (type) {
     case "text":
       return { body: "" };
@@ -40,17 +48,41 @@ function defaultContent(type: RenderCreatableSectionType): RenderSectionContent 
 function defaultLayout(type: RenderCreatableSectionType) {
   switch (type) {
     case "gallery":
-      return { columns: 3 as const, gap: "md" as const, mode: "grid" as const, width: "container" as const };
+      return {
+        columns: 3 as const,
+        gap: "md" as const,
+        mode: "grid" as const,
+        width: "container" as const,
+      };
     case "image_comparison":
-      return { columns: 2 as const, gap: "md" as const, mode: "comparison" as const, width: "container" as const };
+      return {
+        columns: 2 as const,
+        gap: "md" as const,
+        mode: "comparison" as const,
+        width: "container" as const,
+      };
     case "colors":
-      return { columns: 4 as const, gap: "md" as const, mode: "palette" as const, width: "container" as const };
+      return {
+        columns: 4 as const,
+        gap: "md" as const,
+        mode: "palette" as const,
+        width: "container" as const,
+      };
     case "files":
-      return { columns: 3 as const, gap: "md" as const, mode: "cards" as const, width: "container" as const };
+      return {
+        columns: 3 as const,
+        gap: "md" as const,
+        mode: "cards" as const,
+        width: "container" as const,
+      };
     case "text":
     case "image":
     case "fonts":
-      return { gap: "md" as const, mode: "single" as const, width: "container" as const };
+      return {
+        gap: "md" as const,
+        mode: "single" as const,
+        width: "container" as const,
+      };
   }
 }
 

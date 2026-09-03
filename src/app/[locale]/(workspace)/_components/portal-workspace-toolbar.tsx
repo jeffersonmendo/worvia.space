@@ -51,7 +51,7 @@ import {
 } from "@/lib/billing/ai-credits-client";
 import {
   focusPortalPublicationTarget,
-  PORTAL_OPEN_ADD_SECTION_DIALOG_EVENT,
+  requestPortalAddSectionDialog,
 } from "@/lib/portal/scroll-to-section";
 import { cn } from "@/lib/utils";
 
@@ -62,11 +62,7 @@ function dispatchWorkspaceAction(action: "order" | "publish" | "upload") {
 const EMPTY_PUBLICATION_ISSUES: never[] = [];
 
 function dispatchAddSectionAction() {
-  document.dispatchEvent(
-    new CustomEvent(PORTAL_OPEN_ADD_SECTION_DIALOG_EVENT, {
-      detail: { key: "portal-add-section" },
-    }),
-  );
+  requestPortalAddSectionDialog();
 }
 
 export function PortalWorkspaceToolbar({

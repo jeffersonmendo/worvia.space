@@ -2,8 +2,18 @@
 
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { isSortable } from "@dnd-kit/react/sortable";
-import { useCallback, useEffect, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  portalAssetInputAccept,
+  preflightPortalAssetBatch,
+} from "@/lib/portal/asset-validation";
 import { cn } from "@/lib/utils";
 import { RenderActions } from "./render-actions";
 import { RenderCollectionAddTile } from "./render-collection-add-tile";
@@ -18,23 +28,13 @@ import type {
   RenderAction,
   RenderActionTools,
   RenderProjectData,
+  RenderProjectHandle,
   RenderProjectItemMove,
   RenderProjectProps,
   RenderSectionData,
   SelectedAsset,
 } from "./visual-model";
 
-function hasContent(section: RenderSectionData) {
-  const c = section.content;
-  return Boolean(
-    c.body?.trim() ||
-      c.image?.src.trim() ||
-      c.images?.some((i) => i.src.trim()) ||
-      c.colors?.length ||
-      c.fonts?.length ||
-      c.files?.length,
-  );
-}
 function actionsFor<T>(
   factory: ((context: T) => RenderAction[]) | undefined,
   context: T,
@@ -67,16 +67,16 @@ function updateSection(
   };
 }
 
-export function RenderProject({
-  mode,
-  collectionAvailability,
-  project,
-  ui = {},
-  actions,
-  onChange,
-}: RenderProjectProps) {
+export const RenderProject = forwardRef<
+  RenderProjectHandle,
+  RenderProjectProps
+>(function RenderProject(
+  { mode, collectionAvailability, project, ui = {}, actions, onChange },
+  ref,
+) {
   const editor = mode === "editor";
   const inputRef = useRef<HTMLInputElement>(null);
+  const sectionRefs = useRef(new Map<string, HTMLElement>());
   const pickRef = useRef<Parameters<RenderActionTools["pickAssets"]>[0] | null>(
     null,
   );
@@ -91,8 +91,9 @@ export function RenderProject({
         | "item-order"
         | "asset-selection",
       assets?: SelectedAsset[],
+      rejectedFileCount?: number,
     ) => {
-      void onChange?.({ project: next, kind, assets });
+      void onChange?.({ project: next, kind, assets, rejectedFileCount });
     },
     [onChange],
   );
@@ -100,6 +101,23 @@ export function RenderProject({
     () => () => {
       for (const url of urlsRef.current.values()) URL.revokeObjectURL(url);
     },
+    [],
+  );
+  useImperativeHandle(
+    ref,
+    () => ({
+      focusSectionTitle(sectionId) {
+        const section = sectionRefs.current.get(sectionId);
+        const title = section?.querySelector<HTMLElement>(
+          "[data-portal-section-title]",
+        );
+        if (!section || !title) return false;
+
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        title.focus({ preventScroll: true });
+        return true;
+      },
+    }),
     [],
   );
   useEffect(() => {
@@ -131,23 +149,30 @@ export function RenderProject({
         input.accept =
           options.accept ??
           (options.kind === "image"
-            ? "image/*"
+            ? portalAssetInputAccept("gallery")
             : options.kind === "font"
-              ? ".ttf,.otf,.woff,.woff2"
-              : "*/*");
+              ? portalAssetInputAccept("font")
+              : portalAssetInputAccept("file"));
         input.multiple = options.multiple ?? true;
         input.click();
       }
     },
   };
-  const onAssets = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onAssets = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const request = pickRef.current;
     const files = Array.from(event.currentTarget.files ?? []);
     event.currentTarget.value = "";
     if (!request || !files.length) return;
+    const category = request.kind === "image" ? "gallery" : request.kind;
+    const { acceptedFiles, rejectedFileCount } =
+      await preflightPortalAssetBatch(category, files);
+    if (!acceptedFiles.length) {
+      emit(project, "asset-selection", undefined, rejectedFileCount);
+      return;
+    }
     const selected: SelectedAsset[] = [];
     let next = project;
-    for (const file of files) {
+    for (const file of acceptedFiles) {
       const draftId = `draft-${crypto.randomUUID()}`;
       const preview = URL.createObjectURL(file);
       urlsRef.current.set(draftId, preview);
@@ -217,7 +242,7 @@ export function RenderProject({
         };
       });
     }
-    emit(next, "asset-selection", selected);
+    emit(next, "asset-selection", selected, rejectedFileCount);
   };
   const onItemDragEnd = (event: DragEndEvent) => {
     const source = event.operation.source;
@@ -255,7 +280,6 @@ export function RenderProject({
       project,
     });
   };
-  const visibility = ui.visibility;
   const itemVisibility = editor
     ? "always"
     : (ui.actions?.item?.visibility ?? "hover");
@@ -292,23 +316,8 @@ export function RenderProject({
             kind,
           })
         : undefined;
-    if (section.type === "text")
-      return (
-        <RenderText
-          body={section.content.body}
-          editable={editor}
-          layout={section.layout}
-          onChange={(body) =>
-            emit(
-              updateSection(project, section.id, (current) => ({
-                ...current,
-                content: { ...current.content, body },
-              })),
-              "section",
-            )
-          }
-        />
-      );
+    if (section.type === "text" && !editor)
+      return <RenderText body={section.content.body} layout={section.layout} />;
     if (section.type === "image") {
       const image = section.content.image;
       const addImageAction = collectionAction("image");
@@ -439,6 +448,7 @@ export function RenderProject({
         <RenderFiles
           items={section.content.files ?? []}
           editable={editor}
+          editorGridGaps={editor}
           addAction={collectionAction("file")}
           actions={(item) =>
             withContext(
@@ -458,7 +468,7 @@ export function RenderProject({
   const content = (
     <article
       className={cn(
-        "group/project flex max-w-145 flex-col gap-8 space-y-20",
+        "group/project w-full max-w-135 flex flex-col gap-8 space-y-20",
         ui.className,
       )}
       data-project-id={project.id}
@@ -469,7 +479,7 @@ export function RenderProject({
         <input
           className="sr-only"
           data-render-asset-picker
-          onChange={onAssets}
+          onChange={(event) => void onAssets(event)}
           ref={inputRef}
           type="file"
         />
@@ -534,12 +544,6 @@ export function RenderProject({
       >
         {[...project.sections]
           .sort((a, b) => a.position - b.position)
-          .filter(
-            (s) =>
-              (visibility?.showHiddenSections || s.visible) &&
-              (visibility?.showEmptySections || s.type !== "empty") &&
-              (!visibility?.requireContent || hasContent(s)),
-          )
           .map((section) => {
             const context = { project, section };
             return (
@@ -554,6 +558,7 @@ export function RenderProject({
                 description={section.description}
                 editable={editor}
                 id={section.id}
+                inactive={editor && !section.visible}
                 key={section.id}
                 layout={section.layout}
                 onChange={(change) => {
@@ -570,6 +575,10 @@ export function RenderProject({
                     );
                 }}
                 title={section.title}
+                sectionRef={(node) => {
+                  if (node) sectionRefs.current.set(section.id, node);
+                  else sectionRefs.current.delete(section.id);
+                }}
               >
                 {renderContent(section)}
               </RenderSection>
@@ -584,4 +593,4 @@ export function RenderProject({
   ) : (
     content
   );
-}
+});

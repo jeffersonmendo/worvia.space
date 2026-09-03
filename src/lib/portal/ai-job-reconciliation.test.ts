@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   canRefreshCompletedDocumentJob,
+  getTerminalRecoveryJobIds,
   hasAuthoritativeDocumentAck,
   shouldRequestDocumentRefresh,
 } from "./ai-job-reconciliation";
@@ -65,4 +66,22 @@ test("completed AI work is acknowledged after an authoritative server hydration"
   // refresh forever.
   expect(hasAuthoritativeDocumentAck(pending, 8, 1)).toBe(true);
   expect(hasAuthoritativeDocumentAck(pending, 8, 2)).toBe(true);
+});
+
+test("recovers persisted loading jobs missing from the active-job response", () => {
+  expect(
+    getTerminalRecoveryJobIds(
+      {
+        active: { status: "loading", updatedAt: "2026-09-02T12:00:00.000Z" },
+        newest: { status: "loading", updatedAt: "2026-09-02T11:00:00.000Z" },
+        completed: {
+          status: "completed",
+          updatedAt: "2026-09-02T10:00:00.000Z",
+        },
+        oldest: { status: "loading", updatedAt: "2026-09-02T09:00:00.000Z" },
+      },
+      new Set(["active"]),
+      1,
+    ),
+  ).toEqual(["newest"]);
 });

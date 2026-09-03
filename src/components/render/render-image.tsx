@@ -52,7 +52,7 @@ export function RenderImage({
   onDescriptionChange?: (description: string) => void;
   layout?: RenderLayout;
 }) {
-  if (!image.visible || !image.src.trim()) return null;
+  if (!image.src.trim()) return null;
   const label = image.displayName || image.alt || "image";
   const imageElement = (
     // biome-ignore lint/performance/noImgElement: visual renderer accepts arbitrary asset URLs.
@@ -106,7 +106,10 @@ export function RenderImage({
 
   return (
     <figure
-      className="group/item relative flex flex-col gap-2"
+      className={cn(
+        "group/item relative flex flex-col gap-2",
+        editable && !image.visible && "opacity-40",
+      )}
       style={{ order: image.position }}
     >
       {previewable ? (

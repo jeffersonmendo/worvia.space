@@ -107,25 +107,48 @@ async function deletePortalAsset(
   });
 }
 
+type PortalAssetFinalizationResult =
+  | { kind: "finalized"; asset: unknown }
+  | { kind: "asset_not_found" }
+  | { kind: "invalid_asset" }
+  | { kind: "finalization_failed" };
+
+function logPortalAssetFinalizationFailure(
+  assetId: string,
+  stage: string,
+  error?: unknown,
+) {
+  console.error("Portal asset finalization failed", {
+    assetId,
+    error: error instanceof Error ? error.message : error,
+    stage,
+  });
+}
+
 async function finalizePortalAsset(
   assetId: string,
   supabase: Awaited<ReturnType<typeof createClient>>,
-) {
+): Promise<PortalAssetFinalizationResult> {
   const admin = createAdminClient();
-  const { data: asset } = await admin
+  const { data: asset, error: assetError } = await admin
     .from("portal_assets")
     .select("id,portal_id,file_path,name,mime_type,category,state")
     .eq("id", assetId)
     .maybeSingle();
 
-  if (!asset || !(await canEditPortal(supabase, asset.portal_id))) {
-    return null;
+  if (assetError) {
+    logPortalAssetFinalizationFailure(assetId, "asset_lookup", assetError);
+    return { kind: "finalization_failed" };
   }
-  if (asset.state === "ready") return asset;
+  if (!asset || !(await canEditPortal(supabase, asset.portal_id))) {
+    return { kind: "asset_not_found" };
+  }
+  if (asset.state === "ready") return { kind: "finalized", asset };
 
   const info = await admin.storage.from("portal-assets").info(asset.file_path);
-  if (info.error || !info.data.size) {
-    return null;
+  if (info.error || !info.data?.size) {
+    logPortalAssetFinalizationFailure(assetId, "storage_info", info.error);
+    return { kind: "finalization_failed" };
   }
 
   const downloaded = await admin.storage
@@ -140,9 +163,15 @@ async function finalizePortalAsset(
     storedMimeType && storedMimeType !== "application/octet-stream"
       ? storedMimeType
       : normalizeAssetMimeType(asset.mime_type);
+  if (downloaded.error || !downloaded.data) {
+    logPortalAssetFinalizationFailure(
+      assetId,
+      "storage_download",
+      downloaded.error,
+    );
+    return { kind: "finalization_failed" };
+  }
   if (
-    downloaded.error ||
-    !downloaded.data ||
     !actualMimeType ||
     !asset.name ||
     !asset.category ||
@@ -159,7 +188,8 @@ async function finalizePortalAsset(
     )
   ) {
     await deletePortalAsset(asset.id, supabase).catch(() => undefined);
-    return null;
+    logPortalAssetFinalizationFailure(assetId, "asset_validation");
+    return { kind: "invalid_asset" };
   }
 
   const { data: finalized, error } = await admin.rpc("finalize_portal_asset", {
@@ -169,10 +199,11 @@ async function finalizePortalAsset(
   });
   if (error || !finalized) {
     await deletePortalAsset(asset.id, supabase).catch(() => undefined);
-    return null;
+    logPortalAssetFinalizationFailure(assetId, "finalize_rpc", error);
+    return { kind: "finalization_failed" };
   }
 
-  return finalized;
+  return { kind: "finalized", asset: finalized };
 }
 
 export async function GET(request: Request) {
@@ -377,8 +408,17 @@ export async function PATCH(request: Request) {
     );
   }
   const finalized = await finalizePortalAsset(body.assetId, supabase);
-  if (!finalized) {
+  if (finalized.kind === "asset_not_found") {
     return NextResponse.json({ error: "asset_not_found" }, { status: 404 });
+  }
+  if (finalized.kind === "invalid_asset") {
+    return NextResponse.json({ error: "invalid_asset" }, { status: 422 });
+  }
+  if (finalized.kind === "finalization_failed") {
+    return NextResponse.json(
+      { error: "asset_finalization_failed" },
+      { status: 502 },
+    );
   }
   const admin = createAdminClient();
   const { data: asset } = await admin
@@ -398,7 +438,7 @@ export async function PATCH(request: Request) {
     );
   }
   return NextResponse.json({
-    asset: finalized,
+    asset: finalized.asset,
     previewUrl: preview.data.signedUrl,
   });
 }

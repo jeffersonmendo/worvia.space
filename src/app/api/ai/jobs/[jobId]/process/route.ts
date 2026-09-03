@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { processAiOperationJob } from "@/lib/portal/ai-workflow";
+import {
+  claimAiOperationJob,
+  processClaimedAiOperationJob,
+} from "@/lib/portal/ai-workflow";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(
@@ -23,8 +26,7 @@ export async function POST(
     .single();
   if (error || !job)
     return NextResponse.json({ error: "job_not_found" }, { status: 404 });
-  if (job.status === "completed" || job.status === "error")
-    return NextResponse.json({ job });
+  if (job.status !== "queued") return NextResponse.json({ job });
   if (job.kind !== "portal-operation") {
     return NextResponse.json(
       { error: "job_kind_not_supported" },
@@ -32,7 +34,9 @@ export async function POST(
     );
   }
   try {
-    await processAiOperationJob(supabase, job);
+    const claimedJob = await claimAiOperationJob(supabase, job.id);
+    if (!claimedJob) return NextResponse.json({ job });
+    await processClaimedAiOperationJob(supabase, claimedJob);
   } catch {
     // The durable row contains the error state for reconciliation.
   }

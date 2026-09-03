@@ -54,6 +54,17 @@ test("renders the canonical gallery array order without a second CSS order", () 
   expect(source).not.toContain("{ order }");
 });
 
+test("uses matching horizontal and vertical gaps in the Files editor grid", () => {
+  const filesEditorStart = source.indexOf("function FilesEditor({");
+  const filesEditorEnd = source.indexOf(
+    "export function SectionContentEditor({",
+    filesEditorStart,
+  );
+  const filesEditorSource = source.slice(filesEditorStart, filesEditorEnd);
+
+  expect(filesEditorSource).toContain('"grid gap-x-4 gap-y-4"');
+});
+
 test("flushes discrete section configuration changes after scheduling them", () => {
   const updateSectionStart = renderSource.indexOf(
     "function updateRenderSection(",
@@ -98,6 +109,15 @@ test("creates sections from the external picker through the RenderProject helper
   expect(sectionOrderSource).toContain("portalDocumentToRenderProject");
   expect(sectionOrderSource).toContain("applyRenderProjectDocument");
   expect(sectionOrderSource).not.toContain("createPortalSection");
+});
+
+test("marks the triggerless section picker as a non-native button trigger", () => {
+  expect(source).toContain(
+    "<DialogTrigger nativeButton={triggerNativeButton} render={trigger} />",
+  );
+  expect(sectionOrderSource).toContain(
+    'trigger={<span aria-hidden="true" />}\n        triggerNativeButton={false}',
+  );
 });
 
 test("uses the shared visual color picker and shadcn slider for image presentation", () => {

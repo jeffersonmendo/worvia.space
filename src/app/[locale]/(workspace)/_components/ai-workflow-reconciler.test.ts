@@ -1,74 +1,245 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 
-const source = await Bun.file(
-  new URL("./ai-workflow-reconciler.tsx", import.meta.url),
-).text();
-const layoutSource = await Bun.file(
-  new URL("../../layout.tsx", import.meta.url),
-).text();
-const migrationSource = await Bun.file(
-  new URL(
-    "../../../../../supabase/migrations/20260819100000_enable_ai_workflow_realtime.sql",
-    import.meta.url,
-  ),
-).text();
-const sidebarSource = await Bun.file(
-  new URL("./workspace-sidebar.tsx", import.meta.url),
-).text();
+type RealtimeHandler = (payload: { new: unknown }) => void;
+type FetchMock = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
+let realtimeHandler: RealtimeHandler | null = null;
+let jobsById: Record<string, Record<string, unknown>> = {};
+let effectCleanups: Array<() => void> = [];
+const fetchMock = mock<FetchMock>(() => Promise.resolve(new Response()));
+
+mock.module("react", () => ({
+  useEffect: (effect: () => (() => void) | undefined) => {
+    const cleanup = effect();
+    if (cleanup) effectCleanups.push(cleanup);
+  },
+  useRef: <T>(current: T) => ({ current }),
+  useState: <T>(initial: T) => [initial, () => undefined],
+}));
+
+mock.module("react/jsx-dev-runtime", () => ({
+  Fragment: Symbol.for("react.fragment"),
+  jsxDEV: () => null,
+}));
+
+mock.module("react/jsx-runtime", () => ({
+  Fragment: Symbol.for("react.fragment"),
+  jsx: () => null,
+  jsxs: () => null,
+}));
+
+mock.module("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
+
+mock.module("sonner", () => ({
+  toast: {
+    dismiss: () => undefined,
+    error: () => undefined,
+    info: () => undefined,
+    loading: () => undefined,
+    success: () => undefined,
+  },
+}));
+
+mock.module("@/components/ui/button", () => ({
+  Button: () => null,
+}));
+
+mock.module("@/components/ui/dialog", () => ({
+  Dialog: () => null,
+  DialogContent: () => null,
+  DialogDescription: () => null,
+  DialogFooter: () => null,
+  DialogHeader: () => null,
+  DialogTitle: () => null,
+}));
+
+mock.module("@/i18n/navigation", () => ({
+  usePathname: () => "/create/portal-1",
+  useRouter: () => ({ refresh: () => undefined }),
+}));
+
+mock.module("@/application/portal/editor-store", () => ({
+  usePortalEditorStore: {
+    getState: () => ({
+      autosaveByPortalId: {},
+      documentServerRevisionByPortalId: {},
+      serverHydrationGenerationByPortalId: {},
+    }),
+    subscribe: () => () => undefined,
+  },
+}));
+
+mock.module("@/lib/portal/ai-workflow-store", () => {
+  const state = {
+    get jobsById() {
+      return jobsById;
+    },
+    removeJob: (id: string) => {
+      const next = { ...jobsById };
+      delete next[id];
+      jobsById = next;
+    },
+    upsertJob: (job: Record<string, unknown>) => {
+      jobsById = { ...jobsById, [job.id as string]: job };
+    },
+  };
+  const useAiWorkflowStore = <T>(selector: (value: typeof state) => T) =>
+    selector(state);
+  useAiWorkflowStore.getState = () => state;
+  return { useAiWorkflowStore };
+});
+
+mock.module("@/lib/supabase/client", () => ({
+  createClient: () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "user-1" } } }) },
+    channel: () => ({
+      on: (_event: string, _config: unknown, handler: RealtimeHandler) => {
+        realtimeHandler = handler;
+        return {
+          subscribe: () => ({}),
+        };
+      },
+    }),
+    removeChannel: () => Promise.resolve(),
+  }),
+}));
+
+const { AiWorkflowReconciler } = await import("./ai-workflow-reconciler");
+
+async function settle() {
+  for (let i = 0; i < 8; i++) {
+    await Promise.resolve();
+    await Bun.sleep(0);
+  }
+}
+
+function mount() {
+  AiWorkflowReconciler();
+}
+
+beforeEach(() => {
+  for (const cleanup of effectCleanups) cleanup();
+  effectCleanups = [];
+  fetchMock.mockClear();
+  realtimeHandler = null;
+  jobsById = {};
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
+  globalThis.window = {
+    addEventListener: () => undefined,
+    dispatchEvent: () => true,
+    removeEventListener: () => undefined,
+  } as unknown as Window & typeof globalThis;
+});
 
 describe("AiWorkflowReconciler", () => {
-  test("refreshes the persisted server document instead of replaying completed jobs locally", () => {
-    expect(source).toContain("useRef");
-    expect(source).toContain("appliedDocumentJobByPortalRef");
-    expect(source).toContain("previousStatusesRef");
-    expect(source).not.toContain("updateDocument(");
-    expect(source).toContain("routerRef.current.refresh()");
-    expect(source).toContain("job.result?.document");
-    expect(source).toContain("aiCreatingProjectTitle");
-    expect(source).toContain("aiImproveWithAiTitle");
-    expect(source).toContain("aiAddWithAiTitle");
-    expect(source).toContain('"portal-ai-workflow-reconcile"');
-    expect(source).toContain("toast.dismiss");
-    expect(source).toContain("job.portalId");
-    expect(source).not.toContain(
-      "const appliedDocumentJobByPortal = new Map<string, string>();",
+  test("recovers a persisted loading job missing from active jobs through one bounded detail request", async () => {
+    jobsById = {
+      "persisted-job": {
+        id: "persisted-job",
+        kind: "portal-operation",
+        portalId: "portal-1",
+        requestId: "request-1",
+        status: "loading",
+      },
+    };
+    fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/api/ai/jobs")
+        return Promise.resolve(Response.json({ jobs: [] }));
+      if (url === "/api/ai/jobs/persisted-job")
+        return Promise.resolve(
+          Response.json({
+            job: {
+              error_code: null,
+              id: "persisted-job",
+              kind: "portal-operation",
+              portal_id: "portal-1",
+              portal_name: "Portal",
+              request_id: "request-1",
+              status: "error",
+              updated_at: "2026-09-02T10:00:00.000Z",
+            },
+          }),
+        );
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    mount();
+    await settle();
+
+    expect(
+      fetchMock.mock.calls.filter(
+        ([url]) => url === "/api/ai/jobs/persisted-job",
+      ),
+    ).toHaveLength(1);
+    expect(jobsById["persisted-job"]?.status).toBe("error");
+  });
+
+  test("does not process a Realtime processing event and still processes a queued operation", async () => {
+    let activeJobStatus: "processing" | "queued" | null = null;
+    fetchMock.mockImplementation(
+      (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (url === "/api/ai/jobs")
+          return Promise.resolve(
+            Response.json({
+              jobs: activeJobStatus
+                ? [
+                    {
+                      error_code: null,
+                      id: "operation-job",
+                      kind: "portal-operation",
+                      portal_id: "portal-1",
+                      portal_name: "Portal",
+                      request_id: "request-1",
+                      status: activeJobStatus,
+                      updated_at: "2026-09-02T10:00:00.000Z",
+                    },
+                  ]
+                : [],
+            }),
+          );
+        if (
+          url === "/api/ai/jobs/operation-job/process" &&
+          init?.method === "POST"
+        )
+          return Promise.resolve(new Response());
+        throw new Error(`Unexpected request: ${url}`);
+      },
     );
-    expect(source).not.toContain(
-      'const previousStatuses = new Map<string, Job["status"]>();',
-    );
-    expect(source).toContain("canRefreshCompletedDocumentJob(autosave)");
-    expect(source).toContain("usePortalEditorStore.subscribe");
-  });
 
-  test("uses Supabase Realtime without periodic polling", () => {
-    expect(source).toContain("const tRef = useRef(t);");
-    expect(source).toContain("const routerRef = useRef(router);");
-    expect(source).toContain("const pathnameRef = useRef(pathname);");
-    expect(source).toContain('.channel("ai-workflow-jobs")');
-    expect(source).toContain('event: "*"');
-    expect(source).toContain('table: "ai_workflow_jobs"');
-    expect(source).toContain("removeChannel");
-    expect(source).not.toContain("window.setInterval");
-    expect(source).not.toContain("window.clearInterval");
-    expect(source).not.toContain(", router, t, upsertJob]");
-    expect(source).toContain("createTrailingReconciler");
-    expect(source).toContain("aiJobsRequestInFlight");
-    expect(source).toContain('if (status === "SUBSCRIBED") void reconcile()');
-  });
+    mount();
+    await settle();
+    fetchMock.mockClear();
+    expect(realtimeHandler).not.toBeNull();
 
-  test("declares smooth scrolling for Next.js route transitions", () => {
-    expect(layoutSource).toContain('data-scroll-behavior="smooth"');
-  });
+    activeJobStatus = "processing";
+    realtimeHandler?.({ new: { id: "operation-job", status: "processing" } });
+    await settle();
 
-  test("publishes AI job changes for Supabase Realtime", () => {
-    expect(migrationSource).toContain(
-      "alter publication supabase_realtime add table public.ai_workflow_jobs;",
-    );
-  });
+    expect(
+      fetchMock.mock.calls.filter(
+        ([url, init]) =>
+          url === "/api/ai/jobs/operation-job/process" &&
+          (init as RequestInit | undefined)?.method === "POST",
+      ),
+    ).toHaveLength(0);
 
-  test("keeps active AI workflows visible from every sidebar", () => {
-    expect(sidebarSource).not.toContain("currentProjectId === job.portalId");
-    expect(sidebarSource).toContain("jobsById");
-    expect(sidebarSource).toContain("pathname.match(/\\/create\\/([^/]+)/)");
+    activeJobStatus = "queued";
+    realtimeHandler?.({ new: { id: "operation-job", status: "queued" } });
+    await settle();
+
+    expect(
+      fetchMock.mock.calls.filter(
+        ([url, init]) =>
+          url === "/api/ai/jobs/operation-job/process" &&
+          (init as RequestInit | undefined)?.method === "POST",
+      ),
+    ).toHaveLength(1);
   });
 });

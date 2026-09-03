@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { RenderActions } from "./render-actions";
 import { RenderCollectionAddTile } from "./render-collection-add-tile";
 import { ordered } from "./render-utils";
@@ -39,15 +40,18 @@ export function RenderFonts({
   editable?: boolean;
   addAction?: RenderActionsData[number];
 }) {
-  const visibleItems = ordered(items).filter((item) => item.visible);
-  const fontFaces = visibleItems.map(fontFaceFor).filter(Boolean).join("\n");
+  const fonts = ordered(items);
+  const fontFaces = fonts.map(fontFaceFor).filter(Boolean).join("\n");
 
   return (
     <div className="flex flex-col gap-4">
       {fontFaces ? <style>{fontFaces}</style> : null}
-      {visibleItems.map((font) => (
+      {fonts.map((font) => (
         <div
-          className="group/item relative"
+          className={cn(
+            "group/item relative",
+            editable && !font.visible && "opacity-40",
+          )}
           key={font.id}
           style={{
             fontFamily: `"${renderedFontFamily(font)}"`,

@@ -12,6 +12,14 @@ export type UploadedFile = {
 type FileUploadOptions = {
   accept?: string;
   maxSize?: number;
+  onPreflight?: (result: {
+    acceptedFiles: File[];
+    rejectedFileCount: number;
+  }) => void;
+  preflightFiles?: (files: File[]) => Promise<{
+    acceptedFiles: File[];
+    rejectedFileCount: number;
+  }>;
   validateFile?: (file: File, existingFiles: File[]) => string | undefined;
 };
 
@@ -29,64 +37,76 @@ function matchesAccept(file: File, accept: string) {
 export function useFileUpload({
   accept = "*/*",
   maxSize,
+  onPreflight,
+  preflightFiles,
   validateFile,
 }: FileUploadOptions = {}) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const filesRef = useRef(files);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPreflighting, setIsPreflighting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback(
-    (incoming: File[]) => {
-      const nextErrors: string[] = [];
-      const validFiles: File[] = [];
-      const acceptedFiles = filesRef.current.map(({ file }) => file);
-      for (const file of incoming) {
-        if (!matchesAccept(file, accept)) {
-          nextErrors.push(`${file.name}: File type is not supported.`);
-          continue;
+    async (incoming: File[]) => {
+      setIsPreflighting(true);
+      try {
+        const preflight = preflightFiles
+          ? await preflightFiles(incoming)
+          : { acceptedFiles: incoming, rejectedFileCount: 0 };
+        if (preflight.rejectedFileCount > 0) onPreflight?.(preflight);
+        const nextErrors: string[] = [];
+        const validFiles: File[] = [];
+        const acceptedFiles = filesRef.current.map(({ file }) => file);
+        for (const file of preflight.acceptedFiles) {
+          if (!matchesAccept(file, accept)) {
+            nextErrors.push(`${file.name}: File type is not supported.`);
+            continue;
+          }
+          if (maxSize && file.size > maxSize) {
+            nextErrors.push(
+              `${file.name}: File exceeds the ${Math.round(maxSize / 1024 / 1024)}MB limit.`,
+            );
+            continue;
+          }
+          const validationError = validateFile?.(file, acceptedFiles);
+          if (validationError) {
+            nextErrors.push(`${file.name}: ${validationError}`);
+            continue;
+          }
+          validFiles.push(file);
+          acceptedFiles.push(file);
         }
-        if (maxSize && file.size > maxSize) {
-          nextErrors.push(
-            `${file.name}: File exceeds the ${Math.round(maxSize / 1024 / 1024)}MB limit.`,
-          );
-          continue;
-        }
-        const validationError = validateFile?.(file, acceptedFiles);
-        if (validationError) {
-          nextErrors.push(`${file.name}: ${validationError}`);
-          continue;
-        }
-        validFiles.push(file);
-        acceptedFiles.push(file);
-      }
 
-      setErrors(nextErrors);
-      setFiles((current) => {
-        const existing = new Set(
-          current.map(
-            ({ file }) => `${file.name}:${file.size}:${file.lastModified}`,
-          ),
-        );
-        const additions = validFiles
-          .filter((file) => {
-            const key = `${file.name}:${file.size}:${file.lastModified}`;
-            if (existing.has(key)) return false;
-            existing.add(key);
-            return true;
-          })
-          .map((file) => ({
-            file,
-            id: `${file.name}-${file.size}-${file.lastModified}-${createRandomId()}`,
-            preview: file.type.startsWith("image/")
-              ? URL.createObjectURL(file)
-              : undefined,
-          }));
-        return [...current, ...additions];
-      });
+        setErrors(nextErrors);
+        setFiles((current) => {
+          const existing = new Set(
+            current.map(
+              ({ file }) => `${file.name}:${file.size}:${file.lastModified}`,
+            ),
+          );
+          const additions = validFiles
+            .filter((file) => {
+              const key = `${file.name}:${file.size}:${file.lastModified}`;
+              if (existing.has(key)) return false;
+              existing.add(key);
+              return true;
+            })
+            .map((file) => ({
+              file,
+              id: `${file.name}-${file.size}-${file.lastModified}-${createRandomId()}`,
+              preview: file.type.startsWith("image/")
+                ? URL.createObjectURL(file)
+                : undefined,
+            }));
+          return [...current, ...additions];
+        });
+      } finally {
+        setIsPreflighting(false);
+      }
     },
-    [accept, maxSize, validateFile],
+    [accept, maxSize, onPreflight, preflightFiles, validateFile],
   );
 
   const removeFile = useCallback((id?: string) => {
@@ -122,7 +142,7 @@ export function useFileUpload({
   );
 
   return [
-    { files, isDragging, errors },
+    { files, isDragging, isPreflighting, errors },
     {
       handleDragEnter: (event: React.DragEvent) => {
         event.preventDefault();
@@ -136,7 +156,7 @@ export function useFileUpload({
       handleDrop: (event: React.DragEvent) => {
         event.preventDefault();
         setIsDragging(false);
-        addFiles(Array.from(event.dataTransfer.files));
+        void addFiles(Array.from(event.dataTransfer.files));
       },
       openFileDialog: () => inputRef.current?.click(),
       clearFiles,
@@ -144,7 +164,7 @@ export function useFileUpload({
       getInputProps: () => ({
         accept,
         onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-          addFiles(Array.from(event.target.files ?? []));
+          void addFiles(Array.from(event.target.files ?? []));
           event.target.value = "";
         },
         ref: inputRef,
