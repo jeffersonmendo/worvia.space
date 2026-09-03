@@ -114,6 +114,26 @@ describe("AutosaveQueue", () => {
     expect(queue.status).toBe("saved");
   });
 
+  test("caps retryable snapshot persistence at two attempts", async () => {
+    let attempts = 0;
+    const queue = new AutosaveQueue<string>({
+      delay: 10_000,
+      save: async () => {
+        attempts += 1;
+        throw new Error("offline");
+      },
+    });
+
+    queue.schedule("latest");
+
+    await expect(queue.flush()).rejects.toThrow("offline");
+    await expect(queue.flush()).rejects.toThrow("offline");
+    await expect(queue.flush()).rejects.toThrow("offline");
+
+    expect(attempts).toBe(2);
+    expect(queue.status).toBe("error");
+  });
+
   test("a conflict preserves the newest blocked successor for explicit recovery", async () => {
     class Conflict extends Error {}
     let attempts = 0;

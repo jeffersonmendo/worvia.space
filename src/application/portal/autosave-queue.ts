@@ -1,4 +1,6 @@
 export type AutosaveStatus = "idle" | "saving" | "saved" | "error" | "conflict";
+const MAX_RETRYABLE_AUTOSAVE_ATTEMPTS = 2;
+
 export type AutosaveHandoff<T> = {
   error: unknown;
   nonRetryable?: boolean;
@@ -29,6 +31,8 @@ export class AutosaveQueue<T> {
   #inFlight: Promise<void> | null = null;
   #pending: T | undefined;
   #recovery: T | undefined;
+  #retryableAttempts = 0;
+  #retryableError: unknown;
   #status: AutosaveStatus = "idle";
   #terminalError: unknown;
   #timer: ReturnType<typeof setTimeout> | null = null;
@@ -57,6 +61,8 @@ export class AutosaveQueue<T> {
       this.#recovery = value;
       return;
     }
+    this.#retryableAttempts = 0;
+    this.#retryableError = undefined;
     this.#pending = value;
     this.#dueAt = Date.now() + this.#delay;
     this.#setStatus("saving");
@@ -192,15 +198,24 @@ export class AutosaveQueue<T> {
       return Promise.resolve();
     }
     if (this.#inFlight) return this.#inFlight;
+    if (this.#retryableAttempts >= MAX_RETRYABLE_AUTOSAVE_ATTEMPTS) {
+      const error =
+        this.#retryableError ?? new Error("Autosave retry limit reached");
+      this.#setStatus("error", error);
+      return Promise.reject(error);
+    }
 
     const value = this.#pending;
     this.#pending = undefined;
     this.#setStatus("saving");
+    this.#retryableAttempts += 1;
 
     const operation = (async () => {
       let restoredFailedSnapshot = false;
       try {
         await this.#save(value);
+        this.#retryableAttempts = 0;
+        this.#retryableError = undefined;
         this.#setStatus(this.#pending === undefined ? "saved" : "saving");
       } catch (error) {
         const retryable = this.#shouldRetry(error);
@@ -210,9 +225,14 @@ export class AutosaveQueue<T> {
           this.#terminalError = error;
           this.#conflictAcknowledged = false;
         }
-        if (retryable && this.#pending === undefined) {
-          this.#pending = value;
-          restoredFailedSnapshot = true;
+        if (retryable) {
+          this.#retryableError = error;
+          if (this.#pending === undefined) {
+            this.#pending = value;
+            restoredFailedSnapshot = true;
+          } else {
+            this.#retryableAttempts = 0;
+          }
         }
         this.#setStatus(
           retryable ? "error" : "conflict",
